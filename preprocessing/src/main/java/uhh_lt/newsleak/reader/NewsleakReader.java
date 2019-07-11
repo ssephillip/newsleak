@@ -70,6 +70,7 @@ public abstract class NewsleakReader extends CasCollectionReader_ImplBase {
 		scanner.close();
 
 		bodyText = sb.toString();
+		/** TODO 2019-07-04 ps: wieder einkommentieren
 		if (bodyText.length() != origLength) {
 			logger.log(Level.INFO, "Multiple linebreaks have been collapsed.");
 		}
@@ -77,6 +78,7 @@ public abstract class NewsleakReader extends CasCollectionReader_ImplBase {
 			logger.log(Level.INFO, "Document length exceeds maximum (" + maxDocumentLength + "): " + bodyText.length());
 			bodyText = bodyText.substring(0, maxDocumentLength);
 		}
+		 **/
 
 		return bodyText;
 	}
