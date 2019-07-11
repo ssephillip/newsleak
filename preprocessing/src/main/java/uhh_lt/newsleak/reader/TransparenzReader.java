@@ -125,9 +125,6 @@ public class TransparenzReader extends NewsleakReader {
         metaCas.setTimestamp("1900-01-01"); //TODO 2019-07-04 ps: richtiges Datum verwenden
         metaCas.addToIndexes();
 
-        // metadata
-        // is assumed to be provided from external prcessing in a separate file
-
     }
 
     /*
@@ -223,7 +220,7 @@ public class TransparenzReader extends NewsleakReader {
             }
         } catch (IllegalArgumentException e) {
             //TODO 2019-06-30 ps: vernünftig loggen; warsch. vernünftiges error handling einbauen
-            e.printStackTrace();
+            System.out.println("Malformed document: "+outerId);
             return new ArrayList<>();
         }
 
