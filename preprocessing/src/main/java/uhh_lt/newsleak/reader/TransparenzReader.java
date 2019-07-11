@@ -192,8 +192,8 @@ public class TransparenzReader extends NewsleakReader {
 
 
         try {
+
             if (!isSolrDocWellFormed(docResFormats, docResUrls, docResFulltexts, outerId)) {
-                malformedSolrDocCounter++;
                 throw new IllegalArgumentException();  //TODO 2019-06-30, ps: Log the error
             }
 
@@ -219,8 +219,8 @@ public class TransparenzReader extends NewsleakReader {
                 }
             }
         } catch (IllegalArgumentException e) {
-            //TODO 2019-06-30 ps: vernünftig loggen; warsch. vernünftiges error handling einbauen
-            System.out.println("Malformed document: "+outerId);
+            malformedSolrDocCounter++;
+            System.out.println("Malformed document: "+outerId); //TODO 2019-06-30 ps: vernünftig loggen; warsch. vernünftiges error handling einbauen
             return new ArrayList<>();
         }
 
