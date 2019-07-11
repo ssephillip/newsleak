@@ -230,8 +230,8 @@ public class TransparenzReader extends NewsleakReader {
 
     private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResFulltexts, String outerId) {
 
-        return (docResFormats == null || docResUrls == null || docResFulltexts == null || outerId == null) ||
-                (docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size());
+        return !(docResFormats == null || docResUrls == null || docResFulltexts == null || outerId == null ||
+                docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size());
     }
 
     private void printDebugStatistics(int numOfSolrDocs) {
