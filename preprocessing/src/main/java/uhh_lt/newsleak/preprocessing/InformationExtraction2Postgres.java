@@ -41,10 +41,7 @@ import uhh_lt.newsleak.annotator.LanguageDetector;
 import uhh_lt.newsleak.annotator.NerMicroservice;
 import uhh_lt.newsleak.annotator.SentenceCleaner;
 import uhh_lt.newsleak.annotator.SegmenterICU;
-import uhh_lt.newsleak.reader.HooverElasticsearchReader;
-import uhh_lt.newsleak.reader.NewsleakCsvStreamReader;
-import uhh_lt.newsleak.reader.NewsleakElasticsearchReader;
-import uhh_lt.newsleak.reader.NewsleakReader;
+import uhh_lt.newsleak.reader.*;
 import uhh_lt.newsleak.resources.DictionaryResource;
 import uhh_lt.newsleak.resources.ElasticsearchResource;
 import uhh_lt.newsleak.resources.HooverResource;
@@ -215,7 +212,12 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					HooverElasticsearchReader.RESOURCE_METADATA, this.getMetadataResourceDescription(),
 					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
 					this.maxDocumentLength);
-		} else {
+		} else if (type.equals("transparenz")) {
+			reader = CollectionReaderFactory.createReaderDescription(TransparenzReader.class, this.typeSystem,
+					NewsleakCsvStreamReader.PARAM_DEFAULT_LANG, this.defaultLanguage,
+					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
+					this.maxDocumentLength);
+		}else {
 			this.logger.log(Level.SEVERE, "Unknown reader type: " + type);
 			System.exit(1);
 		}
