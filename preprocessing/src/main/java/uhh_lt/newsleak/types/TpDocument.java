@@ -4,10 +4,19 @@ import java.util.Objects;
 
 public class TpDocument {
 
-    String tpId;
-    String newsleakId;
+    /** The id of the outer document (possibly referencing multiple TpDocuments (inner documents)) */
+    String outerId;
+
+    /** The id of the inner document (represented by this object). */
+    String innerId;
+
+    /** The URL to the original resource. */
     String resUrl;
+
+    /** The fulltext of this (inner) document. */
     String resFulltext;
+
+    /** The format of this (inner) document. */
     String resFormat;
 
 
@@ -16,28 +25,28 @@ public class TpDocument {
         if (this == o) return true;
         if (!(o instanceof TpDocument)) return false;
         TpDocument that = (TpDocument) o;
-        return Objects.equals(newsleakId, that.newsleakId);
+        return Objects.equals(innerId, that.innerId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(newsleakId);
+        return Objects.hash(innerId);
     }
 
-    public String getTpId() {
-        return tpId;
+    public String getOuterId() {
+        return outerId;
     }
 
-    public void setTpId(String tpId) {
-        this.tpId = tpId;
+    public void setOuterId(String outerId) {
+        this.outerId = outerId;
     }
 
-    public String getNewsleakId() {
-        return newsleakId;
+    public String getInnerId() {
+        return innerId;
     }
 
-    public void setNewsleakId(String newsleakId) {
-        this.newsleakId = newsleakId;
+    public void setInnerId(String innerId) {
+        this.innerId = innerId;
     }
 
     public String getResUrl() {
