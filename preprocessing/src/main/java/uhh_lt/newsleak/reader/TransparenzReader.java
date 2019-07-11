@@ -1,7 +1,6 @@
 package uhh_lt.newsleak.reader;
 
 
-import org.apache.commons.csv.CSVRecord;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -55,7 +54,6 @@ public class TransparenzReader extends NewsleakReader {
 
     /**
      * Internal Variables
-     *
      */
 
     /** Number of documents where at least one of the necessary fields is missing in the Solr Index. */
@@ -66,11 +64,11 @@ public class TransparenzReader extends NewsleakReader {
 
 
     // Main method for test purposes
-    public static void main(String[] args){
+    public static void main(String[] args) {
         TransparenzReader tpReader = new TransparenzReader();
         try {
             tpReader.initialize(null);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -79,99 +77,20 @@ public class TransparenzReader extends NewsleakReader {
     @Override
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
-
-        HttpSolrClient solrClient =  new HttpSolrClient.Builder(solrCoreAddress).build();
-        SolrQuery idQuery = new SolrQuery("res_format:\"PDF\"");
-        idQuery.addField("id");
-        idQuery.addField("res_format");
-        idQuery.addField("res_url");
-        idQuery.addField("res_fulltext");
-        idQuery.setRows(Integer.MAX_VALUE);
-
-
-        QueryResponse response = null;
-        try {
-            response = solrClient.query(idQuery);
-        }catch(SolrServerException | IOException e){
-            e.printStackTrace(); //TODO 2019-06-24, ps: vernünftiges Error-Handling einbauen
-        }
-
-        //TODO 2019-30-06, ps: sinnvoll abfangen, wenn response == null ist
-
-
-        SolrDocumentList solrDocuments = response.getResults();
-
-
-
         List<TpDocument> allTpDocuments = new ArrayList<>();
 
-        for(SolrDocument solrDocument: solrDocuments){
-           List<TpDocument> innerTpDocuments = getTpDocsFromInnerDocs(solrDocument);
-           allTpDocuments.addAll(innerTpDocuments);
+        SolrDocumentList solrDocuments = getDocumentsFromSolrIndex();
 
+        for (SolrDocument solrDocument : solrDocuments) {
+            List<TpDocument> innerTpDocuments = getInnerDocsAsTpDocs(solrDocument);
+            allTpDocuments.addAll(innerTpDocuments);
         }
 
         totalDocuments = allTpDocuments.size();
         tpDocumentIterator = allTpDocuments.iterator();
 
-        System.out.println("Number of malformed SolrDocuments: "+ malformedSolrDocCounter);
-        System.out.println("Average number of inner PDF: "+ ((float) numOfInnerPdf)/solrDocuments.size());
-        System.out.println("blub");
 
-
-
-    }
-
-
-//    private SolrDocumentList getDocumentsFromSolrIndex(){
-//
-//    }
-
-    private List<TpDocument> getTpDocsFromInnerDocs(SolrDocument solrDoc){
-
-        List<TpDocument> tpDocuments = new ArrayList<>();
-
-        List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
-        List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        List<String> docResFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
-        String tpId = (String) solrDoc.getFieldValue("id");
-
-        if(docResFormats == null || docResUrls == null || docResFulltexts == null || tpId == null){
-            //TODO 2019-06-30, ps: Log the error und evtl. korrekte fehler behandlung
-            System.out.println("Malformed SolrDocument \\p TpId: "+ tpId);
-            malformedSolrDocCounter++;
-            return new ArrayList<>();
-        }
-
-
-        int numOfInnerDocs = docResFormats.size();
-
-        try {
-            for (int i = 0; i < numOfInnerDocs; i++) {
-                String innerDocFormat = docResFormats.get(i);
-                if (innerDocFormat.equals("PDF")) {
-                    numOfInnerPdf++;
-                    String url = docResUrls.get(i);
-                    String fulltext = docResFulltexts.get(i);
-
-
-                    TpDocument tpDocument = new TpDocument();
-                    tpDocument.setResFormat(innerDocFormat);
-                    tpDocument.setNewsleakId(url);
-                    tpDocument.setResUrl(url);
-                    tpDocument.setResFulltext(fulltext);
-                    tpDocument.setTpId(tpId);
-
-                    tpDocuments.add(tpDocument);
-                }
-            }
-        }catch(Exception e){
-            //TODO 2019-06-30 ps: vernünftig loggen; warsch. vernünftiges error handling einbauen
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-
-        return tpDocuments;
+        printDebugStatistics(solrDocuments.size());
     }
 
 
@@ -194,7 +113,7 @@ public class TransparenzReader extends NewsleakReader {
         TpDocument document = tpDocumentIterator.next();
         String docId = Integer.toString(currentDocument);
 
-        if(document.getResFulltext() == null){
+        if (document.getResFulltext() == null) {
             System.out.println("blub");
         }
         jcas.setDocumentText(cleanBodyText(document.getResFulltext()));
@@ -217,8 +136,8 @@ public class TransparenzReader extends NewsleakReader {
      * @see org.apache.uima.collection.base_cpm.BaseCollectionReader#getProgress()
      */
     public Progress[] getProgress() {
-        return new Progress[] { new ProgressImpl(Long.valueOf(currentDocument).intValue(),
-                Long.valueOf(totalDocuments).intValue(), Progress.ENTITIES) };
+        return new Progress[]{new ProgressImpl(Long.valueOf(currentDocument).intValue(),
+                Long.valueOf(totalDocuments).intValue(), Progress.ENTITIES)};
     }
 
     /*
@@ -232,5 +151,95 @@ public class TransparenzReader extends NewsleakReader {
         return tpDocumentIterator.hasNext();
     }
 
+
+
+
+    private SolrDocumentList getDocumentsFromSolrIndex() throws ResourceInitializationException {
+        QueryResponse response = null;
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
+        SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
+        documentQuery.addField("id");
+        documentQuery.addField("res_format");
+        documentQuery.addField("res_url");
+        documentQuery.addField("res_fulltext");
+        documentQuery.setRows(Integer.MAX_VALUE);
+
+
+        try {
+            response = solrClient.query(documentQuery);
+
+            if (response == null) {
+                throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
+            }
+        } catch (SolrServerException | IOException e) {
+            e.printStackTrace(); //TODO 2019-06-24, ps: vernünftiges Error-Handling einbauen (loggen und nicht nur den stack printen)
+            throw new ResourceInitializationException();
+        }
+
+
+        return response.getResults();
+    }
+
+
+
+
+    private List<TpDocument> getInnerDocsAsTpDocs(SolrDocument solrDoc) {
+
+        List<TpDocument> tpDocuments = new ArrayList<>();
+
+        List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
+        List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
+        List<String> docResFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
+        String outerId = (String) solrDoc.getFieldValue("id");
+
+
+        try {
+            if (!isSolrDocWellFormed(docResFormats, docResUrls, docResFulltexts, outerId)) {
+                malformedSolrDocCounter++;
+                throw new IllegalArgumentException();  //TODO 2019-06-30, ps: Log the error
+            }
+
+
+            int numOfInnerDocs = docResFormats.size();
+
+            for (int i = 0; i < numOfInnerDocs; i++) {
+                String innerDocFormat = docResFormats.get(i);
+
+                if (innerDocFormat.equals("PDF")) {
+                    String url = docResUrls.get(i);
+                    String fulltext = docResFulltexts.get(i);
+
+                    TpDocument tpDocument = new TpDocument();
+                    tpDocument.setResFormat(innerDocFormat);
+                    tpDocument.setInnerId(url);
+                    tpDocument.setResUrl(url);
+                    tpDocument.setResFulltext(fulltext);
+                    tpDocument.setOuterId(outerId);
+
+                    tpDocuments.add(tpDocument);
+                    numOfInnerPdf++;
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            //TODO 2019-06-30 ps: vernünftig loggen; warsch. vernünftiges error handling einbauen
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+
+        return tpDocuments;
+    }
+
+
+    private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResFulltexts, String outerId) {
+
+        return (docResFormats == null || docResUrls == null || docResFulltexts == null || outerId == null) ||
+                (docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size());
+    }
+
+    private void printDebugStatistics(int numOfSolrDocs) {
+        System.out.println("Number of malformed SolrDocuments: " + malformedSolrDocCounter);
+        System.out.println("Average number of inner PDF: " + ((float) numOfInnerPdf) / numOfSolrDocs);
+    }
 
 }
