@@ -429,7 +429,7 @@ public class HooverElasticsearchReader extends NewsleakReader {
 	 */
 	public boolean hasNext() throws IOException, CollectionException {
 		if (currentRecord < totalRecords) {
-			currentRecord++;
+			currentRecord++; //TODO 2019-06-24, ps: Stimmt das? (das currentrecords erhöht wird?) wenn ja, warum?
 			return true;
 		} else {
 			return false;
