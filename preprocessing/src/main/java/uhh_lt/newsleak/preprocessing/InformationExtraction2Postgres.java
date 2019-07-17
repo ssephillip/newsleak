@@ -42,12 +42,8 @@ import uhh_lt.newsleak.annotator.NerMicroservice;
 import uhh_lt.newsleak.annotator.SentenceCleaner;
 import uhh_lt.newsleak.annotator.SegmenterICU;
 import uhh_lt.newsleak.reader.*;
-import uhh_lt.newsleak.resources.DictionaryResource;
-import uhh_lt.newsleak.resources.ElasticsearchResource;
-import uhh_lt.newsleak.resources.HooverResource;
-import uhh_lt.newsleak.resources.LanguageDetectorResource;
-import uhh_lt.newsleak.resources.PostgresResource;
-import uhh_lt.newsleak.resources.TextLineWriterResource;
+import uhh_lt.newsleak.resources.*;
+import uhh_lt.newsleak.writer.Doc2VecWriter;
 import uhh_lt.newsleak.writer.ElasticsearchDocumentWriter;
 import uhh_lt.newsleak.writer.PostgresDbWriter;
 import uhh_lt.newsleak.writer.TextLineWriter;
@@ -359,16 +355,10 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// alternative writers for testing purposes (rawtext, xmi) ...
 			// ... raw text writer
-			// ExternalResourceDescription resourceLinewriter =
-			// ExternalResourceFactory.createExternalResourceDescription(
-			// TextLineWriterResource.class,
-			// TextLineWriterResource.PARAM_OUTPUT_FILE, this.dataDirectory + File.separator
-			// + "output.txt");
-			// AnalysisEngineDescription linewriter =
-			// AnalysisEngineFactory.createEngineDescription(
-			// TextLineWriter.class,
-			// TextLineWriter.RESOURCE_LINEWRITER, resourceLinewriter
-			// );
+			 ExternalResourceDescription resourceDoc2VecWriter =
+			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.dataDirectory + File.separator + "doc2vec_train.txt");
+			 AnalysisEngineDescription doc2vecWriter =
+			 AnalysisEngineFactory.createEngineDescription(Doc2VecWriter.class, Doc2VecWriter.RESOURCE_DOC2VECWRITER, resourceDoc2VecWriter);
 			//
 			// ... xmi writer
 			// AnalysisEngineDescription xmi =
@@ -388,7 +378,8 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// define pipeline
 			AnalysisEngineDescription pipeline = AnalysisEngineFactory.createEngineDescription(sentenceICU,
-					sentenceCleaner, dictionaries, heideltime, nerMicroservice, keyterms,
+					sentenceCleaner, //dictionaries, heideltime, nerMicroservice, keyterms,
+					doc2vecWriter,
 					// linewriter,
 					// xmi,
 					postgresWriter);
