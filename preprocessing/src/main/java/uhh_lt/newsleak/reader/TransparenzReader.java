@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TransparenzReader extends NewsleakReader {
 
@@ -87,6 +89,7 @@ public class TransparenzReader extends NewsleakReader {
         }
 
         totalDocuments = allTpDocuments.size();
+        currentDocument = 0;
         tpDocumentIterator = allTpDocuments.iterator();
 
 
@@ -113,13 +116,12 @@ public class TransparenzReader extends NewsleakReader {
         TpDocument document = tpDocumentIterator.next();
         String docId = Integer.toString(currentDocument);
 
-        if (document.getResFulltext() == null) {
-            System.out.println("blub");
-        }
-        jcas.setDocumentText(cleanBodyText(document.getResFulltext()));
-        jcas.setDocumentLanguage("de");
+        jcas.setDocumentText(document.getResUrl()+"\t"+document.getResFulltext());
+
+
 
         // Set metadata
+        //TODO brauche ich das?
         Metadata metaCas = new Metadata(jcas);
         metaCas.setDocId(docId);
         metaCas.setTimestamp("1900-01-01"); //TODO 2019-07-04 ps: richtiges Datum verwenden
@@ -137,6 +139,7 @@ public class TransparenzReader extends NewsleakReader {
                 Long.valueOf(totalDocuments).intValue(), Progress.ENTITIES)};
     }
 
+
     /*
      * (non-Javadoc)
      *
@@ -149,6 +152,13 @@ public class TransparenzReader extends NewsleakReader {
     }
 
 
+    private String removeMultWhitespaces(String text){
+        Pattern p = Pattern.compile("[\\s\\v]+");
+        Matcher m = p.matcher(text);
+        String cleanedText = m.replaceAll(" ");
+
+        return cleanedText;
+    }
 
 
     private SolrDocumentList getDocumentsFromSolrIndex() throws ResourceInitializationException {
@@ -211,7 +221,7 @@ public class TransparenzReader extends NewsleakReader {
                     tpDocument.setResFormat(innerDocFormat);
                     tpDocument.setInnerId(url);
                     tpDocument.setResUrl(url);
-                    tpDocument.setResFulltext(fulltext);
+                    tpDocument.setResFulltext(removeMultWhitespaces(fulltext).trim());
                     tpDocument.setOuterId(outerId);
 
                     tpDocuments.add(tpDocument);
