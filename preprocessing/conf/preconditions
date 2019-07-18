@@ -1,0 +1,9 @@
+-install python3
+-install numpy (pip3)
+-install python3 setup tools
+-install nmslib (pip3)
+-install libc6-dev (for c compiling)
+-install wheel (pip3)
+-install setuptools (pip3)
+-install python3-dev (warsch. doch nicht)
+-instal min. einen von den folgenden (für nmslib): gcc libxml2-dev libxslt1-dev zlib1g-dev g++
