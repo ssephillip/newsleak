@@ -191,7 +191,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 				IndexResponse response = client
 						.prepareIndex(esResource.getIndex(), ES_TYPE_DOCUMENT, newsleakDocId.toString())
 						.setSource(builder).get();
-				logger.log(Level.INFO, response.toString());
+				//logger.log(Level.INFO, response.toString());  TODO ps 2019-07-17 wieder einkommentieren
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ParseException e) {

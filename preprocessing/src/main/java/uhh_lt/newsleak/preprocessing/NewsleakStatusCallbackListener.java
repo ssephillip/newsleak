@@ -20,7 +20,7 @@ import org.apache.uima.util.Logger;
 public class NewsleakStatusCallbackListener implements StatusCallbackListener {
 
 	/** The Constant ENTITY_CNT_FOR_LOG. */
-	private static final int ENTITY_CNT_FOR_LOG = 1;
+	private static final int ENTITY_CNT_FOR_LOG = 100;
 	
 	/** The logger. */
 	private Logger logger;

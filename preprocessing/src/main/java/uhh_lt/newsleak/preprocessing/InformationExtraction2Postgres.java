@@ -356,7 +356,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 			// alternative writers for testing purposes (rawtext, xmi) ...
 			// ... raw text writer
 			 ExternalResourceDescription resourceDoc2VecWriter =
-			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.dataDirectory + File.separator + "doc2vec_train.txt");
+			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.dataDirectory + File.separator + "/doc2vec/doc2vec_train_with_id.txt");
 			 AnalysisEngineDescription doc2vecWriter =
 			 AnalysisEngineFactory.createEngineDescription(Doc2VecWriter.class, Doc2VecWriter.RESOURCE_DOC2VECWRITER, resourceDoc2VecWriter);
 			//
