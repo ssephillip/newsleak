@@ -210,7 +210,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					this.maxDocumentLength);
 		} else if (type.equals("transparenz")) {
 			reader = CollectionReaderFactory.createReaderDescription(TransparenzReader.class, this.typeSystem,
-					NewsleakCsvStreamReader.PARAM_DEFAULT_LANG, this.defaultLanguage,
+					NewsleakCsvStreamReader.PARAM_DEFAULT_LANG, this.defaultLanguage, TransparenzReader.RESOURCE_METADATA, this.getMetadataResourceDescription(),
 					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
 					this.maxDocumentLength);
 		}else {
@@ -378,7 +378,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// define pipeline
 			AnalysisEngineDescription pipeline = AnalysisEngineFactory.createEngineDescription(sentenceICU,
-					sentenceCleaner, //dictionaries, heideltime, nerMicroservice, keyterms,
+					sentenceCleaner, dictionaries, heideltime, nerMicroservice, keyterms,
 					doc2vecWriter,
 					// linewriter,
 					// xmi,

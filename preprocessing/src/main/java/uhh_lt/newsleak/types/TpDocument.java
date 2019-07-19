@@ -20,6 +20,13 @@ public class TpDocument {
     String resFormat;
 
 
+    /** The outer document name. */
+    String title;
+
+    /** The inner document name */
+    String resName;
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,6 +78,23 @@ public class TpDocument {
 
     public void setResFormat(String resFormat) {
         this.resFormat = resFormat;
+    }
+
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getResName() {
+        return resName;
+    }
+
+    public void setResName(String resName) {
+        this.resName = resName;
     }
 
 

@@ -1,6 +1,7 @@
 package uhh_lt.newsleak.reader;
 
 
+import com.google.gson.JsonElement;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -12,10 +13,12 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
+import uhh_lt.newsleak.resources.MetadataResource;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.TpDocument;
 
@@ -27,6 +30,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TransparenzReader extends NewsleakReader {
+
+    /** The Constant RESOURCE_METADATA. */
+    public static final String RESOURCE_METADATA = "metadataResource";
+
+    /** The metadata resource. */
+    @ExternalResource(key = RESOURCE_METADATA)
+    private MetadataResource metadataResource;
 
     /** The Constant PARAM_DEFAULT_LANG. */
     public static final String PARAM_DEFAULT_LANG = "defaultLanguage";
@@ -119,7 +129,6 @@ public class TransparenzReader extends NewsleakReader {
         jcas.setDocumentText(document.getResUrl()+"\t"+document.getResFulltext());
 
 
-
         // Set metadata
         //TODO brauche ich das?
         Metadata metaCas = new Metadata(jcas);
@@ -127,6 +136,40 @@ public class TransparenzReader extends NewsleakReader {
         metaCas.setTimestamp("1900-01-01"); //TODO 2019-07-04 ps: richtiges Datum verwenden
         metaCas.addToIndexes();
 
+
+
+        // write external metadata
+        ArrayList<List<String>> metadata = new ArrayList<List<String>>();
+
+        // filename, subject, path
+        String fileName = "";
+        String field = document.getTitle(); //Das ist nicht wirklich der Filename
+        if (field != null) {
+            fileName = field;
+            metadata.add(metadataResource.createTextMetadata(docId, "filename", fileName));
+        }
+        field = document.getResName();
+        if (field != null) {
+            metadata.add(metadataResource.createTextMetadata(docId, "subject", field));
+        } else {
+            if (!fileName.isEmpty()) {
+                metadata.add(metadataResource.createTextMetadata(docId, "subject", fileName));
+            }
+        }
+
+        field = document.getResUrl();
+        if(field != null) {
+            // Source Id
+            metadata.add(metadataResource.createTextMetadata(docId, "Link", field));
+        }
+
+        // file-type
+        field = "PDF";
+        if (field != null) {
+            metadata.add(metadataResource.createTextMetadata(docId, "filetype", field));
+        }
+
+        metadataResource.appendMetadata(metadata);
     }
 
     /*
@@ -170,6 +213,8 @@ public class TransparenzReader extends NewsleakReader {
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
         documentQuery.addField("res_fulltext");
+        documentQuery.addField("res_name");
+        documentQuery.addField("title");
         documentQuery.setRows(Integer.MAX_VALUE);
 
 
@@ -198,7 +243,9 @@ public class TransparenzReader extends NewsleakReader {
         List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
         List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
         List<String> docResFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
+        List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
         String outerId = (String) solrDoc.getFieldValue("id");
+        String outerName = (String) solrDoc.getFieldValue("title");
 
 
         try {
@@ -216,13 +263,19 @@ public class TransparenzReader extends NewsleakReader {
                 if (innerDocFormat.equals("PDF")) {
                     String url = docResUrls.get(i);
                     String fulltext = docResFulltexts.get(i);
+                    String name = null;
+                    if(docResNames != null) {
+                        name = docResNames.get(i);
+                    }
 
                     TpDocument tpDocument = new TpDocument();
                     tpDocument.setResFormat(innerDocFormat);
                     tpDocument.setInnerId(url);
                     tpDocument.setResUrl(url);
                     tpDocument.setResFulltext(removeMultWhitespaces(fulltext).trim());
+                    tpDocument.setResName(name);
                     tpDocument.setOuterId(outerId);
+                    tpDocument.setTitle(outerName);
 
                     tpDocuments.add(tpDocument);
                     numOfInnerPdf++;
