@@ -126,15 +126,15 @@ public class TransparenzReader extends NewsleakReader {
         TpDocument document = tpDocumentIterator.next();
         String docId = Integer.toString(currentDocument);
 
-        jcas.setDocumentText(document.getResUrl()+"\t"+document.getResFulltext());
+        jcas.setDocumentText(document.getResFulltext());
 
 
         // Set metadata
-        //TODO brauche ich das?
         Metadata metaCas = new Metadata(jcas);
         metaCas.setDocId(docId);
         metaCas.setTimestamp("1900-01-01"); //TODO 2019-07-04 ps: richtiges Datum verwenden
         metaCas.addToIndexes();
+
 
 
 
@@ -164,9 +164,15 @@ public class TransparenzReader extends NewsleakReader {
         }
 
         // file-type
-        field = "PDF";
+        field = document.getResFormat();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "filetype", field));
+        }
+
+        // TP-ID
+        field = document.getOuterId();
+        if (field != null) {
+            metadata.add(metadataResource.createTextMetadata(docId, "transparenz-id", field));
         }
 
         metadataResource.appendMetadata(metadata);
@@ -194,14 +200,6 @@ public class TransparenzReader extends NewsleakReader {
         return tpDocumentIterator.hasNext();
     }
 
-
-    private String removeMultWhitespaces(String text){
-        Pattern p = Pattern.compile("[\\s\\v]+");
-        Matcher m = p.matcher(text);
-        String cleanedText = m.replaceAll(" ");
-
-        return cleanedText;
-    }
 
 
     private SolrDocumentList getDocumentsFromSolrIndex() throws ResourceInitializationException {
@@ -272,7 +270,7 @@ public class TransparenzReader extends NewsleakReader {
                     tpDocument.setResFormat(innerDocFormat);
                     tpDocument.setInnerId(url);
                     tpDocument.setResUrl(url);
-                    tpDocument.setResFulltext(removeMultWhitespaces(fulltext).trim());
+                    tpDocument.setResFulltext(fulltext);
                     tpDocument.setResName(name);
                     tpDocument.setOuterId(outerId);
                     tpDocument.setTitle(outerName);

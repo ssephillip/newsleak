@@ -56,11 +56,14 @@ public class Doc2VecWriter extends JCasAnnotator_ImplBase {
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
 
+        Metadata metadata = (Metadata) jcas.getAnnotationIndex(Metadata.type).iterator().next();
+        String docId = metadata.getDocId();
         String docText = jcas.getDocumentText();
 
-        docText = docText.replaceAll("\n", " ");
+        //docText = docText.replaceAll("[\\s\\v]+", " ");
+        docText = docText.trim();
 
-        String outputText = docText; //TODO 2019-07-12 ps: hier muss noch die ID davor geschrieben werden
+        String outputText = docId+"\t"+docText; //TODO 2019-07-12 ps: hier muss noch die ID davor geschrieben werden
 
         doc2vecWriter.append(outputText);
     }
