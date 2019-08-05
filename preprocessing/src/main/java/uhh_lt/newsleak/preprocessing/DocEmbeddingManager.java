@@ -13,16 +13,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class DocEmbeddingCreator extends NewsleakPreprocessor {
+public class DocEmbeddingManager extends NewsleakPreprocessor {
 
     public static void main(String[] args) {
-        DocEmbeddingCreator docEmbeddingCreator = new DocEmbeddingCreator();
+        DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
         //docEmbeddingCreator.getConfiguration(args);
 
-        docEmbeddingCreator.hooverHost = "http://localhost";
-        docEmbeddingCreator.dataDirectory = "./data";
-        docEmbeddingCreator.createEmbeddings();
-        docEmbeddingCreator.indexVectors();
+        docEmbeddingManager.hooverHost = "http://localhost";
+        docEmbeddingManager.dataDirectory = "./data";
+        docEmbeddingManager.createEmbeddings();
+        docEmbeddingManager.indexVectors();
 
     }
 
@@ -56,7 +56,7 @@ public class DocEmbeddingCreator extends NewsleakPreprocessor {
     public void indexVectors(){
         CloseableHttpClient client = HttpClients.createDefault();
         //TODO 2019-07-21 ps: introduce new configuration variable for the python server url and port (similar to hooverurl)
-        HttpPost httpPost = new HttpPost(hooverHost+":5002"+"/index_vectors");
+        HttpPost httpPost = new HttpPost(hooverHost+":5000"+"/index_vectors");
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.addBinaryBody("docvectors", new File(dataDirectory+File.separator+"doc2vec/docvectors.txt"), ContentType.APPLICATION_OCTET_STREAM, "docvectors.ext");

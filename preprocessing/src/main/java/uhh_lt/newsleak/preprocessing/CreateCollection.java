@@ -25,7 +25,7 @@ public class CreateCollection {
 		// extract fulltext, entities and metdadata and write to DB
 		InformationExtraction2Postgres.main(args);
 
-		DocEmbeddingCreator.main(args);
+		DocEmbeddingManager.main(args);
 
 		// read from DB and write to fullext index
 		Postgres2ElasticsearchIndexer.main(args);
