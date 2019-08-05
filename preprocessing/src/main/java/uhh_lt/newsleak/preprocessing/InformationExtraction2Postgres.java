@@ -353,8 +353,8 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					DictionaryExtractor.PARAM_EXTRACT_PHONE, this.patternPhone,
 					DictionaryExtractor.PARAM_EXTRACT_IP, this.patternIP);
 
-			// alternative writers for testing purposes (rawtext, xmi) ...
-			// ... raw text writer
+
+			//writes the documents to a training file (.txt) for document embedding
 			 ExternalResourceDescription resourceDoc2VecWriter =
 			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.dataDirectory + File.separator + "/doc2vec/doc2vec_train_with_id.txt");
 			 AnalysisEngineDescription doc2vecWriter =
