@@ -60,10 +60,10 @@ public class Doc2VecWriter extends JCasAnnotator_ImplBase {
         String docId = metadata.getDocId();
         String docText = jcas.getDocumentText();
 
-        //docText = docText.replaceAll("[\\s\\v]+", " ");
+        docText = docText.replaceAll("[\\s\\v]+", " ");
         docText = docText.trim();
 
-        String outputText = docId+"\t"+docText; //TODO 2019-07-12 ps: hier muss noch die ID davor geschrieben werden
+        String outputText = docId+"\t"+docText;
 
         doc2vecWriter.append(outputText);
     }
