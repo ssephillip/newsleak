@@ -1,0 +1,3 @@
+-nmslib gibt teilweise eine zufällige anzahl an NN zurück die kleiner ist als die gewünschte anzahl
+    -passiert nur wenn k relativ hoch ist
+    -die id muss kleiner sein als das k (die beiden sollten eigentlich nichts miteinander zu tuen haben)
