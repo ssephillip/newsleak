@@ -24,6 +24,9 @@ public class CreateCollection {
 
 		// extract fulltext, entities and metdadata and write to DB
 		InformationExtraction2Postgres.main(args);
+
+		DocEmbeddingCreator.main(args);
+
 		// read from DB and write to fullext index
 		Postgres2ElasticsearchIndexer.main(args);
 
@@ -31,5 +34,7 @@ public class CreateCollection {
 
 		System.out.println("Processing time passed (seconds): " + estimatedTime / 1000);
 	}
+
+
 
 }
