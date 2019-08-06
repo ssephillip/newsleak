@@ -211,6 +211,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 		} else if (type.equals("transparenz")) {
 			reader = CollectionReaderFactory.createReaderDescription(TransparenzReader.class, this.typeSystem,
 					TransparenzReader.PARAM_DEFAULT_LANG, this.defaultLanguage, TransparenzReader.RESOURCE_METADATA, this.getMetadataResourceDescription(),
+					TransparenzReader.TRANSPARENZ_CORE_ADDRESS, this.transparenzCoreAddress,
 					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
 					this.maxDocumentLength);
 		}else {

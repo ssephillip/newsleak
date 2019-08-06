@@ -49,7 +49,7 @@ public class TransparenzReader extends NewsleakReader {
     public static final String TRANSPARENZ_CORE_ADDRESS = "transparenzcoreaddress";
 
     /** The URL to the core of the (solr) Transparenz index*/
-    @ConfigurationParameter(name = TRANSPARENZ_CORE_ADDRESS, mandatory = false,  defaultValue = "http://localhost:8983/solr/simfin") //TODO fixen das es erkannt wird
+    @ConfigurationParameter(name = TRANSPARENZ_CORE_ADDRESS, mandatory = true)
     private String solrCoreAddress;
 
     /** Number of total documents in the Solr Index. */
