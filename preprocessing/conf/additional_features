@@ -1,2 +1,4 @@
 -make it variable which doc formats are used by the TransparenzReader
 -make paths of training directory script directory, result directory more independent (or independent at all)
+-indexing docker container: make python script available to host with a mount
+    -write a script that copies the data to the directory that is mounted on (otherwise the data in the container is deleted)
