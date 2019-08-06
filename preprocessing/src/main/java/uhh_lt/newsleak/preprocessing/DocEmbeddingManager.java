@@ -15,22 +15,24 @@ import java.io.InputStreamReader;
 
 public class DocEmbeddingManager extends NewsleakPreprocessor {
 
+
+
     public static void main(String[] args) {
         DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
-        //docEmbeddingCreator.getConfiguration(args);
+        docEmbeddingManager.getConfiguration(args);
 
-        docEmbeddingManager.hooverHost = "http://localhost";
-        docEmbeddingManager.dataDirectory = "./data";
         docEmbeddingManager.createEmbeddings();
         docEmbeddingManager.indexVectors();
-
     }
+
+
+
 
     public void createEmbeddings() {
 
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.directory(new File(dataDirectory+File.separator+"doc2vec"));
-        processBuilder.command("bash", "-c","bash produce_vectors.sh");
+        processBuilder.directory(new File(this.doc2vecTrainingDir));
+        processBuilder.command("bash", "-c","bash produce_vectors.sh "+this.trainingFileName+".txt "+this.trainingFileNameDocOnly+".txt "+this.trainingFileNameIdOnly+".txt "+this.doc2vecResultVector+".txt");
 
         try {
             Process process = processBuilder.start();
@@ -55,12 +57,11 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
 
     public void indexVectors(){
         CloseableHttpClient client = HttpClients.createDefault();
-        //TODO 2019-07-21 ps: introduce new configuration variable for the python server url and port (similar to hooverurl)
-        HttpPost httpPost = new HttpPost(hooverHost+":5000"+"/index_vectors");
+        HttpPost httpPost = new HttpPost(this.doc2vecIndexUrl+":"+this.doc2vecIndexPort+"/index_vectors");
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addBinaryBody("docvectors", new File(dataDirectory+File.separator+"doc2vec/docvectors.txt"), ContentType.APPLICATION_OCTET_STREAM, "docvectors.ext");
-        builder.addBinaryBody("doc2vec_id", new File(dataDirectory+File.separator+"doc2vec/doc2vec_id.txt"), ContentType.APPLICATION_OCTET_STREAM, "doc2vec_id.ext");
+        builder.addBinaryBody(this.doc2vecResultVector, new File(this.doc2vecResultDir+File.separator+this.doc2vecResultVector+".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultVector+".ext");
+        builder.addBinaryBody(this.trainingFileNameIdOnly, new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");
         HttpEntity multipart = builder.build();
         httpPost.setEntity(multipart);
 

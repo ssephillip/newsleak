@@ -88,8 +88,8 @@ def get_vector(id):
     return indexerObject.get_vector(id)
 
 
-if __name__ == '__main__':
-    app.run(port='5002', debug=True)
+# if __name__ == '__main__':
+#     app.run(port='5002', debug=True)
 
 
 

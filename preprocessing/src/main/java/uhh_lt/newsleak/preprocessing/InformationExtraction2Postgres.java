@@ -210,7 +210,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					this.maxDocumentLength);
 		} else if (type.equals("transparenz")) {
 			reader = CollectionReaderFactory.createReaderDescription(TransparenzReader.class, this.typeSystem,
-					NewsleakCsvStreamReader.PARAM_DEFAULT_LANG, this.defaultLanguage, TransparenzReader.RESOURCE_METADATA, this.getMetadataResourceDescription(),
+					TransparenzReader.PARAM_DEFAULT_LANG, this.defaultLanguage, TransparenzReader.RESOURCE_METADATA, this.getMetadataResourceDescription(),
 					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
 					this.maxDocumentLength);
 		}else {
@@ -356,7 +356,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			//writes the documents to a training file (.txt) for document embedding
 			 ExternalResourceDescription resourceDoc2VecWriter =
-			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.dataDirectory + File.separator + "/doc2vec/doc2vec_train_with_id.txt");
+			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.doc2vecTrainingDir+File.separator+this.trainingFileName+".txt");
 			 AnalysisEngineDescription doc2vecWriter =
 			 AnalysisEngineFactory.createEngineDescription(Doc2VecWriter.class, Doc2VecWriter.RESOURCE_DOC2VECWRITER, resourceDoc2VecWriter);
 			//
@@ -378,7 +378,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// define pipeline
 			AnalysisEngineDescription pipeline = AnalysisEngineFactory.createEngineDescription(sentenceICU,
-					sentenceCleaner, dictionaries, heideltime, nerMicroservice, keyterms,
+					sentenceCleaner, //dictionaries, heideltime, nerMicroservice, keyterms,
 					doc2vecWriter,
 					// linewriter,
 					// xmi,

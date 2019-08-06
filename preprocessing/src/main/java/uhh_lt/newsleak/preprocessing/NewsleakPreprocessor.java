@@ -74,6 +74,20 @@ public abstract class NewsleakPreprocessor {
 	protected String hooverTmpMetadata;
 	protected String hooverSearchUrl;
 
+	//doc2vec training configuration
+	protected String doc2vecTrainingDir;
+	protected String doc2vecResultDir;
+	protected String trainingFileName = "training_file";
+	protected String trainingFileNameDocOnly = "training_file_doc_only";
+	protected String trainingFileNameIdOnly = "training_file_id_only";
+	protected String doc2vecResultVector = "docvectors";
+	protected String doc2vecIndexUrl;
+	protected String doc2vecIndexPort;
+
+
+	//transparenz reader configuration
+	protected String transparenzCoreAddress;
+
 	// newsleak postgres configuration
 	protected String dbUrl;
 	protected String dbName;
@@ -139,6 +153,13 @@ public abstract class NewsleakPreprocessor {
 			hooverPort = prop.getProperty("hooverport");
 			hooverTmpMetadata = prop.getProperty("hoovertmpmetadata");
 			hooverSearchUrl = prop.getProperty("hooversearchurl");
+
+			doc2vecTrainingDir = prop.getProperty("doc2vectrainingdir");
+			doc2vecResultDir = doc2vecTrainingDir + File.separator + "result";
+			doc2vecIndexUrl = prop.getProperty("doc2vecindexurl");
+			doc2vecIndexPort = prop.getProperty("doc2vecindexport");
+
+			transparenzCoreAddress = prop.getProperty("transparenzcoreaddress");
 
 			esHost = prop.getProperty("esurl");
 			esClustername = prop.getProperty("esclustername");

@@ -45,14 +45,12 @@ public class TransparenzReader extends NewsleakReader {
     @ConfigurationParameter(name = PARAM_DEFAULT_LANG, mandatory = false, defaultValue = "deu")
     private String defaultLanguage;
 
-    /** The URL to the Solr-Server. */
-    String SOLR_ADDRESS = "http://localhost:8983/solr/";
+    /** The Constant TRANSPARENZ_CORE_ADDRESS. */
+    public static final String TRANSPARENZ_CORE_ADDRESS = "transparenzcoreaddress";
 
-    /** The name of the Solr Core */
-    String SOLR_CORE_NAME = "simfin";
-
-    /** The URL to the Solr Core */
-    String solrCoreAddress = SOLR_ADDRESS + SOLR_CORE_NAME;
+    /** The URL to the core of the (solr) Transparenz index*/
+    @ConfigurationParameter(name = TRANSPARENZ_CORE_ADDRESS, mandatory = false,  defaultValue = "http://localhost:8983/solr/simfin") //TODO fixen das es erkannt wird
+    private String solrCoreAddress;
 
     /** Number of total documents in the Solr Index. */
     private int totalDocuments = 0;
@@ -90,7 +88,6 @@ public class TransparenzReader extends NewsleakReader {
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
         List<TpDocument> allTpDocuments = new ArrayList<>();
-
         SolrDocumentList solrDocuments = getDocumentsFromSolrIndex();
 
         for (SolrDocument solrDocument : solrDocuments) {
