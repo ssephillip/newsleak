@@ -28,10 +28,10 @@
 6,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12566,Text
 6,Filetype,PDF,Text
 6,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-3,Language,deu,Text
-4,Language,deu,Text
 1,Language,deu,Text
+4,Language,deu,Text
 2,Language,deu,Text
+3,Language,deu,Text
 7,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 7,Subject,Anfrage 21/12549,Text
 7,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12549,Text
@@ -42,9 +42,6 @@
 8,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12564,Text
 8,Filetype,PDF,Text
 8,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-6,Language,deu,Text
-7,Language,deu,Text
-5,Language,deu,Text
 9,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 9,Subject,Anfrage 21/12565,Text
 9,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12565,Text
@@ -55,7 +52,10 @@
 10,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12568,Text
 10,Filetype,PDF,Text
 10,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+7,Language,deu,Text
+5,Language,deu,Text
 8,Language,deu,Text
+6,Language,deu,Text
 11,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 11,Subject,Anfrage 21/12569,Text
 11,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12569,Text
@@ -66,25 +66,25 @@
 12,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12540,Text
 12,Filetype,PDF,Text
 12,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-9,Language,deu,Text
 13,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 13,Subject,Anfrage 21/12541,Text
 13,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12541,Text
 13,Filetype,PDF,Text
 13,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-11,Language,deu,Text
+9,Language,deu,Text
+10,Language,deu,Text
 14,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 14,Subject,Anfrage 21/12542,Text
 14,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12542,Text
 14,Filetype,PDF,Text
 14,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-10,Language,deu,Text
+11,Language,deu,Text
+12,Language,deu,Text
 15,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 15,Subject,Anfrage 21/12543,Text
 15,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12543,Text
 15,Filetype,PDF,Text
 15,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-12,Language,deu,Text
 13,Language,deu,Text
 16,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 16,Subject,Anfrage 21/12526,Text
@@ -101,20 +101,20 @@
 18,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12524,Text
 18,Filetype,PDF,Text
 18,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+14,Language,deu,Text
+16,Language,deu,Text
 15,Language,deu,Text
 19,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 19,Subject,Anfrage 21/12525,Text
 19,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12525,Text
 19,Filetype,PDF,Text
 19,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-14,Language,deu,Text
 17,Language,deu,Text
 20,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 20,Subject,Anfrage 21/12522,Text
 20,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12522,Text
 20,Filetype,PDF,Text
 20,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-16,Language,deu,Text
 21,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 21,Subject,Anfrage 21/12523,Text
 21,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12523,Text
@@ -125,27 +125,25 @@
 22,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12520,Text
 22,Filetype,PDF,Text
 22,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+18,Language,deu,Text
 19,Language,deu,Text
 23,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 23,Subject,Anfrage 21/12521,Text
 23,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12521,Text
 23,Filetype,PDF,Text
 23,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-18,Language,deu,Text
+20,Language,deu,Text
 24,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 24,Subject,Anfrage 21/12575,Text
 24,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12575,Text
 24,Filetype,PDF,Text
 24,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-20,Language,deu,Text
-21,Language,deu,Text
 22,Language,deu,Text
 25,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 25,Subject,Anfrage 21/12567,Text
 25,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12567,Text
 25,Filetype,PDF,Text
 25,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-23,Language,deu,Text
 26,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 26,Subject,Anfrage 21/12528,Text
 26,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12528,Text
@@ -156,26 +154,27 @@
 27,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12529,Text
 27,Filetype,PDF,Text
 27,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+21,Language,deu,Text
+23,Language,deu,Text
+24,Language,deu,Text
+25,Language,deu,Text
 28,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 28,Subject,Anfrage 21/12573,Text
 28,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12573,Text
 28,Filetype,PDF,Text
 28,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+26,Language,deu,Text
 29,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 29,Subject,Anfrage 21/12580,Text
 29,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12580,Text
 29,Filetype,PDF,Text
 29,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-24,Language,deu,Text
-26,Language,deu,Text
-27,Language,deu,Text
-25,Language,deu,Text
 30,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 30,Subject,Anfrage 21/12581,Text
 30,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12581,Text
 30,Filetype,PDF,Text
 30,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-28,Language,deu,Text
+27,Language,deu,Text
 31,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 31,Subject,Anfrage 21/12572,Text
 31,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12572,Text
@@ -186,30 +185,31 @@
 32,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12557,Text
 32,Filetype,PDF,Text
 32,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+28,Language,deu,Text
+29,Language,deu,Text
+30,Language,deu,Text
 33,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 33,Subject,Anfrage 21/12574,Text
 33,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12574,Text
 33,Filetype,PDF,Text
 33,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-29,Language,deu,Text
-30,Language,deu,Text
 34,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 34,Subject,Anfrage 21/12556,Text
 34,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12556,Text
 34,Filetype,PDF,Text
 34,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-31,Language,deu,Text
 35,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 35,Subject,Anfrage 21/12555,Text
 35,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12555,Text
 35,Filetype,PDF,Text
 35,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-32,Language,deu,Text
 36,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 36,Subject,Anfrage 21/12539,Text
 36,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12539,Text
 36,Filetype,PDF,Text
 36,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+31,Language,deu,Text
+32,Language,deu,Text
 33,Language,deu,Text
 37,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 37,Subject,Anfrage 21/12538,Text
@@ -228,62 +228,61 @@
 39,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12554,Text
 39,Filetype,PDF,Text
 39,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-36,Language,deu,Text
 40,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 40,Subject,Anfrage 21/12571,Text
 40,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12571,Text
 40,Filetype,PDF,Text
 40,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+36,Language,deu,Text
 41,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 41,Subject,Anfrage 21/12570,Text
 41,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12570,Text
 41,Filetype,PDF,Text
 41,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-37,Language,deu,Text
 38,Language,deu,Text
-39,Language,deu,Text
+37,Language,deu,Text
 42,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 42,Subject,Anfrage 21/12559,Text
 42,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12559,Text
 42,Filetype,PDF,Text
 42,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+39,Language,deu,Text
 43,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 43,Subject,Anfrage 21/12558,Text
 43,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12558,Text
 43,Filetype,PDF,Text
 43,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+40,Language,deu,Text
 44,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 44,Subject,Anfrage 21/12531,Text
 44,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12531,Text
 44,Filetype,PDF,Text
 44,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-41,Language,deu,Text
 45,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 45,Subject,Anfrage 21/12530,Text
 45,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12530,Text
 45,Filetype,PDF,Text
 45,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-40,Language,deu,Text
+41,Language,deu,Text
 46,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 46,Subject,Anfrage 21/12533,Text
 46,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12533,Text
 46,Filetype,PDF,Text
 46,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-43,Language,deu,Text
 42,Language,deu,Text
+43,Language,deu,Text
+44,Language,deu,Text
 47,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 47,Subject,Anfrage 21/12532,Text
 47,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12532,Text
 47,Filetype,PDF,Text
 47,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-44,Language,deu,Text
+45,Language,deu,Text
 48,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 48,Subject,Anfrage 21/12535,Text
 48,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12535,Text
 48,Filetype,PDF,Text
 48,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-45,Language,deu,Text
-46,Language,deu,Text
 49,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 49,Subject,Anfrage 21/12534,Text
 49,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12534,Text
@@ -294,25 +293,26 @@
 50,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12537,Text
 50,Filetype,PDF,Text
 50,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+46,Language,deu,Text
+47,Language,deu,Text
 51,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 51,Subject,Anfrage 21/12536,Text
 51,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12536,Text
 51,Filetype,PDF,Text
 51,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+48,Language,deu,Text
 52,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 52,Subject,Anfrage 21/12551,Text
 52,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12551,Text
 52,Filetype,PDF,Text
 52,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-48,Language,deu,Text
-47,Language,deu,Text
 49,Language,deu,Text
+50,Language,deu,Text
 53,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 53,Subject,Anfrage 21/12519,Text
 53,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12519,Text
 53,Filetype,PDF,Text
 53,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
-50,Language,deu,Text
 51,Language,deu,Text
 54,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 54,Subject,Anfrage 21/12550,Text
@@ -329,13 +329,13 @@
 56,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12578,Text
 56,Filetype,PDF,Text
 56,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+52,Language,deu,Text
 57,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
 57,Subject,Anfrage 21/12579,Text
 57,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12579,Text
 57,Filetype,PDF,Text
 57,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
 53,Language,deu,Text
-52,Language,deu,Text
 54,Language,deu,Text
 55,Language,deu,Text
 58,Filename,Niederschrift über die Senatssitzung vom 10.04.2018 (lll.1-58 ),Text
@@ -348,14 +348,13 @@
 59,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=12552,Text
 59,Filetype,PDF,Text
 59,Transparenz-id,b7dd87de-d5d0-4545-b31e-7884390e1de0,Text
+56,Language,deu,Text
+57,Language,deu,Text
 60,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 60,Subject,Akte:702.29-01-2016,Text
 60,Link,http://daten.transparenz.hamburg.de/Dataport.HmbTG.ZS.Webservice.GetRessource100/GetRessource100.svc/ee7b1b0f-00b8-425a-8501-03020929b385/Akte_702.29-01-2016.pdf,Text
 60,Filetype,PDF,Text
 60,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-56,Language,deu,Text
-58,Language,deu,Text
-57,Language,deu,Text
 61,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 61,Subject,Anfrage 21/33,Text
 61,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=33,Text
@@ -366,19 +365,21 @@
 62,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3329,Text
 62,Filetype,PDF,Text
 62,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+58,Language,deu,Text
 59,Language,deu,Text
 63,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 63,Subject,Anfrage 21/3293,Text
 63,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3293,Text
 63,Filetype,PDF,Text
 63,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+61,Language,deu,Text
 60,Language,deu,Text
 64,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 64,Subject,Anfrage 21/3325,Text
 64,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3325,Text
 64,Filetype,PDF,Text
 64,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-61,Language,deu,Text
+62,Language,deu,Text
 65,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 65,Subject,Anfrage 21/3324,Text
 65,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3324,Text
@@ -389,8 +390,8 @@
 66,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3298,Text
 66,Filetype,PDF,Text
 66,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+63,Language,deu,Text
 64,Language,deu,Text
-62,Language,deu,Text
 67,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 67,Subject,Anfrage 21/3292,Text
 67,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3292,Text
@@ -401,32 +402,31 @@
 68,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3321,Text
 68,Filetype,PDF,Text
 68,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-63,Language,deu,Text
 65,Language,deu,Text
 69,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 69,Subject,Anfrage 21/3320,Text
 69,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3320,Text
 69,Filetype,PDF,Text
 69,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-67,Language,deu,Text
+66,Language,deu,Text
 70,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 70,Subject,Anfrage 21/3323,Text
 70,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3323,Text
 70,Filetype,PDF,Text
 70,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-66,Language,deu,Text
 71,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 71,Subject,Anfrage 21/3322,Text
 71,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3322,Text
 71,Filetype,PDF,Text
 71,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
 68,Language,deu,Text
+69,Language,deu,Text
+67,Language,deu,Text
 72,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 72,Subject,Anfrage 21/3282,Text
 72,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3282,Text
 72,Filetype,PDF,Text
 72,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-69,Language,deu,Text
 73,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 73,Subject,Anfrage 21/3277,Text
 73,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3277,Text
@@ -444,6 +444,7 @@
 75,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3281,Text
 75,Filetype,PDF,Text
 75,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+72,Language,deu,Text
 76,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 76,Subject,Anfrage 21/3268,Text
 76,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3268,Text
@@ -454,15 +455,14 @@
 77,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3269,Text
 77,Filetype,PDF,Text
 77,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-74,Language,deu,Text
 73,Language,deu,Text
-72,Language,deu,Text
-75,Language,deu,Text
+74,Language,deu,Text
 78,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 78,Subject,Anfrage 21/3284,Text
 78,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3284,Text
 78,Filetype,PDF,Text
 78,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+75,Language,deu,Text
 76,Language,deu,Text
 79,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 79,Subject,Anfrage 21/3285,Text
@@ -474,12 +474,12 @@
 80,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3264,Text
 80,Filetype,PDF,Text
 80,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+77,Language,deu,Text
 81,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 81,Subject,Anfrage 21/3265,Text
 81,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3265,Text
 81,Filetype,PDF,Text
 81,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-77,Language,deu,Text
 82,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 82,Subject,Anfrage 21/3266,Text
 82,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3266,Text
@@ -492,19 +492,18 @@
 83,Filetype,PDF,Text
 83,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
 79,Language,deu,Text
+80,Language,deu,Text
 81,Language,deu,Text
 84,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 84,Subject,Anfrage 21/3260,Text
 84,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3260,Text
 84,Filetype,PDF,Text
 84,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-80,Language,deu,Text
 85,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 85,Subject,Anfrage 21/3261,Text
 85,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3261,Text
 85,Filetype,PDF,Text
 85,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-82,Language,deu,Text
 86,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 86,Subject,Anfrage 21/3262,Text
 86,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3262,Text
@@ -515,8 +514,10 @@
 87,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3263,Text
 87,Filetype,PDF,Text
 87,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-83,Language,deu,Text
+82,Language,deu,Text
 84,Language,deu,Text
+83,Language,deu,Text
+85,Language,deu,Text
 88,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 88,Subject,Anfrage 21/3289,Text
 88,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3289,Text
@@ -528,31 +529,30 @@
 89,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3273,Text
 89,Filetype,PDF,Text
 89,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-85,Language,deu,Text
 90,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 90,Subject,Anfrage 21/3272,Text
 90,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3272,Text
 90,Filetype,PDF,Text
 90,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-87,Language,deu,Text
 91,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 91,Subject,Anfrage 21/3257,Text
 91,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3257,Text
 91,Filetype,PDF,Text
 91,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+87,Language,deu,Text
+88,Language,deu,Text
+89,Language,deu,Text
 92,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 92,Subject,Anfrage 21/3256,Text
 92,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3256,Text
 92,Filetype,PDF,Text
 92,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-88,Language,deu,Text
 93,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 93,Subject,Anfrage 21/3327,Text
 93,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3327,Text
 93,Filetype,PDF,Text
 93,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
 90,Language,deu,Text
-89,Language,deu,Text
 94,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 94,Subject,Anfrage 21/3328,Text
 94,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3328,Text
@@ -565,36 +565,36 @@
 95,Filetype,PDF,Text
 95,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
 92,Language,deu,Text
-93,Language,deu,Text
 96,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 96,Subject,Anfrage 21/3317,Text
 96,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3317,Text
 96,Filetype,PDF,Text
 96,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+93,Language,deu,Text
 97,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 97,Subject,Anfrage 21/3318,Text
 97,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3318,Text
 97,Filetype,PDF,Text
 97,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
+94,Language,deu,Text
 98,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 98,Subject,Anfrage 21/3319,Text
 98,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3319,Text
 98,Filetype,PDF,Text
 98,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-94,Language,deu,Text
+95,Language,deu,Text
 99,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 99,Subject,Anfrage 21/3259,Text
 99,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3259,Text
 99,Filetype,PDF,Text
 99,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-96,Language,deu,Text
-95,Language,deu,Text
+97,Language,deu,Text
 100,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 100,Subject,Anfrage 21/3258,Text
 100,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3258,Text
 100,Filetype,PDF,Text
 100,Transparenz-id,17f47c28-c381-4b55-8ca3-0dc509250e16,Text
-97,Language,deu,Text
+96,Language,deu,Text
 101,Filename,Niederschrift über die Senatssitzung vom 23.02.2016 (lll.1-58),Text
 101,Subject,Anfrage 21/3297,Text
 101,Link,http://www.buergerschaft-hh.de/parldok/tcl/PDDocView.tcl?mode=get&lp=21&doknum=3297,Text
