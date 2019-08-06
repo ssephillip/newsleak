@@ -59,29 +59,18 @@ public class TransparenzReader extends NewsleakReader {
     /** Iterator holding all documents from the Solr Index. */
     Iterator<TpDocument> tpDocumentIterator = null;
 
-
-    /**
-     * Internal Variables
-     */
-
-    /** Number of documents where at least one of the necessary fields is missing in the Solr Index. */
+    /** Number of documents in the Solr Index where at least one of the necessary fields is missing or malformed. */
     int malformedSolrDocCounter = 0;
 
     /** Number of inner documents. */
     int numOfInnerPdf = 0;
 
 
-    // Main method for test purposes
-    public static void main(String[] args) {
-        TransparenzReader tpReader = new TransparenzReader();
-        try {
-            tpReader.initialize(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
+    /**
+     * Gets all documents from the solr index (that match the query) and stores them in an iterator for later processing.
+     * @param context
+     * @throws ResourceInitializationException
+     */
     @Override
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
@@ -201,7 +190,11 @@ public class TransparenzReader extends NewsleakReader {
     }
 
 
-
+    /**
+     * Gets all documents from the solr index that match the query.
+     * @return List of SolrDocument
+     * @throws ResourceInitializationException
+     */
     private SolrDocumentList getDocumentsFromSolrIndex() throws ResourceInitializationException {
         QueryResponse response = null;
 
@@ -235,8 +228,15 @@ public class TransparenzReader extends NewsleakReader {
     }
 
 
-
-
+    /**
+     * Gets all inner documents from the given SolrDocument.
+     * A SolrDocument in the TransparenzPortal is often actually a group of documents.
+     * Each document in this group is called inner document.
+     * The SolrDocument itself is called outer document.
+     * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
+     * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
+     * @return List<TpDocument> A list of inner documents "extracted" from the given outer document.
+     */
     private List<TpDocument> getInnerDocsAsTpDocs(SolrDocument solrDoc) {
 
         List<TpDocument> tpDocuments = new ArrayList<>();
@@ -298,7 +298,17 @@ public class TransparenzReader extends NewsleakReader {
         return tpDocuments;
     }
 
-
+    /**
+     * Tests if an outer document is wellformed.
+     * An outer document (SolrDocument) is wellformed if all the mandatory fields (i.e. the parameters of this method)
+     * are Non-Null and Non-Empty AND if all lists have the same length.
+     *
+     * @param docResFormats The list of file-formats of the inner documents
+     * @param docResUrls The list of URLs to the original files of the inner documents
+     * @param docResFulltexts The list of fulltexts of the inner documents
+     * @param outerId The ID of the outer document (containing the inner documents)
+     * @return boolean - True if the outer document is wellformed.
+     */
     private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResFulltexts, String outerId) {
 
         return !(docResFormats == null || docResUrls == null || docResFulltexts == null || outerId == null ||

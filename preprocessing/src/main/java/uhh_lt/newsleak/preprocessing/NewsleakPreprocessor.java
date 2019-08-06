@@ -80,7 +80,7 @@ public abstract class NewsleakPreprocessor {
 	protected String trainingFileName = "training_file";
 	protected String trainingFileNameDocOnly = "training_file_doc_only";
 	protected String trainingFileNameIdOnly = "training_file_id_only";
-	protected String doc2vecResultVector = "docvectors";
+	protected String doc2vecResultFileName = "docvectors";
 	protected String doc2vecIndexUrl;
 	protected String doc2vecIndexPort;
 

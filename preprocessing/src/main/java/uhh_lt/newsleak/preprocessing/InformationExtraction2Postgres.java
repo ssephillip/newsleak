@@ -355,12 +355,13 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					DictionaryExtractor.PARAM_EXTRACT_IP, this.patternIP);
 
 
-			//writes the documents to a training file (.txt) for document embedding
+			//writes the documents to a textfile (constitutes training data for document embedding)
 			 ExternalResourceDescription resourceDoc2VecWriter =
 			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.doc2vecTrainingDir+File.separator+this.trainingFileName+".txt");
 			 AnalysisEngineDescription doc2vecWriter =
 			 AnalysisEngineFactory.createEngineDescription(Doc2VecWriter.class, Doc2VecWriter.RESOURCE_DOC2VECWRITER, resourceDoc2VecWriter);
-			//
+
+			 //
 			// ... xmi writer
 			// AnalysisEngineDescription xmi =
 			// AnalysisEngineFactory.createEngineDescription(
@@ -379,7 +380,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// define pipeline
 			AnalysisEngineDescription pipeline = AnalysisEngineFactory.createEngineDescription(sentenceICU,
-					sentenceCleaner, //dictionaries, heideltime, nerMicroservice, keyterms,
+					sentenceCleaner, dictionaries, heideltime, nerMicroservice, keyterms,
 					doc2vecWriter,
 					// linewriter,
 					// xmi,

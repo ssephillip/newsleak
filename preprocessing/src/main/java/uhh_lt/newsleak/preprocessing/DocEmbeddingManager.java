@@ -1,7 +1,6 @@
 package uhh_lt.newsleak.preprocessing;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -10,15 +9,16 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.uima.util.Level;
-import org.apache.uima.util.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Provides functionality to create document embedding vectors and store these vectors to a remote vector index (via WebService)
+ */
 public class DocEmbeddingManager extends NewsleakPreprocessor {
-
 
 
     public static void main(String[] args) {
@@ -30,13 +30,15 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
     }
 
 
-
-
+    /**
+     * This method triggers a Shell script which prepares the training data and starts a C-Script which starts the embedding process.
+     * The resulting vectors are written to a textfile in the result directory.
+     */
     public void createEmbeddings() {
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.directory(new File(this.doc2vecTrainingDir));
-        processBuilder.command("bash", "-c","bash produce_vectors.sh "+this.trainingFileName+".txt "+this.trainingFileNameDocOnly+".txt "+this.trainingFileNameIdOnly+".txt "+this.doc2vecResultVector+".txt");
+        processBuilder.command("bash", "-c","bash produce_vectors.sh "+this.trainingFileName+".txt "+this.trainingFileNameDocOnly+".txt "+this.trainingFileNameIdOnly+".txt "+this.doc2vecResultFileName +".txt");
 
         try {
             logger.log(Level.INFO, "Starting document embedding process with "+this.trainingFileName+" as training data.");
@@ -60,7 +62,10 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
 
     }
 
-
+    /**
+     * Reads vectors from a textfile and stores them in a remote vector index.
+     * The data is sent via http request.
+     */
     public void indexVectors(){
         logger.log(Level.INFO, "Preparing document vector indexing.");
         CloseableHttpClient client = HttpClients.createDefault();
@@ -69,7 +74,7 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
 
         //String pathToResultVectorFile =
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addBinaryBody("vectors", new File(this.doc2vecResultDir+File.separator+this.doc2vecResultVector+".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultVector+".ext");
+        builder.addBinaryBody("vectors", new File(this.doc2vecResultDir+File.separator+this.doc2vecResultFileName +".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultFileName +".ext");
         builder.addBinaryBody("ids", new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");
         HttpEntity multipart = builder.build();
         httpPost.setEntity(multipart);

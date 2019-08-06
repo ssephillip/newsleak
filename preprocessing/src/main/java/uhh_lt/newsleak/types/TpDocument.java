@@ -2,6 +2,18 @@ package uhh_lt.newsleak.types;
 
 import java.util.Objects;
 
+/**
+ * A TpDocument represents an inner document of the Transparenz Portal solr index.
+ * The solr index of the Transparenz Portal contains SolrDocuments (outer documents).
+ * An outer document is only a wrapper for the information of the actual document.
+ * This "actual document" is an inner document.
+ * An outer document may hold information about multiple inner documents.
+ * An outer document holds many lists with different information (e.g. file-formats, filename, fultexts).
+ * Each element in the list is the information of one inner document.
+ * The information is mapped to the inner document by the position in the list.
+ * E.g. For the inner document X the filename is in the position 2 of the list of filenames.
+ *      Therefore the file-format in position 2 in the list of file-formats is the file-format of this inner document etc.
+ */
 public class TpDocument {
 
     /** The id of the outer document (possibly referencing multiple TpDocuments (inner documents)) */
