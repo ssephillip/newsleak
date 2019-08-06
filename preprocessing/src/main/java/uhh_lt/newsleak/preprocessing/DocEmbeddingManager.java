@@ -1,12 +1,16 @@
 package uhh_lt.newsleak.preprocessing;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.uima.util.Level;
+import org.apache.uima.util.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,6 +39,7 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
         processBuilder.command("bash", "-c","bash produce_vectors.sh "+this.trainingFileName+".txt "+this.trainingFileNameDocOnly+".txt "+this.trainingFileNameIdOnly+".txt "+this.doc2vecResultVector+".txt");
 
         try {
+            logger.log(Level.INFO, "Starting document embedding process with "+this.trainingFileName+" as training data.");
             Process process = processBuilder.start();
 
             //For some reason the script does not finish/return if the output isn't read
@@ -46,30 +51,43 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
             if (exitVal != 0) {
                 throw new IllegalArgumentException();
             }
-            //TODO 2019-21-07 ps: Log if it worked or not (and maybe minimalistic stats)
+            logger.log(Level.INFO, "Finished document embedding process successfully.");
+
         }catch(Exception e){
+            logger.log(Level.SEVERE, "Failed producing document embeddings with "+this.trainingFileName+" as training data.");
             e.printStackTrace();
-            //TODO 2019-07-21 ps: log the error
         }
 
     }
 
 
     public void indexVectors(){
+        logger.log(Level.INFO, "Preparing document vector indexing.");
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(this.doc2vecIndexUrl+":"+this.doc2vecIndexPort+"/index_vectors");
 
+
+        //String pathToResultVectorFile =
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addBinaryBody(this.doc2vecResultVector, new File(this.doc2vecResultDir+File.separator+this.doc2vecResultVector+".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultVector+".ext");
-        builder.addBinaryBody(this.trainingFileNameIdOnly, new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");
+        builder.addBinaryBody("vectors", new File(this.doc2vecResultDir+File.separator+this.doc2vecResultVector+".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultVector+".ext");
+        builder.addBinaryBody("ids", new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");
         HttpEntity multipart = builder.build();
         httpPost.setEntity(multipart);
 
         try {
+            logger.log(Level.INFO, "Starting document vector indexing. Index URL: "+httpPost.getURI());
             CloseableHttpResponse response = client.execute(httpPost);
-            System.out.println(response.getStatusLine().getStatusCode());
             client.close();
+
+            int statusCode = response.getStatusLine().getStatusCode();
+            if(statusCode == 200) {
+                logger.log(Level.INFO, "Finished document vector indexing successfully.");
+            }else{
+                logger.log(Level.SEVERE, "Http request failed with status code: "+statusCode);
+                throw new HttpResponseException(statusCode,"Vector indexing failed.");
+            }
         }catch(Exception e){
+            logger.log(Level.SEVERE, "Failed indexing document vectors. Index URL: "+httpPost.getURI());
             e.printStackTrace();
         }
 

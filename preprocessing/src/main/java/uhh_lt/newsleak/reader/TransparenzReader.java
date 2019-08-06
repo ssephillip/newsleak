@@ -1,7 +1,6 @@
 package uhh_lt.newsleak.reader;
 
 
-import com.google.gson.JsonElement;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -16,6 +15,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.util.Level;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
 import uhh_lt.newsleak.resources.MetadataResource;
@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TransparenzReader extends NewsleakReader {
 
@@ -87,9 +85,13 @@ public class TransparenzReader extends NewsleakReader {
     @Override
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
+        logger = context.getLogger();
+
         List<TpDocument> allTpDocuments = new ArrayList<>();
         SolrDocumentList solrDocuments = getDocumentsFromSolrIndex();
 
+        logger.log(Level.INFO, "Total number of outer documents: " + solrDocuments.size());
+        logger.log(Level.INFO, "Getting inner documents from outer documents.");
         for (SolrDocument solrDocument : solrDocuments) {
             List<TpDocument> innerTpDocuments = getInnerDocsAsTpDocs(solrDocument);
             allTpDocuments.addAll(innerTpDocuments);
@@ -99,8 +101,9 @@ public class TransparenzReader extends NewsleakReader {
         currentDocument = 0;
         tpDocumentIterator = allTpDocuments.iterator();
 
-
-        printDebugStatistics(solrDocuments.size());
+        logger.log(Level.INFO, "Total number of inner documents: " + totalDocuments);
+        logger.log(Level.INFO, "Number of malformed SolrDocuments: " + malformedSolrDocCounter);
+        logger.log(Level.FINEST, "Average number of inner PDF: " + ((float) numOfInnerPdf) / solrDocuments.size());
     }
 
 
@@ -122,9 +125,9 @@ public class TransparenzReader extends NewsleakReader {
         // Set document data
         TpDocument document = tpDocumentIterator.next();
         String docId = Integer.toString(currentDocument);
+        logger.log(Level.INFO, "Proceessing document: " + docId);
 
         jcas.setDocumentText(document.getResFulltext());
-
 
         // Set metadata
         Metadata metaCas = new Metadata(jcas);
@@ -213,14 +216,17 @@ public class TransparenzReader extends NewsleakReader {
         documentQuery.setRows(Integer.MAX_VALUE);
 
 
+
         try {
+            logger.log(Level.INFO, "Getting documents from index " + solrCoreAddress+" with filter "+documentQuery.getQuery());
             response = solrClient.query(documentQuery);
 
             if (response == null) {
                 throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
         } catch (SolrServerException | IOException e) {
-            e.printStackTrace(); //TODO 2019-06-24, ps: vernünftiges Error-Handling einbauen (loggen und nicht nur den stack printen)
+            logger.log(Level.SEVERE, "Failed retrieving documents from index "+solrCoreAddress);
+            e.printStackTrace();
             throw new ResourceInitializationException();
         }
 
@@ -244,15 +250,18 @@ public class TransparenzReader extends NewsleakReader {
 
 
         try {
+            logger.log(Level.FINEST, "Getting inner documents for: "+outerId+"."); //TODO log level korrekt?
 
             if (!isSolrDocWellFormed(docResFormats, docResUrls, docResFulltexts, outerId)) {
-                throw new IllegalArgumentException();  //TODO 2019-06-30, ps: Log the error
+                throw new IllegalArgumentException();
             }
 
 
             int numOfInnerDocs = docResFormats.size();
 
             for (int i = 0; i < numOfInnerDocs; i++) {
+                logger.log(Level.FINEST, "Processing inner document "+i+" from outer document "+outerId+".");
+
                 String innerDocFormat = docResFormats.get(i);
 
                 if (innerDocFormat.equals("PDF")) {
@@ -277,11 +286,15 @@ public class TransparenzReader extends NewsleakReader {
                 }
             }
         } catch (IllegalArgumentException e) {
+            /** A SolrDocument is malformed if some mandatory information is missing.
+             *  E.g. the number of fulltexts does not match the number of inner documents. */
             malformedSolrDocCounter++;
-            System.out.println("Malformed document: "+outerId); //TODO 2019-06-30 ps: vernünftig loggen; warsch. vernünftiges error handling einbauen
+            logger.log(Level.INFO, "Malformed document: "+outerId+". Discarding document."); //TODO evtl. level fine oder finest
             return new ArrayList<>();
         }
 
+
+        logger.log(Level.FINEST, "Found "+tpDocuments.size()+" inner documents for "+outerId+".");
         return tpDocuments;
     }
 
@@ -290,11 +303,6 @@ public class TransparenzReader extends NewsleakReader {
 
         return !(docResFormats == null || docResUrls == null || docResFulltexts == null || outerId == null ||
                 docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size());
-    }
-
-    private void printDebugStatistics(int numOfSolrDocs) {
-        System.out.println("Number of malformed SolrDocuments: " + malformedSolrDocCounter);
-        System.out.println("Average number of inner PDF: " + ((float) numOfInnerPdf) / numOfSolrDocs);
     }
 
 }
