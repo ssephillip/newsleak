@@ -1,1 +1,2 @@
 -make it variable which doc formats are used by the TransparenzReader
+-make paths of training directory script directory, result directory more independent (or independent at all)
