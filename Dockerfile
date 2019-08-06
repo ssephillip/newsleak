@@ -21,10 +21,14 @@ ADD preprocessing/conf/dictionaries conf/dictionaries/
 ADD preprocessing/conf/newsleak.properties conf/
 ADD preprocessing/data/document_example.csv data/document_example.csv
 ADD preprocessing/data/metadata_example.csv data/metadata_example.csv
+ADD preprocessing/data/doc2vec-training/doc2vecc doc2vec-training/doc2vecc
+ADD preprocessing/data/doc2vec-training/produce_vectors.sh doc2vec-training/produce_vectors.sh
 ADD preprocessing/resources resources/
 ADD preprocessing/desc desc/
 
 RUN chown newsleak:newsleak /opt/newsleak/data
+RUN chown newsleak:newsleak /opt/newsleak/conf
+RUN chown newsleak:newsleak /opt/newsleak/doc2vec-training
 
 ADD newsleak-start.sh .
 
@@ -32,4 +36,4 @@ USER newsleak
 
 EXPOSE 9000
 
-CMD ./newsleak-start.sh
+#CMD ./newsleak-start.sh
