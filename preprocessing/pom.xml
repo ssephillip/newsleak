@@ -41,6 +41,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<uimaDependencyVersion>2.10.2</uimaDependencyVersion>
 		<uimafitDependencyVersion>2.4.0</uimafitDependencyVersion>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 
