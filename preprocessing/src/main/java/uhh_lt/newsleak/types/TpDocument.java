@@ -20,7 +20,7 @@ public class TpDocument {
     String outerId;
 
     /** The id of the inner document (represented by this object). */
-    String innerId;
+    String innerId; //TODO ps 2019-08-20: evtl. auf int umstellen
 
     /** The URL to the original resource. */
     String resUrl;
