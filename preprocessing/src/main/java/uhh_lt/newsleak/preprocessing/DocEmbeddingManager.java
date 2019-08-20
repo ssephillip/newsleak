@@ -37,8 +37,14 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
     public void createEmbeddings() {
 
         ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.inheritIO();
         processBuilder.directory(new File(this.doc2vecTrainingDir));
-        processBuilder.command("bash", "-c","bash produce_vectors.sh "+this.trainingFileName+".txt "+this.trainingFileNameDocOnly+".txt "+this.trainingFileNameIdOnly+".txt "+this.doc2vecResultFileName +".txt");
+        //processBuilder.command("bash", "produce_vectors.sh "+this.trainingFileName+".txt "+this.trainingFileNameDocOnly+".txt "+this.trainingFileNameIdOnly+".txt "+this.doc2vecResultFileName +".txt");
+
+        processBuilder.command(this.doc2vecTrainingDir+File.separator+"produce_vectors.sh", this.trainingFileName+".txt", this.trainingFileNameDocOnly+".txt", this.trainingFileNameIdOnly+".txt", this.doc2vecResultFileName+".txt");
+        //processBuilder.command("bash produce_vectors.sh",this.trainingFileName+".txt",this.trainingFileNameDocOnly+".txt",this.trainingFileNameIdOnly+".txt",this.doc2vecResultFileName +".txt");
+
+
 
         try {
             logger.log(Level.INFO, "Starting document embedding process with "+this.trainingFileName+" as training data.");
