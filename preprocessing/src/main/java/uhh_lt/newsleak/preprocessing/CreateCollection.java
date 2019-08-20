@@ -21,6 +21,7 @@ public class CreateCollection {
 	 */
 	public static void main(String[] args) throws Exception {
 		long startTime = System.currentTimeMillis();
+		Class.forName("org.postgresql.Driver");
 
 		// extract fulltext, entities and metdadata and write to DB
 		InformationExtraction2Postgres.main(args);
