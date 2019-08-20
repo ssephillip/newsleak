@@ -211,7 +211,7 @@ public class TransparenzReader extends NewsleakReader {
 
 
         try {
-            logger.log(Level.INFO, "Getting documents from index " + solrCoreAddress+" with filter "+documentQuery.getQuery());
+            logger.log(Level.INFO, "Getting documents from index " + solrCoreAddress+" with filter '"+documentQuery.getQuery()+"'");
             response = solrClient.query(documentQuery);
 
             if (response == null) {
