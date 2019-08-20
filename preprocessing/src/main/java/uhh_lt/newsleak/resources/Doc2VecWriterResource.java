@@ -39,16 +39,17 @@ public class Doc2VecWriterResource extends Resource_ImplBase {
         super.initialize(aSpecifier, aAdditionalParams);
         this.logger = this.getLogger();
 
-        FileWriter fileWriter;
-        try {
-            fileWriter = new FileWriter(trainingFile, false);
-            fileWriter.write("");
-            fileWriter.close();
-            logger.log(Level.INFO, "Deleted old training data.");
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error deleting old training data.");
-            e.printStackTrace();
-            System.exit(1);
+        if(trainingFile.isFile()) {
+            try {
+                FileWriter fileWriter = new FileWriter(trainingFile, false);
+                fileWriter.write("");
+                fileWriter.close();
+                logger.log(Level.INFO, "Deleted old training data.");
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error deleting old training data.");
+                e.printStackTrace();
+                System.exit(1);
+            }
         }
 
         return true;
