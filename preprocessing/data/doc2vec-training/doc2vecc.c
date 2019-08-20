@@ -654,17 +654,17 @@ void TrainModel() {
   FILE *fi = fopen(test_file, "rb");
   fo = fopen(output_file, "wb");
   while (!feof(fi)) {
+   /* printf( "\n" );
     printf( "\n" );
     printf( "\n" );
     printf( "\n" );
     printf( "\n" );
-    printf( "\n" );
-    fflush(stdout);
+    fflush(stdout); */
 	sentence_length = 0;
 	while (1) {
         	word = ReadWordIndex(fi);
-            printf("%s ", vocab[word].word);
-            fflush(stdout);
+            //printf("%s ", vocab[word].word);
+            //fflush(stdout);
         	if (feof(fi)) break;
         	if (word == -1) continue;
         	word_count++;
@@ -687,20 +687,22 @@ void TrainModel() {
 		w = 1.0/sentence_length;
 		for (c = 0; c < layer1_size; c ++) neu1[c] += w * syn0[c + l1];
 	}
+
 	for (c = 0; c < layer1_size; c++) fprintf(fo, "%lf ", neu1[c]);
       	fprintf(fo, "\n");
-    for (c = 0; c < layer1_size; c++) printf("%lf ", neu1[c]);
+/*    for (c = 0; c < layer1_size; c++) printf("%lf ", neu1[c]);
       	printf("\n");
-       
+
       int test_index;
-      
+
       for( test_index = 0; test_index < (sizeof( sen ) / sizeof( sen[0] )); test_index++){
-        //printf( "%s ", vocab[sen[test_index]].word);        
+        //printf( "%s ", vocab[sen[test_index]].word);
       }
       printf( "\n" );
       printf( "\n" );
       printf( "\n" );
       fflush(stdout);
+      */
   }
   fclose(fi);
   fclose(fo);
