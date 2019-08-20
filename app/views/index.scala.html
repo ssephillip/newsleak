@@ -34,7 +34,7 @@
         <link type="text/css" rel="stylesheet" href="@routes.Assets.at("javascripts/libs/angular-material/angular-material.min.css")">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-         
+
         <link type="text/css" rel="stylesheet" href="@routes.Assets.at("stylesheets/style.css")">
 
         <style>
@@ -102,6 +102,14 @@
                     <md-tab md-on-select="">
                         <md-tab-label>
                             <md-icon class-="material-icons">{{ historyFactory.getIcon('timeX') }}</md-icon> Date Expression
+                        </md-tab-label>
+                        <md-tab-body>
+                            <div ui-view="histogramX"></div>
+                        </md-tab-body>
+                    </md-tab>
+                    <md-tab md-on-select="">
+                        <md-tab-label>
+                            <md-icon class-="material-icons">{{ historyFactory.getIcon('timeX') }}</md-icon> Similar Documents
                         </md-tab-label>
                         <md-tab-body>
                             <div ui-view="histogramX"></div>
