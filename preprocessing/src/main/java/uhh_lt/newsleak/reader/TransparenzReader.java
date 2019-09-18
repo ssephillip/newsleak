@@ -8,6 +8,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.uima.UimaContext;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.collection.CollectionException;
@@ -65,6 +66,9 @@ public class TransparenzReader extends NewsleakReader {
     /** Number of inner documents. */
     int numOfInnerPdf = 0;
 
+    /** The solr client */
+    HttpSolrClient solrClient;
+
 
     /**
      * Gets all inner document ids from the solr index (that match the query) and stores them in an iterator for later processing.
@@ -75,6 +79,7 @@ public class TransparenzReader extends NewsleakReader {
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
         logger = context.getLogger();
+        solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
         List<String> allInnerIds = new ArrayList<>();
         SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex();
@@ -113,7 +118,7 @@ public class TransparenzReader extends NewsleakReader {
         SolrDocument solrDocument = getOuterDocumentFromSolrIndex(outerId);
         TpDocument document = getInnerDocFromOuterDoc(solrDocument, relativeInnerId);
         if(document == null){
-            throw new CollectionException();
+            throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
         }
 
         String docId = Integer.toString(currentDocument);
@@ -200,7 +205,6 @@ public class TransparenzReader extends NewsleakReader {
     private SolrDocumentList getOuterDocIdsFromSolrIndex() throws ResourceInitializationException {
         QueryResponse response = null;
 
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
         SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
         documentQuery.addField("id");
         documentQuery.addField("res_format");
@@ -232,7 +236,7 @@ public class TransparenzReader extends NewsleakReader {
     private SolrDocument getOuterDocumentFromSolrIndex(String outerId) throws IOException {
         QueryResponse response = null;
 
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
+
         SolrQuery documentQuery = new SolrQuery("id:"+outerId);
         documentQuery.addField("id");
         documentQuery.addField("res_format");
@@ -373,5 +377,13 @@ public class TransparenzReader extends NewsleakReader {
                 docResFormats.isEmpty() || docResUrls.isEmpty() || docResFulltexts.isEmpty() || docResNames.isEmpty() ||
                 docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size() || docResFormats.size() != docResNames.size());
     }
+
+    @Override
+    public void close() throws IOException{
+        super.close();
+    }
+
+
+
 
 }
