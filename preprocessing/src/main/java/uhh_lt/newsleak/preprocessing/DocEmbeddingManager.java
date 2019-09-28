@@ -80,8 +80,8 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
 
         //String pathToResultVectorFile =
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addBinaryBody("vectors", new File(this.doc2vecResultDir+File.separator+this.doc2vecResultFileName +".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultFileName +".ext");
-        builder.addBinaryBody("ids", new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");
+        builder.addBinaryBody("vectors", new File(this.doc2vecResultDir+File.separator+this.doc2vecResultFileName +".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultFileName +".ext"); //TODO 2019-09-18 ps: introduce own attribute in config file for result dir
+        builder.addBinaryBody("ids", new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");//TODO 2019-09-18 ps: maybe copy id file also to result dir for consistency
         HttpEntity multipart = builder.build();
         httpPost.setEntity(multipart);
 
