@@ -698,9 +698,6 @@ define([
                     $scope.getSimilarDocsForOpenTab = function () {
                         var index = $scope.selectedTab.index;
                         $scope.similarDocuments = [];
-                        console.log("index: " + index);
-                        console.log("tabs: " + $scope.tabs);
-                        console.log("tab 1: " + $scope.tabs[0].title);
                         if (index == 0) {
 
                             //TODO 2019-09-26 ps: show message that no similar docs are available for graph networks
@@ -718,7 +715,6 @@ define([
 
                         $http.get('http://localhost:5003/vector/' + docid + '?num=' + $scope.numOfDocs) //TODO 2019-09-26 ps: get address from application.conf file;
                             .then(function (response) {
-                                console.log("response data: " + JSON.stringify(response.data));
                                 var docids = response.data.result.map(function (item) {
                                     return item[0];
                                 });
@@ -726,9 +722,7 @@ define([
                                 angular.forEach(response.data.result, function(item){
                                     docidsAndScores[item[0]] = item[1];
                                 });
-                                console.log("docids and scores: " + JSON.stringify(docidsAndScores));
                                 playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
-                                    console.log("docs: " + JSON.stringify(response.data.docs));
                                     var docs = response.data.docs;
                                     angular.forEach(docs, function (doc) {
                                         var currentDoc = {
@@ -748,19 +742,18 @@ define([
                                                 'type': metadata.type
                                             });
                                         });
-                                        console.log
+
                                         $scope.similarDocuments.push(currentDoc);
                                     });
-                                    console.log("similar docs: " + JSON.stringify($scope.similarDocuments));
                                 });
                             });
                     };
 
 
                     $scope.loadFullDocument = function (doc) {
-                        console.log("item: " + JSON.stringify(doc));
                         EntityService.setToggleEntityGraph(true);
                         EntityService.setToggleKeywordGraph(false);
+
                         // Focus open tab if document is already opened
                         if ($scope.isDocumentOpen(doc.id)) {
                             var index = _.findIndex($scope.sourceShareService.tabs, function (t) {
