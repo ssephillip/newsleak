@@ -18,7 +18,6 @@
 package controllers
 
 import javax.inject.Inject
-
 import models.services.DocumentService
 import models.{ Document, Facets, IteratorSession }
 import models.KeyTerm.keyTermFormat
@@ -26,7 +25,7 @@ import models.Tag.tagFormat
 import play.api.cache.CacheApi
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc.{ Action, AnyContent, Controller, Request }
-import util.DateUtils
+import util.{ DateUtils, NewsleakConfigReader }
 import util.SessionUtils.currentDataset
 
 import scala.collection.mutable.ListBuffer
@@ -55,6 +54,15 @@ class DocumentController @Inject() (
   def getDocsByLabel(label: String) = Action { implicit request =>
     val docs = documentService.getByTagLabel(label)(currentDataset)
     Ok(createJsonResponse(docs, docs.length))
+  }
+
+  /**
+   * Returns the address to the vector index.
+   * @return the address to the vector index
+   */
+  def getVectorIndexAddress() = Action { implicit request =>
+    val address = NewsleakConfigReader.config.getBoolean("vectorindex.address")
+    Ok(Json.obj("address" -> address)).as("application/json")
   }
 
   /**
