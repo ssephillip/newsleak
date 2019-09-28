@@ -205,11 +205,11 @@ define([
                     $scope.observer.subscribeItems($scope.observer_subscribe_fulltext, "fulltext");
 
                     //resize height of visible bars in 'metadata' view
-                    $scope.updateHeight = function() {
-                        $(".scroll-chart").css("height",$("#metadata").height()-150);
+                    $scope.updateHeight = function () {
+                        $(".scroll-chart").css("height", $("#metadata").height() - 150);
                     };
 
-                    $scope.emptyFacets = [{'key':'dummy','data': []}];
+                    $scope.emptyFacets = [{'key': 'dummy', 'data': []}];
 
                     // order by black bars (default = true)
                     $scope.reorder = true;
@@ -231,14 +231,16 @@ define([
                         var defer2 = $q.defer();
                         var prom = $q.all([defer1.promise, defer2.promise]);
                         $scope.observer.getEntityTypes().then(function (types) {
-                            $scope.entityTypes = types.map(function(t) { return t.name; });
-                            $scope.initEntityCharts().then(function() {
+                            $scope.entityTypes = types.map(function (t) {
+                                return t.name;
+                            });
+                            $scope.initEntityCharts().then(function () {
                                 defer1.resolve("initEntity");
                             });
                         });
                         $scope.observer.getMetadataTypes().then(function (types) {
                             $scope.metadataTypes = types;
-                            $scope.initMetadataCharts().then(function() {
+                            $scope.initMetadataCharts().then(function () {
                                 defer2.resolve("initMeta");
                             });
                         });
@@ -300,7 +302,7 @@ define([
 
                     $scope.updateEntityCharts = function () {
                         if ($scope.initializedEntity) {
-                            $scope.promiseEntityCharts =  $q.defer();
+                            $scope.promiseEntityCharts = $q.defer();
                             var entities = [];
                             angular.forEach($scope.entityFilters, function (item) {
                                 entities.push(item.data.id);
@@ -316,8 +318,8 @@ define([
                             $scope.entityPromises = [];
                             $scope.entityPromisesLocal = [];
                             angular.forEach($scope.entityTypes, function (type) {
-                                if($scope.metaCharts[type])
-                                     $scope.metaCharts[type].showLoading('Loading ...');
+                                if ($scope.metaCharts[type])
+                                    $scope.metaCharts[type].showLoading('Loading ...');
 
                                 var promise = $q.defer();
                                 $scope.entityPromisesLocal[type] = promise;
@@ -325,8 +327,8 @@ define([
                                 var defReorder = $q.defer();
                                 var instances = [];
 
-                                if($scope.reorder) {
-                                    playRoutes.controllers.EntityController.getEntitiesByType(fulltext, facets, entities, timeRange ,timeRangeX, 50, type).get().then(
+                                if ($scope.reorder) {
+                                    playRoutes.controllers.EntityController.getEntitiesByType(fulltext, facets, entities, timeRange, timeRangeX, 50, type).get().then(
                                         function (result) {
                                             var data = [];
                                             angular.forEach(result.data, function (x) {
@@ -345,7 +347,7 @@ define([
                                             });
                                             $scope.metaCharts[type].xAxis[0].setCategories(_.pluck(data, 'name'));
                                             $scope.metaCharts[type].series[1].setData(data);
-                                            $scope.metaCharts[type].series[1].data.forEach(function(e) {
+                                            $scope.metaCharts[type].series[1].data.forEach(function (e) {
                                                 instances.push(e.id);
                                             });
                                             fulltext = [];
@@ -356,38 +358,38 @@ define([
                                             defReorder.resolve("reorder");
                                         });
                                 } else {
-                                    $scope.metaCharts[type].series[0].data.forEach(function(e) {
+                                    $scope.metaCharts[type].series[0].data.forEach(function (e) {
                                         instances.push(e.id);
                                     });
                                     defReorder.resolve("reorder");
                                 }
-                                defReorder.promise.then(function() {
-                                playRoutes.controllers.EntityController.getEntitiesByType(fulltext, facets, entities, timeRange ,timeRangeX, 50, type, instances).get().then(
-                                    function (result) {
-                                        var data = [];
-                                        angular.forEach(result.data, function (x) {
-                                            if (x.docCount <= 0)
-                                                data.push({
-                                                    y: null,
-                                                    name: x.name,
-                                                    id: x.id
-                                                });
+                                defReorder.promise.then(function () {
+                                    playRoutes.controllers.EntityController.getEntitiesByType(fulltext, facets, entities, timeRange, timeRangeX, 50, type, instances).get().then(
+                                        function (result) {
+                                            var data = [];
+                                            angular.forEach(result.data, function (x) {
+                                                if (x.docCount <= 0)
+                                                    data.push({
+                                                        y: null,
+                                                        name: x.name,
+                                                        id: x.id
+                                                    });
+                                                else
+                                                    data.push({
+                                                        y: x.docCount,
+                                                        name: x.name,
+                                                        id: x.id
+                                                    });
+                                            });
+                                            if ($scope.reorder)
+                                                $scope.metaCharts[type].series[0].setData(data);
                                             else
-                                                data.push({
-                                                    y: x.docCount,
-                                                    name: x.name,
-                                                    id: x.id
-                                                });
-                                        });
-                                        if($scope.reorder)
-                                            $scope.metaCharts[type].series[0].setData(data);
-                                        else
-                                            $scope.metaCharts[type].series[1].setData(data);
+                                                $scope.metaCharts[type].series[1].setData(data);
 
-                                        $scope.metaCharts[type].hideLoading();
-                                        $scope.entityPromisesLocal[type].resolve("suc: " + type);
-                                    }
-                                );
+                                            $scope.metaCharts[type].hideLoading();
+                                            $scope.entityPromisesLocal[type].resolve("suc: " + type);
+                                        }
+                                    );
                                 });
 
                             });
@@ -418,11 +420,11 @@ define([
                                 $scope.metaCharts[type].showLoading('Loading ...');
                                 var instances = [];
                                 var defReorder = $q.defer();
-                                if($scope.reorder) {
-                                    playRoutes.controllers.MetadataController.getSpecificMetadata(fulltext, type.replace(".","_"), facets, entities, undefined, timeRange,timeRangeX).get().then(
+                                if ($scope.reorder) {
+                                    playRoutes.controllers.MetadataController.getSpecificMetadata(fulltext, type.replace(".", "_"), facets, entities, undefined, timeRange, timeRangeX).get().then(
                                         function (result) {
                                             var data = [];
-                                            angular.forEach(result.data[type.replace(".","_")], function (x) {
+                                            angular.forEach(result.data[type.replace(".", "_")], function (x) {
                                                 if (x.count <= 0)
                                                     data.push({
                                                         y: null,
@@ -436,7 +438,7 @@ define([
                                             });
                                             $scope.metaCharts[type].series[1].setData(data);
                                             $scope.metaCharts[type].xAxis[0].setCategories(_.pluck(data, 'name'));
-                                            $scope.chartConfigs[type].series[1].data.forEach(function(m) {
+                                            $scope.chartConfigs[type].series[1].data.forEach(function (m) {
                                                 instances.push(m.name);
                                             });
                                             fulltext = [];
@@ -447,37 +449,37 @@ define([
                                             defReorder.resolve("suc");
                                         });
                                 } else {
-                                    $scope.chartConfigs[type].series[0].data.forEach(function(m) {
+                                    $scope.chartConfigs[type].series[0].data.forEach(function (m) {
                                         instances.push(m.name);
                                     });
                                     defReorder.resolve("suc");
                                 }
-                               defReorder.promise.then(function() {
+                                defReorder.promise.then(function () {
 
-                                playRoutes.controllers.MetadataController.getSpecificMetadata(fulltext, type.replace(".","_"), facets, entities, instances, timeRange,timeRangeX).get().then(
-                                    function (result) {
-                                        var data = [];
-                                        angular.forEach(result.data[type.replace(".","_")], function (x) {
-                                            if (x.count <= 0)
-                                                data.push({
-                                                    y: null,
-                                                    name: x.key
-                                                });
+                                    playRoutes.controllers.MetadataController.getSpecificMetadata(fulltext, type.replace(".", "_"), facets, entities, instances, timeRange, timeRangeX).get().then(
+                                        function (result) {
+                                            var data = [];
+                                            angular.forEach(result.data[type.replace(".", "_")], function (x) {
+                                                if (x.count <= 0)
+                                                    data.push({
+                                                        y: null,
+                                                        name: x.key
+                                                    });
+                                                else
+                                                    data.push({
+                                                        y: x.count,
+                                                        name: x.key
+                                                    });
+                                            });
+                                            if ($scope.reorder)
+                                                $scope.metaCharts[type].series[0].setData(data);
                                             else
-                                                data.push({
-                                                    y: x.count,
-                                                    name: x.key
-                                                });
-                                        });
-                                        if($scope.reorder)
-                                            $scope.metaCharts[type].series[0].setData(data);
-                                        else
-                                            $scope.metaCharts[type].series[1].setData(data);
-                                        $scope.metaCharts[type].hideLoading();
-                                        $scope.metaPromisesLocal[type].resolve("suc: " + type);
-                                    }
-                                );
-                               });
+                                                $scope.metaCharts[type].series[1].setData(data);
+                                            $scope.metaCharts[type].hideLoading();
+                                            $scope.metaPromisesLocal[type].resolve("suc: " + type);
+                                        }
+                                    );
+                                });
 
                             });
                             return $scope.metaPromises;
@@ -575,7 +577,7 @@ define([
                                     $.each(result.data, function () {
                                             $.each(this, function (key2, value) {
                                                 //console.log(value);
-                                                var key = key2.replace("_",".");
+                                                var key = key2.replace("_", ".");
                                                 if ($scope.metadataTypes.indexOf(key) != -1) {
 
                                                     $scope.chartConfigs[key] = angular.copy($scope.chartConfig);
@@ -623,8 +625,8 @@ define([
                                                             }
                                                         }
                                                     }];
-                                                    $scope.chartConfigs[key].chart.renderTo = "chart_" + key.toLowerCase().replace(".","_");
-                                                    $("#chart_" + key.toLowerCase().replace(".","_")).css("height", $scope.metaData[key].length * 35);
+                                                    $scope.chartConfigs[key].chart.renderTo = "chart_" + key.toLowerCase().replace(".", "_");
+                                                    $("#chart_" + key.toLowerCase().replace(".", "_")).css("height", $scope.metaData[key].length * 35);
                                                     $scope.metaCharts[key] = new Highcharts.Chart($scope.chartConfigs[key]);
                                                 }
                                             });
@@ -637,8 +639,8 @@ define([
                         return defer.promise;
                     };
 
-                    $scope.resetMetadataView = function() {
-                        $scope.initMetadataView().then(function() {
+                    $scope.resetMetadataView = function () {
+                        $scope.initMetadataView().then(function () {
                             $scope.updateMetadataView();
 
                         });
@@ -651,7 +653,7 @@ define([
                     };
 
 
-                    $scope.observer.registerObserverCallback({ priority: 10, callback: $scope.updateMetadataView });
+                    $scope.observer.registerObserverCallback({priority: 10, callback: $scope.updateMetadataView});
                     //load another 50 entities for specific metadata
                     $scope.loadMore = function (ele) {
                         if (ele.mcs.top != 0) {
