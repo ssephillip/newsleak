@@ -34,6 +34,7 @@ define([
         .controller('MetadataController',
             [
                 '$scope',
+                '$http',
                 '$timeout',
                 '$q',
                 'playRoutes',
@@ -43,7 +44,8 @@ define([
                 'sourceShareService',
                 'ObserverService',
                 '_',
-                function ($scope, $timeout, $q, playRoutes, historyFactory, graphProperties, metaShareService, sourceShareService, ObserverService, _) {
+                'EntityService',
+                function ($scope, $http, $timeout, $q, playRoutes, historyFactory, graphProperties, metaShareService, sourceShareService, ObserverService, _, EntityService) {
 
                     /*(function (H, $) {
                         var fireEvent = H.fireEvent;
@@ -183,6 +185,7 @@ define([
                     $scope.chartConfig = metaShareService.chartConfig;
                     $scope.historyFactory = historyFactory;
                     $scope.observer = ObserverService;
+                    $scope.numOfDocs = 10;
 
 
                     /**
@@ -683,10 +686,119 @@ define([
                     /** entry point here **/
                     $scope.metaShareService = metaShareService;
                     $scope.sourceShareService = sourceShareService;
+                    $scope.tabs = $scope.sourceShareService.tabs;
 
 
                     //TODO: calc height on bar count -> scroll bar
                     $scope.tabHeight = $("#metadata").height() - 100;
+
+
+                    $scope.getSimilarDocsForOpenTab = function () {
+                        var index = $scope.selectedTab.index;
+                        $scope.similarDocuments = [];
+                        console.log("index: " + index);
+                        console.log("tabs: " + $scope.tabs);
+                        console.log("tab 1: " + $scope.tabs[0].title);
+                        if (index == 0) {
+
+                            //TODO 2019-09-26 ps: show message that no similar docs are available for graph networks
+                            return;
+                        } else {
+                            var docid = $scope.tabs[index - 1].id;
+                        }
+
+                        var address = ""; //TODO 2019-09-27 ps: Gregor fragen wie das mit dem routing funktioniert
+                        // playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function(response){
+                        //     console.log(JSON.stringify(response));
+                        //    address = response.address;
+                        //     console.log(address);
+                        // })
+
+                        $http.get('http://localhost:5003/vector/' + docid + '?num=' + $scope.numOfDocs) //TODO 2019-09-26 ps: get address from application.conf file;
+                            .then(function (response) {
+                                console.log("response data: " + JSON.stringify(response.data));
+                                var docids = response.data.result.map(function (item) {
+                                    return item[0];
+                                });
+                                var docidsAndScores = [];
+                                angular.forEach(response.data.result, function(item){
+                                    docidsAndScores[item[0]] = item[1];
+                                });
+                                console.log("docids and scores: " + JSON.stringify(docidsAndScores));
+                                playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
+                                    console.log("docs: " + JSON.stringify(response.data.docs));
+                                    var docs = response.data.docs;
+                                    angular.forEach(docs, function (doc) {
+                                        var currentDoc = {
+                                            id: doc.id,
+                                            content: doc.content,
+                                            highlighted: doc.highlighted,
+                                            score: docidsAndScores[doc.id],
+                                            metadata: {}
+                                    }
+                                        ;
+                                        angular.forEach(doc.metadata, function (metadata) {
+                                            if (!currentDoc.metadata.hasOwnProperty(metadata.key)) {
+                                                currentDoc.metadata[metadata.key] = [];
+                                            }
+                                            currentDoc.metadata[metadata.key].push({
+                                                'val': metadata.val,
+                                                'type': metadata.type
+                                            });
+                                        });
+                                        console.log
+                                        $scope.similarDocuments.push(currentDoc);
+                                    });
+                                    console.log("similar docs: " + JSON.stringify($scope.similarDocuments));
+                                });
+                            });
+                    };
+
+
+                    $scope.loadFullDocument = function (doc) {
+                        console.log("item: " + JSON.stringify(doc));
+                        EntityService.setToggleEntityGraph(true);
+                        EntityService.setToggleKeywordGraph(false);
+                        // Focus open tab if document is already opened
+                        if ($scope.isDocumentOpen(doc.id)) {
+                            var index = _.findIndex($scope.sourceShareService.tabs, function (t) {
+                                return t.id == doc.id;
+                            });
+                            // Skip first network tab
+                            $scope.selectedTab.index = index + 1;
+                        } else {
+                            var editItem = {
+                                type: 'openDoc',
+                                data: {
+                                    id: doc.id,
+                                    description: "#" + doc.id,
+                                    item: "#" + doc.id
+                                }
+                            };
+                            $scope.observer.addItem(editItem);
+
+                            playRoutes.controllers.EntityController.getEntitiesByDoc(doc.id).get().then(function (response) {
+                                // Provide document controller with document information
+                                $scope.sourceShareService.tabs.push({
+                                    id: doc.id,
+                                    title: doc.id,
+                                    content: doc.content,
+                                    highlighted: doc.highlighted,
+                                    meta: doc.metadata,
+                                    entities: response.data
+                                });
+                            });
+                        }
+                    };
+
+
+                    $scope.isDocumentOpen = function (id) {
+                        var index = _.findIndex($scope.sourceShareService.tabs, function (t) {
+                            return t.id == id;
+                        });
+                        return index != -1;
+                    };
+
 
                     /*$scope.onContext = function(params) {
                         params.event.preventDefault();
