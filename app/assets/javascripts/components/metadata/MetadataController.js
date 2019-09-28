@@ -695,14 +695,17 @@ define([
                     $scope.tabHeight = $("#metadata").height() - 100;
 
 
+                    //gets semantically similar docs for currently open tab
                     $scope.getSimilarDocsForOpenTab = function () {
                         var index = $scope.selectedTab.index;
                         $scope.similarDocuments = [];
-                        if (index == 0) {
 
+                        if (index == 0) {
+                            //first tab (with graphs) is selected
                             //TODO 2019-09-26 ps: show message that no similar docs are available for graph networks
                             return;
                         } else {
+                            //get the id of the currently opened document
                             var docid = $scope.tabs[index - 1].id;
                         }
 
@@ -713,26 +716,31 @@ define([
                         //     console.log(address);
                         // })
 
+                        //get the ids of the most similar documents
                         $http.get('http://localhost:5003/vector/' + docid + '?num=' + $scope.numOfDocs) //TODO 2019-09-26 ps: get address from application.conf file;
                             .then(function (response) {
-                                var docids = response.data.result.map(function (item) {
-                                    return item[0];
-                                });
+                                //extract ids from the response
+                                var docids = response.data.result.map(function (item) { return item[0]; });
                                 var docidsAndScores = [];
-                                angular.forEach(response.data.result, function(item){
+
+                                //create map with key=docid and value=doc-similarity-score
+                                angular.forEach(response.data.result, function (item) {
                                     docidsAndScores[item[0]] = item[1];
                                 });
+
+                                //gets documents for the before retrieved ids, transforms them in the necessary structure and adds them to the list of similar documents
                                 playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
                                     var docs = response.data.docs;
                                     angular.forEach(docs, function (doc) {
                                         var currentDoc = {
-                                            id: doc.id,
-                                            content: doc.content,
-                                            highlighted: doc.highlighted,
-                                            score: docidsAndScores[doc.id],
-                                            metadata: {}
-                                    }
-                                        ;
+                                                id: doc.id,
+                                                content: doc.content,
+                                                highlighted: doc.highlighted,
+                                                score: docidsAndScores[doc.id],
+                                                metadata: {}
+                                            };
+
+                                        //transforms metadata into different structure; content stays the same
                                         angular.forEach(doc.metadata, function (metadata) {
                                             if (!currentDoc.metadata.hasOwnProperty(metadata.key)) {
                                                 currentDoc.metadata[metadata.key] = [];
