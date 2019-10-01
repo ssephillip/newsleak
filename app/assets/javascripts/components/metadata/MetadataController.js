@@ -212,6 +212,10 @@ define([
                         $(".scroll-chart").css("height", $("#metadata").height() - 150);
                     };
 
+                    $scope.updateHeightSimDocs = function () {
+                        $(".similar-docs-list").css("height", $("#metadata").height() - 150);
+                    };
+
                     $scope.emptyFacets = [{'key': 'dummy', 'data': []}];
 
                     // order by black bars (default = true)
@@ -700,6 +704,7 @@ define([
 
                     //gets semantically similar docs for currently open tab
                     $scope.getSimilarDocsForOpenTab = function () {
+                        $scope.updateHeightSimDocs();
                         var method = $scope.selectedMethod.name;
                         if (method === $scope.availableMethods[0].name) {
                             //selected method is Doc2VecC

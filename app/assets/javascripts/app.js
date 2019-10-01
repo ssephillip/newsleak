@@ -158,6 +158,7 @@ define([
                 $("#histogram").highcharts().reflow();
                 $("#histogramX").highcharts().reflow();
                 $(".scroll-chart").css("height",$("#metadata").height()-150);
+                $(".similar-docs-list").css("height", $("#metadata").height() - 150);
                 if($("#metadata-view .md-active .meta-chart").highcharts()){
                     $("#metadata-view .md-active .meta-chart").highcharts().reflow();
                 }

@@ -56,13 +56,13 @@
                 </div>
             </md-tab-body>
         </md-tab>
-        <md-tab md-on-select="getSimilarDocsForOpenTab()">
+        <md-tab md-on-select="getSimilarDocsForOpenTab()" class="docs-ul">
             <md-tab-label>
                 <!--                <md-icon class-="material-icons">{{ historyFactory.getIcon('metadata') }}</md-icon> -->
                 Similar Docs
             </md-tab-label>
             <md-tab-body>
-             <div>
+
                 <div style="display: flex; margin-left:25px; margin-top:5px; opacity: 0.8;">
                     Similar documents (for selected tab)
                 </div>
@@ -84,9 +84,12 @@
                         <md-tooltip> Load similar documents for the tab currently open</md-tooltip>
                     </md-button>
                 </div>
+                <div class="no-sim-docs" ng-show="!similarDocsAvailable" >
+                    <span> No similar documents available.
+                        <br> Verify that you selected the correct tab. </span>
+                </div>
 
-                <div>
-                <md-content ng-show="similarDocsAvailable" style="height: 800px;">
+                <md-content ng-show="similarDocsAvailable" class="similar-docs-list" style="height: 500px">
                     <md-list class="md-dense" >
                         <md-list-item
                                 ng-repeat="item in similarDocuments"
@@ -110,13 +113,9 @@
                         </md-list-item>
                     </md-list>
                 </md-content>
-                </div>
-                <div class="no-sim-docs" ng-show="!similarDocsAvailable" >
-                    <span> No similar documents available.
-                        <br> Verify that you selected the correct tab. </span>
-                </div>
+
             </md-tab-body>
-        </div>
+
         </md-tab>
     </md-tabs>
 
