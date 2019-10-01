@@ -61,7 +61,7 @@ class DocumentController @Inject() (
    * @return the address to the vector index
    */
   def getVectorIndexAddress() = Action { implicit request =>
-    val address = NewsleakConfigReader.config.getBoolean("vectorindex.address")
+    val address = NewsleakConfigReader.config.getString("vectorindex.address")
     Ok(Json.obj("address" -> address)).as("application/json")
   }
 

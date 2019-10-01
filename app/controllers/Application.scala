@@ -123,6 +123,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
         controllers.routes.javascript.DocumentController.createNewEntity,
         controllers.routes.javascript.DocumentController.createInitEntityType,
         controllers.routes.javascript.DocumentController.createNewEntityType,
+        controllers.routes.javascript.DocumentController.getVectorIndexAddress,
         controllers.routes.javascript.NetworkController.blacklistEntitiesById,
         controllers.routes.javascript.NetworkController.mergeEntitiesById,
         controllers.routes.javascript.NetworkController.changeEntityNameById,

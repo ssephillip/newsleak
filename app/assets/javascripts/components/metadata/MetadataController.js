@@ -736,16 +736,15 @@ define([
                             var docid = $scope.tabs[index - 1].id;
                         }
 
-                        var address = ""; //TODO 2019-09-27 ps: Gregor fragen wie das mit dem routing funktioniert
-                        // playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function(response){
-                        //     console.log(JSON.stringify(response));
-                        //    address = response.address;
-                        //     console.log(address);
-                        // })
+                        var vectorIndexAddress = "";
+                        playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function(response){
+                            vectorIndexAddress = response.data.address;
+
 
                         //get the ids of the most similar documents
-                        $http.get('http://localhost:5003/vector/' + docid + '?num=' + $scope.numOfDocs) //TODO 2019-09-26 ps: get address from application.conf file;
+                        $http.get(vectorIndexAddress+'/' + docid + '?num=' + $scope.numOfDocs)
                             .then(function (response) {
+                                console.log("response: "+response);
                                 //extract ids from the response
                                 var docids = response.data.result.map(function (item) { return item[0]; });
                                 var docidsAndScores = [];
