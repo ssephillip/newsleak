@@ -186,6 +186,9 @@ define([
                     $scope.historyFactory = historyFactory;
                     $scope.observer = ObserverService;
                     $scope.numOfDocs = 10;
+                    $scope.availableMethods = [{name: "Doc2VecC"}, {name: "Elastic"}];
+                    $scope.selectedMethod = $scope.availableMethods[0];
+                    $scope.similarDocsAvailable = true;
 
 
                     /**
@@ -697,12 +700,36 @@ define([
 
                     //gets semantically similar docs for currently open tab
                     $scope.getSimilarDocsForOpenTab = function () {
+                        var method = $scope.selectedMethod.name;
+                        if (method === $scope.availableMethods[0].name) {
+                            //selected method is Doc2VecC
+                            $scope.getSimilarDocsDoc2VecC();
+                        } else if (method === $scope.availableMethods[1].name) {
+                            //selected method is Elastic
+                            $scope.getSimilarDocsElasticsearch();
+                        } else {
+                            $scope.similarDocsAvailable = false;
+                            console.log("Unknown method!");
+                        }
+                    }
+
+
+                    $scope.getSimilarDocsElasticsearch = function () {
+                        console.log("Hier wird mal die Elasticsearch 'more like this' Query verwendet werden.");
+                        console.log("Getting similar documents with method 'Elastic");
+                        $scope.getSimilarDocsDoc2VecC();
+                    }
+
+                    $scope.getSimilarDocsDoc2VecC = function () {
                         var index = $scope.selectedTab.index;
                         $scope.similarDocuments = [];
 
+                        console.log("Getting similar documents with method 'Doc2VecC");
+
                         if (index == 0) {
+                            console.log("No similar docs available for selected tab/document")
+                            $scope.similarDocsAvailable = false;
                             //first tab (with graphs) is selected
-                            //TODO 2019-09-26 ps: show message that no similar docs are available for graph networks
                             return;
                         } else {
                             //get the id of the currently opened document
@@ -733,12 +760,12 @@ define([
                                     var docs = response.data.docs;
                                     angular.forEach(docs, function (doc) {
                                         var currentDoc = {
-                                                id: doc.id,
-                                                content: doc.content,
-                                                highlighted: doc.highlighted,
-                                                score: docidsAndScores[doc.id],
-                                                metadata: {}
-                                            };
+                                            id: doc.id,
+                                            content: doc.content,
+                                            highlighted: doc.highlighted,
+                                            score: docidsAndScores[doc.id],
+                                            metadata: {}
+                                        };
 
                                         //transforms metadata into different structure; content stays the same
                                         angular.forEach(doc.metadata, function (metadata) {
@@ -753,8 +780,14 @@ define([
 
                                         $scope.similarDocuments.push(currentDoc);
                                     });
+                                    if($scope.similarDocuments.length > 0){
+                                        $scope.similarDocsAvailable = true;
+                                    }else{
+                                        $scope.similarDocsAvailable = false;
+                                    }
                                 });
                             });
+                        })
                     };
 
 

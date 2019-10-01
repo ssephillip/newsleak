@@ -447,6 +447,15 @@ footer > div #histogram {
     text-align: center;
 }
 
+.no-sim-docs {
+    margin-top: 20px;
+    height: 100%;
+    width: 100%;
+    background: white;
+    opacity: 0.5;
+    text-align: center;
+}
+
 .docs-loading span {
     font-weight: bold;
     position: relative;

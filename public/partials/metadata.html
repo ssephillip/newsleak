@@ -62,15 +62,22 @@
                 Similar Docs
             </md-tab-label>
             <md-tab-body>
-                <div style="display: flex; margin-left:25px; margin-top:5px;">
+             <div>
+                <div style="display: flex; margin-left:25px; margin-top:5px; opacity: 0.8;">
                     Similar documents (for selected tab)
                 </div>
-                <div id="similarDocsControls" style="display: flex; flex-direction:row; margin-left:25px; margin-top: 7px; align-items: center">
+                <div id="similarDocsControls"
+                     style="display: flex; flex-direction:row; margin-left:25px; margin-top: 7px; align-items: center">
                     <md-input-container layout flex="30" flex-direction="column">
                         <label>Num. of Docs</label>
-                        <input ng-model="numOfDocs"  ng-click="event = null" type="number"
-                               step="1" min="0"
-                               ng-model-options="{updateOn: 'default blur', debounce: {default: 1000, blur: 0} }">
+                        <input ng-model="numOfDocs" type="number"
+                               step="1" min="0">
+                    </md-input-container>
+                    <md-input-container flex="33" style="margin-left: 3px;">
+                        <label>Method</label>
+                        <md-select ng-model="selectedMethod" ng-model-options="{trackBy: '$value.name'}">
+                            <md-option ng-value="method" ng-repeat="method in availableMethods">{{ method.name }}</md-option>
+                        </md-select>
                     </md-input-container>
                     <md-button class="md-raised md-small" ng-click="getSimilarDocsForOpenTab()" aria-label="">
                         Refresh
@@ -78,8 +85,9 @@
                     </md-button>
                 </div>
 
-                <md-content>
-                    <md-list class="md-dense" style="height: 500px;">
+                <div>
+                <md-content ng-show="similarDocsAvailable" style="height: 800px;">
+                    <md-list class="md-dense" >
                         <md-list-item
                                 ng-repeat="item in similarDocuments"
                                 md-item-size="50"
@@ -95,15 +103,20 @@
                             </md-button>
                             <div class="md-list-item-text" layout="column">
                                 <h3>{{ sourceShareService.pluckMetaValues(item.metadata.Subject).join(", ") }}</h3>
-                                <p>Score: {{item.score | number : 4}}  Id: {{item.id}} </p>
+                                <p>Score: {{item.score | number : 4}} Id: {{item.id}} </p>
                             </div>
                             <md-divider ng-if="!$last"></md-divider>
 
                         </md-list-item>
                     </md-list>
                 </md-content>
-
+                </div>
+                <div class="no-sim-docs" ng-show="!similarDocsAvailable" >
+                    <span> No similar documents available.
+                        <br> Verify that you selected the correct tab. </span>
+                </div>
             </md-tab-body>
+        </div>
         </md-tab>
     </md-tabs>
 
