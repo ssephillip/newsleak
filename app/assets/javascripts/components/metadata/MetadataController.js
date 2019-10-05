@@ -779,7 +779,7 @@ define([
 
 
                     //gets documents for the before retrieved ids, transforms them in the necessary structure and adds them to the list of similar documents
-                    $scope.getAndPushDocs = function(docids, docIdsAndScores, reverseOrder){
+                    $scope.getAndPushDocs = function (docids, docIdsAndScores, reverseOrder) {
                         playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
                             var docs = response.data.docs;
                             var transformedDocs = $scope.transformDocuments(docs, docIdsAndScores);
@@ -792,7 +792,7 @@ define([
 
 
 
-                    $scope.transformDocuments = function(docs, docIdsAndScores){
+                    $scope.transformDocuments = function (docs, docIdsAndScores) {
                         var transformedDocs = [];
 
                         angular.forEach(docs, function (doc) {

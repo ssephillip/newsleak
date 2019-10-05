@@ -77,7 +77,8 @@
                     <md-input-container flex="33" style="margin-left: 3px;">
                         <label>Method</label>
                         <md-select ng-model="selectedMethod" ng-model-options="{trackBy: '$value.name'}">
-                            <md-option ng-value="method" ng-repeat="method in availableMethods">{{ method.name }}</md-option>
+                            <md-option ng-value="method" ng-repeat="method in availableMethods">{{ method.name }}
+                            </md-option>
                         </md-select>
                     </md-input-container>
                     <md-button class="md-raised md-small" ng-click="getSimilarDocsForOpenTab()" aria-label="">
@@ -85,13 +86,13 @@
                         <md-tooltip> Load similar documents for the tab currently open</md-tooltip>
                     </md-button>
                 </div>
-                <div class="no-sim-docs" ng-show="!similarDocsAvailable" >
+                <div class="no-sim-docs" ng-show="!similarDocsAvailable">
                     <span> No similar documents available.
                         <br> Verify that you selected the correct tab. </span>
                 </div>
 
                 <md-content ng-show="similarDocsAvailable" class="similar-docs-list" style="height: 500px">
-                    <md-list class="md-dense" >
+                    <md-list class="md-dense">
                         <md-list-item
                                 ng-repeat="item in similarDocuments"
                                 md-item-size="50"
