@@ -37,6 +37,7 @@ define([
                 '$http',
                 '$timeout',
                 '$q',
+                '$filter',
                 'playRoutes',
                 'historyFactory',
                 'graphProperties',
@@ -45,7 +46,7 @@ define([
                 'ObserverService',
                 '_',
                 'EntityService',
-                function ($scope, $http, $timeout, $q, playRoutes, historyFactory, graphProperties, metaShareService, sourceShareService, ObserverService, _, EntityService) {
+                function ($scope, $http, $timeout, $q, $filter, playRoutes, historyFactory, graphProperties, metaShareService, sourceShareService, ObserverService, _, EntityService) {
 
                     /*(function (H, $) {
                         var fireEvent = H.fireEvent;
@@ -705,41 +706,57 @@ define([
                     //gets semantically similar docs for currently open tab
                     $scope.getSimilarDocsForOpenTab = function () {
                         $scope.updateHeightSimDocs();
-                        var method = $scope.selectedMethod.name;
-                        if (method === $scope.availableMethods[0].name) {
-                            //selected method is Doc2VecC
-                            $scope.getSimilarDocsDoc2VecC();
-                        } else if (method === $scope.availableMethods[1].name) {
-                            //selected method is Elastic
-                            $scope.getSimilarDocsElasticsearch();
-                        } else {
-                            $scope.similarDocsAvailable = false;
-                            console.log("Unknown method!");
-                        }
-                    }
-
-
-                    $scope.getSimilarDocsElasticsearch = function () {
-                        console.log("Hier wird mal die Elasticsearch 'more like this' Query verwendet werden.");
-                        console.log("Getting similar documents with method 'Elastic");
-                        $scope.getSimilarDocsDoc2VecC();
-                    }
-
-                    $scope.getSimilarDocsDoc2VecC = function () {
-                        var index = $scope.selectedTab.index;
+                        var tabIndex = $scope.selectedTab.index;
                         $scope.similarDocuments = [];
 
-                        console.log("Getting similar documents with method 'Doc2VecC");
 
-                        if (index == 0) {
+                        if (tabIndex == 0) {
+                            //first tab (with graphs) is selected
                             console.log("No similar docs available for selected tab/document")
                             $scope.similarDocsAvailable = false;
-                            //first tab (with graphs) is selected
+
                             return;
-                        } else {
-                            //get the id of the currently opened document
-                            var docid = $scope.tabs[index - 1].id;
+                        } else { //a tab with a document is selected
+                            var docid = $scope.tabs[tabIndex - 1].id;
+                            var method = $scope.selectedMethod.name;
+
+                            if (method === $scope.availableMethods[0].name) {
+                                //selected method is Doc2VecC
+                                $scope.getSimilarDocsDoc2VecC(docid);
+                                console.log("similar docs length: "+$scope.similarDocuments.length);
+                            } else if (method === $scope.availableMethods[1].name) {
+                                //selected method is Elastic
+                                $scope.getSimilarDocsElasticsearch(docid);
+                            } else {
+                                $scope.similarDocsAvailable = false;
+                                console.log("Unknown method!");
+                            }
+
                         }
+
+
+                    }
+
+
+                    $scope.getSimilarDocsElasticsearch = function (docid) {
+                        console.log("Hier wird mal die Elasticsearch 'more like this' Query verwendet werden.");
+                        console.log("Getting similar documents with method 'Elastic");
+
+                        var docids = [];
+                        var docIdsAndScores = [];
+
+                        playRoutes.controllers.DocumentController.getMoreLikeThis(docid, $scope.numOfDocs).get().then(function (response) {
+
+                            docids = Object.keys(response.data);
+                            docIdsAndScores = response.data;
+
+                            $scope.getAndPushDocs(docids, docIdsAndScores, true);
+
+                        });
+                    }
+
+                    $scope.getSimilarDocsDoc2VecC = function (docid) {
+                        console.log("Getting similar documents with method 'Doc2VecC");
 
                         var vectorIndexAddress = "";
                         playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function(response){
@@ -749,50 +766,66 @@ define([
                         //get the ids of the most similar documents
                         $http.get(vectorIndexAddress+'/' + docid + '?num=' + $scope.numOfDocs)
                             .then(function (response) {
-                                console.log("response: "+response);
                                 //extract ids from the response
                                 var docids = response.data.result.map(function (item) { return item[0]; });
-                                var docidsAndScores = [];
+                                var docIdsAndScores = [];
 
                                 //create map with key=docid and value=doc-similarity-score
                                 angular.forEach(response.data.result, function (item) {
-                                    docidsAndScores[item[0]] = item[1];
+                                    docIdsAndScores[item[0]] = item[1];
                                 });
 
-                                //gets documents for the before retrieved ids, transforms them in the necessary structure and adds them to the list of similar documents
-                                playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
-                                    var docs = response.data.docs;
-                                    angular.forEach(docs, function (doc) {
-                                        var currentDoc = {
-                                            id: doc.id,
-                                            content: doc.content,
-                                            highlighted: doc.highlighted,
-                                            score: docidsAndScores[doc.id],
-                                            metadata: {}
-                                        };
-
-                                        //transforms metadata into different structure; content stays the same
-                                        angular.forEach(doc.metadata, function (metadata) {
-                                            if (!currentDoc.metadata.hasOwnProperty(metadata.key)) {
-                                                currentDoc.metadata[metadata.key] = [];
-                                            }
-                                            currentDoc.metadata[metadata.key].push({
-                                                'val': metadata.val,
-                                                'type': metadata.type
-                                            });
-                                        });
-
-                                        $scope.similarDocuments.push(currentDoc);
-                                    });
-                                    if($scope.similarDocuments.length > 0){
-                                        $scope.similarDocsAvailable = true;
-                                    }else{
-                                        $scope.similarDocsAvailable = false;
-                                    }
-                                });
+                                $scope.getAndPushDocs(docids, docIdsAndScores, false);
                             });
                         })
                     };
+
+
+
+                    //gets documents for the before retrieved ids, transforms them in the necessary structure and adds them to the list of similar documents
+                    $scope.getAndPushDocs = function(docids, docIdsAndScores, reverseOrder){
+                        playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
+                            var docs = response.data.docs;
+                            var transformedDocs = $scope.transformDocuments(docs, docIdsAndScores);
+                            transformedDocs.map(doc => $scope.similarDocuments.push(doc));
+
+                            console.log("docs unordered: "+JSON.stringify($scope.similarDocuments));
+                            $scope.similarDocuments = $filter('orderBy')($scope.similarDocuments, 'score', reverseOrder);
+                            console.log("docs ordered: "+JSON.stringify($scope.similarDocuments));
+
+                            $scope.similarDocsAvailable = $scope.similarDocuments.length > 0;
+                        });
+                    }
+
+
+                    $scope.transformDocuments = function(docs, docIdsAndScores){
+                        var transformedDocs = [];
+
+                        angular.forEach(docs, function (doc) {
+                            var currentDoc = {
+                                id: doc.id,
+                                content: doc.content,
+                                highlighted: doc.highlighted,
+                                score: docIdsAndScores[doc.id],
+                                metadata: {}
+                            };
+
+                            //transforms metadata into different structure; content stays the same
+                            angular.forEach(doc.metadata, function (metadata) {
+                                if (!currentDoc.metadata.hasOwnProperty(metadata.key)) {
+                                    currentDoc.metadata[metadata.key] = [];
+                                }
+                                currentDoc.metadata[metadata.key].push({
+                                    'val': metadata.val,
+                                    'type': metadata.type
+                                });
+                            });
+
+                            transformedDocs.push(currentDoc);
+                        });
+                        console.log("transformed docs length : "+transformedDocs.length);
+                        return transformedDocs;
+                    }
 
 
                     $scope.loadFullDocument = function (doc) {

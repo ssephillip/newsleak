@@ -74,6 +74,7 @@ GET        /createNewKeyword                      controllers.DocumentController
 GET        /createInitEntityTy1pe                 controllers.DocumentController.createInitEntityType(docId: String, entId: Int, entName: String, entType: String)
 GET        /createNewEntityType                   controllers.DocumentController.createNewEntityType(docId: String, entId: Int, entName: String, entType: String)
 GET        /getVectorIndexAddress                 controllers.DocumentController.getVectorIndexAddress()
+GET        /getMoreLikeThis                       controllers.DocumentController.getMoreLikeThis(id: String, numOfDocs: Int)
 
 GET        /highlightKeysByEnt                    controllers.NetworkController.highlightKeysByEnt(entName: String)
 GET        /highlightEntsByKey                    controllers.KeywordNetworkController.highlightEntsByKey(keyName: String)

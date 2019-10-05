@@ -313,6 +313,13 @@ class DocumentController @Inject() (
     Ok(createJsonResponse(docList.toList, iteratorSession.hits))
   }
 
+  def getMoreLikeThis(id: String, numOfDocs: Int) = Action { implicit request =>
+
+    val idsAndScores = documentService.searchMoreLikeThis(id, numOfDocs)(currentDataset);
+
+    Ok(Json.toJson(idsAndScores)).as("application/json")
+  }
+
   /**
    * query full document using a list of document ids
    * @param ids List of Document Ids
