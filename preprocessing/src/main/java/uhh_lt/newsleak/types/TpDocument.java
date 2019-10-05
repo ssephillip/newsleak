@@ -38,6 +38,9 @@ public class TpDocument {
     /** The inner document name */
     String resName;
 
+    /** The date the document was published */
+    String date;
+
 
     @Override
     public boolean equals(Object o) {
@@ -107,6 +110,14 @@ public class TpDocument {
 
     public void setResName(String resName) {
         this.resName = resName;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
 

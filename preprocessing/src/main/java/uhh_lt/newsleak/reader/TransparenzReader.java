@@ -24,9 +24,7 @@ import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.TpDocument;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class TransparenzReader extends NewsleakReader {
 
@@ -129,7 +127,7 @@ public class TransparenzReader extends NewsleakReader {
         // Set metadata
         Metadata metaCas = new Metadata(jcas);
         metaCas.setDocId(docId);
-        metaCas.setTimestamp("1900-01-01"); //TODO 2019-07-04 ps: richtiges Datum verwenden
+        metaCas.setTimestamp(document.getDate());
         metaCas.addToIndexes();
 
 
@@ -244,6 +242,7 @@ public class TransparenzReader extends NewsleakReader {
         documentQuery.addField("res_fulltext");
         documentQuery.addField("res_name");
         documentQuery.addField("title");
+        documentQuery.addField("publishing_date");
         documentQuery.setRows(Integer.MAX_VALUE); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
 
 
@@ -330,6 +329,9 @@ public class TransparenzReader extends NewsleakReader {
         List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
         String outerId = (String) solrDoc.getFieldValue("id");
         String outerName = (String) solrDoc.getFieldValue("title");
+        String date = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
+
+
 
         try {
             logger.log(Level.FINEST, "Processing inner document "+relativeInnerId+" from outer document "+outerId+"."); //TODO log-level korrekt?
@@ -348,6 +350,7 @@ public class TransparenzReader extends NewsleakReader {
             tpDocument.setResName(name);
             tpDocument.setOuterId(outerId);
             tpDocument.setTitle(outerName);
+            tpDocument.setDate(date);
         } catch (IllegalArgumentException e) {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
@@ -357,6 +360,35 @@ public class TransparenzReader extends NewsleakReader {
         }
 
         return tpDocument;
+    }
+
+
+    //TODO java-doc comments
+    public String getDateAsString(Date date){
+        String dateString;
+
+        if(date != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            String year = Integer.toString(calendar.get(Calendar.YEAR));
+            String month = Integer.toString(calendar.get(Calendar.MONTH)+1);
+            String day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+
+            if(month.length()==1){
+                month = "0"+month;
+            }
+            if(day.length()==1){
+                day = "0"+day;
+            }
+
+            dateString = year+"-"+month+"-"+day;
+
+
+        }else{
+            dateString = "1900-01-01";
+        }
+
+        return dateString;
     }
 
 
