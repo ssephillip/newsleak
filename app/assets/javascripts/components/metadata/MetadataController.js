@@ -723,7 +723,6 @@ define([
                             if (method === $scope.availableMethods[0].name) {
                                 //selected method is Doc2VecC
                                 $scope.getSimilarDocsDoc2VecC(docid);
-                                console.log("similar docs length: "+$scope.similarDocuments.length);
                             } else if (method === $scope.availableMethods[1].name) {
                                 //selected method is Elastic
                                 $scope.getSimilarDocsElasticsearch(docid);
@@ -739,44 +738,41 @@ define([
 
 
                     $scope.getSimilarDocsElasticsearch = function (docid) {
-                        console.log("Hier wird mal die Elasticsearch 'more like this' Query verwendet werden.");
                         console.log("Getting similar documents with method 'Elastic");
 
                         var docids = [];
                         var docIdsAndScores = [];
 
                         playRoutes.controllers.DocumentController.getMoreLikeThis(docid, $scope.numOfDocs).get().then(function (response) {
-
                             docids = Object.keys(response.data);
                             docIdsAndScores = response.data;
-
                             $scope.getAndPushDocs(docids, docIdsAndScores, true);
-
                         });
                     }
+
+
 
                     $scope.getSimilarDocsDoc2VecC = function (docid) {
                         console.log("Getting similar documents with method 'Doc2VecC");
 
                         var vectorIndexAddress = "";
-                        playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function(response){
+                        playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function (response) {
                             vectorIndexAddress = response.data.address;
 
+                            //get the ids of the most similar documents
+                            $http.get(vectorIndexAddress + '/' + docid + '?num=' + $scope.numOfDocs)
+                                .then(function (response) {
+                                    //extract ids from the response
+                                    var docids = response.data.result.map(function (item) { return item[0]; });
+                                    var docIdsAndScores = [];
 
-                        //get the ids of the most similar documents
-                        $http.get(vectorIndexAddress+'/' + docid + '?num=' + $scope.numOfDocs)
-                            .then(function (response) {
-                                //extract ids from the response
-                                var docids = response.data.result.map(function (item) { return item[0]; });
-                                var docIdsAndScores = [];
+                                    //create map with key=docid and value=doc-similarity-score
+                                    angular.forEach(response.data.result, function (item) {
+                                        docIdsAndScores[item[0]] = item[1];
+                                    });
 
-                                //create map with key=docid and value=doc-similarity-score
-                                angular.forEach(response.data.result, function (item) {
-                                    docIdsAndScores[item[0]] = item[1];
+                                    $scope.getAndPushDocs(docids, docIdsAndScores, false);
                                 });
-
-                                $scope.getAndPushDocs(docids, docIdsAndScores, false);
-                            });
                         })
                     };
 
@@ -789,13 +785,11 @@ define([
                             var transformedDocs = $scope.transformDocuments(docs, docIdsAndScores);
                             transformedDocs.map(doc => $scope.similarDocuments.push(doc));
 
-                            console.log("docs unordered: "+JSON.stringify($scope.similarDocuments));
                             $scope.similarDocuments = $filter('orderBy')($scope.similarDocuments, 'score', reverseOrder);
-                            console.log("docs ordered: "+JSON.stringify($scope.similarDocuments));
-
                             $scope.similarDocsAvailable = $scope.similarDocuments.length > 0;
                         });
                     }
+
 
 
                     $scope.transformDocuments = function(docs, docIdsAndScores){
@@ -823,7 +817,7 @@ define([
 
                             transformedDocs.push(currentDoc);
                         });
-                        console.log("transformed docs length : "+transformedDocs.length);
+
                         return transformedDocs;
                     }
 
@@ -871,6 +865,7 @@ define([
                         });
                         return index != -1;
                     };
+
 
 
                     /*$scope.onContext = function(params) {
