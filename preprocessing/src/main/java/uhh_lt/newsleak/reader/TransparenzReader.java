@@ -67,6 +67,8 @@ public class TransparenzReader extends NewsleakReader {
     /** The solr client */
     HttpSolrClient solrClient;
 
+    Map<String, SolrDocument> cachedOuterDocs;
+
 
     /**
      * Gets all inner document ids from the solr index (that match the query) and stores them in an iterator for later processing.
@@ -92,6 +94,7 @@ public class TransparenzReader extends NewsleakReader {
         totalDocuments = allInnerIds.size();
         currentDocument = 0;
         innerIdsIterator = allInnerIds.iterator();
+        cachedOuterDocs = new HashMap<>();
     }
 
 
@@ -113,7 +116,7 @@ public class TransparenzReader extends NewsleakReader {
         String innerId = innerIdsIterator.next();
         Integer relativeInnerId = Integer.valueOf(innerId.split("_")[0]);
         String outerId = innerId.split("_")[1];
-        SolrDocument solrDocument = getOuterDocumentFromSolrIndex(outerId);
+        SolrDocument solrDocument = getOuterDocument(outerId);
         TpDocument document = getInnerDocFromOuterDoc(solrDocument, relativeInnerId);
         if(document == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
@@ -223,6 +226,19 @@ public class TransparenzReader extends NewsleakReader {
         }
 
         return response.getResults();
+    }
+
+    //TODO javadoc
+    private SolrDocument getOuterDocument(String outerId) throws IOException {
+        SolrDocument outerDoc;
+        outerDoc = cachedOuterDocs.get(outerId);
+
+        if(outerDoc == null){
+            outerDoc = getOuterDocumentFromSolrIndex(outerId);
+            cachedOuterDocs.put(outerId, outerDoc);
+        }
+
+        return outerDoc;
     }
 
 
