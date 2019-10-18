@@ -21,7 +21,7 @@ ADD target/universal/newsleak-ui .
 RUN rm conf/*.conf
 ADD conf/application.production.conf conf/
 
-ADD preprocessing/target/preprocessing-jar-with-dependencies.jar preprocessing.jar
+
 ADD preprocessing/conf/dictionaries conf/dictionaries/
 ADD preprocessing/conf/newsleak.properties conf/
 ADD preprocessing/data/document_example.csv data/document_example.csv
@@ -30,6 +30,7 @@ ADD preprocessing/data/doc2vec-training/doc2vecc.c doc2vec-training/doc2vecc.c
 ADD preprocessing/data/doc2vec-training/produce_vectors.sh doc2vec-training/produce_vectors.sh
 ADD preprocessing/resources resources/
 ADD preprocessing/desc desc/
+ADD preprocessing/target/preprocessing-jar-with-dependencies.jar preprocessing.jar
 
 RUN chown newsleak:newsleak /opt/newsleak/data
 RUN chown -R newsleak:newsleak /opt/newsleak/doc2vec-training
@@ -39,10 +40,11 @@ RUN chmod -R 777 /home
 
 ADD newsleak-start.sh .
 
+
 USER newsleak
 
 EXPOSE 9000
 
-#CMD ./newsleak-start.sh
+CMD ./newsleak-start.sh
 
 
