@@ -43,6 +43,7 @@ import uhh_lt.newsleak.annotator.SentenceCleaner;
 import uhh_lt.newsleak.annotator.SegmenterICU;
 import uhh_lt.newsleak.reader.*;
 import uhh_lt.newsleak.resources.*;
+import uhh_lt.newsleak.util.Doc2VecUtil;
 import uhh_lt.newsleak.writer.Doc2VecWriter;
 import uhh_lt.newsleak.writer.ElasticsearchDocumentWriter;
 import uhh_lt.newsleak.writer.PostgresDbWriter;
@@ -84,6 +85,8 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 		// read configuration file
 		np.getConfiguration(args);
 
+
+		Doc2VecUtil.deleteOldTrainingData(np.doc2vecTrainingDir+File.separator+np.trainingFileName+".txt", np.logger);
 		// run language detection
 		np.pipelineLanguageDetection();
 		// extract information (per language)
