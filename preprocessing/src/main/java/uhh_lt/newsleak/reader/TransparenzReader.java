@@ -257,6 +257,9 @@ public class TransparenzReader extends NewsleakReader {
             }
         } catch (SolrServerException | IOException e) {
             logger.log(Level.SEVERE, "Failed retrieving outer document '"+outerId+"' from index "+solrCoreAddress);
+            logger.log(Level.SEVERE, "Error message: " + e.getMessage());
+            logger.log(Level.SEVERE, "Localized error message: " + e.getLocalizedMessage());
+
             e.printStackTrace();
             throw new IOException(); //TODO 2019-08-20 ps: sinnvolle exception schmeißen
         }
