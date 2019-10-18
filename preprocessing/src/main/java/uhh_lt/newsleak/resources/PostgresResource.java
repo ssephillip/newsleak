@@ -213,6 +213,7 @@ public class PostgresResource extends Resource_ImplBase {
 		Connection rootConnection = DriverManager.getConnection("jdbc:postgresql://" + dbUrl + "/postgres", dbUser,
 				dbPass);
 		Statement dbStatement = rootConnection.createStatement();
+		dbStatement.execute("SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = '"+dbName+"' AND pid <> pg_backend_pid();");
 		dbStatement.executeUpdate("DROP DATABASE IF EXISTS " + dbName + ";");
 
 		dbStatement.executeUpdate("CREATE DATABASE " + dbName
