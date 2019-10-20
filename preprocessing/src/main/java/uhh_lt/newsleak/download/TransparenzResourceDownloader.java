@@ -42,6 +42,12 @@ public class TransparenzResourceDownloader {
 
 
     public static void main(String[] args){
+        String solrAddress;
+        String path;
+        int startFrom;
+        int downloadUntil;
+
+
         TransparenzResourceDownloader transparenzResourceDownloader = new TransparenzResourceDownloader("http://localhost:8983/solr/simfin");
         Instant start = Instant.now();
         try {
@@ -92,85 +98,6 @@ public class TransparenzResourceDownloader {
         downloadAllDocuments(tpDocuments, path);
 
     }
-
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path){
-        final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
-
-        for(int i= 0; i < 10; i++){
-            Thread thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    downloadDocuments(tpDocumentProvider, path);
-                }
-            });
-            thread.start();
-        }
-    }
-
-    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path) {
-        System.out.println("Starting to download files.");
-
-        while(true) {
-            TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
-            if(tpDocument != null) {
-                int current = tpDocumentProvider.getCurrent();
-                System.out.println("Downloading document "+current);
-                if(current > 12000) {
-                    downloadDocument(tpDocument, path);
-                }
-            }else{
-                System.out.println("Thread finished");
-                break;
-            }
-        }
-
-    }
-
-
-
-    private void downloadDocument(TpDocument tpDocument, String path){
-            String urlString = tpDocument.getResUrl();
-            String docFormat = tpDocument.getResFormat().toLowerCase();
-            String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
-            String docName = tpDocument.getResName();
-            String pathToFile = path+docId+"."+docFormat;
-
-            try {
-                URL url = new URL(urlString);
-                InputStream in = new BufferedInputStream(url.openStream());
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
-
-                for (int i; (i = in.read()) != -1; ) {
-                    out.write(i);
-                }
-                in.close();
-                out.close();
-            }catch(Exception e){
-                System.out.println("Couldn't download dcoument.");
-                e.printStackTrace();
-            }
-
-    }
-
-
-    /**
-     * Gets one outer document from the solr index.
-     * @return List of SolrDocument
-     * @throws IOException
-     */
-    private List<TpDocument> getInnerDocsFromSolrIndex(SolrDocument outerDocument) throws IOException {
-        List<TpDocument> innerDocuments = new ArrayList<>();
-
-        if(currentDocument%20 == 0) {
-            System.out.println("Getting outer document number '" + currentDocument + "' of '" + totalDocuments + "' from index " + solrCoreAddress);
-        }
-
-        innerDocuments = getAllInnerDocumentsFromOuterDoc(outerDocument);
-
-        return innerDocuments;
-    }
-
 
 
     public SolrDocumentList getAllOuterDocumentsFromSolr(int numberOfDocs) throws InstantiationException{
@@ -256,7 +183,7 @@ public class TransparenzResourceDownloader {
 
 
         try {
- //           System.out.println("Processing inner document "+relativeInnerId+" from outer document "+outerId+"."); //TODO log-level korrekt?
+            //           System.out.println("Processing inner document "+relativeInnerId+" from outer document "+outerId+"."); //TODO log-level korrekt?
             if (!isSolrDocWellFormed(docResFormats, docResUrls, docResNames, outerId)) {
                 throw new IllegalArgumentException();
             }
@@ -282,39 +209,68 @@ public class TransparenzResourceDownloader {
         return tpDocument;
     }
 
+    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path){
+        final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
 
+        for(int i= 0; i < 10; i++){
+            Thread thread = new Thread(new Runnable() {
 
+                @Override
+                public void run() {
+                    downloadDocuments(tpDocumentProvider, path);
+                }
+            });
+            thread.start();
+        }
+    }
 
-    /**
-     * Gets all outer document ids from the solr index that match the query.
-     * The additional lists are retrieved to verify that the documents are well formed.
-     * @return SolrDocumentList
-     * @throws InstantiationException
-     */
-    private SolrDocumentList getOuterDocIdsFromSolrIndex(int amountOfDocs) throws InstantiationException {
-        QueryResponse response = null;
+    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path) {
+        System.out.println("Starting to download files.");
 
-        SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
-        documentQuery.addField("id");
-        documentQuery.addField("res_format");
-        documentQuery.addField("res_url");
-        documentQuery.setRows(amountOfDocs);
-
-        try {
-           System.out.println("Getting outer document ids from index " + solrCoreAddress+" with filter '"+documentQuery.getQuery()+"'");
-            response = solrClient.query(documentQuery);
-
-            if (response == null) {
-                throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
+        while(true) {
+            TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
+            if(tpDocument != null) {
+                int current = tpDocumentProvider.getCurrent();
+                System.out.println("Downloading document "+current);
+                if(current > 12000) {
+                    downloadDocument(tpDocument, path);
+                }
+            }else{
+                System.out.println("Thread finished");
+                break;
             }
-        } catch (SolrServerException | IOException e) {
-            System.out.println("Failed retrieving outer document ids from index "+solrCoreAddress);
-            e.printStackTrace();
-            throw new InstantiationException();
         }
 
-        return response.getResults();
     }
+
+
+
+    private void downloadDocument(TpDocument tpDocument, String path){
+            String urlString = tpDocument.getResUrl();
+            String docFormat = tpDocument.getResFormat().toLowerCase();
+            String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
+            String docName = tpDocument.getResName();
+            String pathToFile = path+docId+"."+docFormat;
+
+            try {
+                URL url = new URL(urlString);
+                InputStream in = new BufferedInputStream(url.openStream());
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
+
+                for (int i; (i = in.read()) != -1; ) {
+                    out.write(i);
+                }
+                in.close();
+                out.close();
+            }catch(Exception e){
+                System.out.println("Couldn't download dcoument.");
+                e.printStackTrace();
+            }
+
+    }
+
+
+
 
 
 
