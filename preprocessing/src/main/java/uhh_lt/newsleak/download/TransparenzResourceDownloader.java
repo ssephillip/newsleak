@@ -214,7 +214,7 @@ public class TransparenzResourceDownloader {
 
 
     private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int startFrom, int downloadUntil, int numOfThreads){
-        final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
+        final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpDocuments);
         final int start = startFrom;
         final int end = downloadUntil;
 
@@ -328,32 +328,4 @@ public class TransparenzResourceDownloader {
                 docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
     }
 
-    private class TpDocumentProvider{
-        Iterator<TpDocument> tpDocumentIterator;
-        int current;
-        int threadCounter;
-
-        public TpDocumentProvider(List<TpDocument> tpDocuments){
-            tpDocumentIterator = tpDocuments.iterator();
-        }
-
-        public synchronized TpDocument getNextTpDocument(){
-            TpDocument tpDocument = null;
-            if(tpDocumentsIterator.hasNext()){
-                current++;
-                tpDocument = tpDocumentsIterator.next();
-            }
-
-            return tpDocument;
-        }
-
-        public synchronized int getCurrentThreadCount(){
-            threadCounter++;
-            return threadCounter;
-        }
-
-        public synchronized int getCurrent(){
-            return current;
-        }
-    }
 }
