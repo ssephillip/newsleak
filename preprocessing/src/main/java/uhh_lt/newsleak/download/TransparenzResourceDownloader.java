@@ -82,6 +82,7 @@ public class TransparenzResourceDownloader {
             List<TpDocument> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc);
 
             tpDocuments.addAll(innerDocuments);
+            totalDocuments = tpDocuments.size();
         }
 
         tpDocumentsIterator = tpDocuments.iterator();
@@ -92,19 +93,40 @@ public class TransparenzResourceDownloader {
 
     }
 
+    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path){
+        final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
 
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path) {
-        System.out.println("Starting to download files.");
-        currentDocument = 0;
-        totalDocuments = tpDocuments.size();
+        for(int i= 0; i < 10; i++){
+            Thread thread = new Thread(new Runnable() {
 
-        for(TpDocument tpDocument: tpDocuments){
-                currentDocument++;
-                System.out.println("Downloading document '"+currentDocument+"' of '"+totalDocuments+"'");
-                downloadDocument(tpDocument, path);
-
+                @Override
+                public void run() {
+                    downloadDocuments(tpDocumentProvider, path);
+                }
+            });
+            thread.start();
         }
     }
+
+    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path) {
+        System.out.println("Starting to download files.");
+
+        while(true) {
+            TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
+            if(tpDocument != null) {
+                int current = tpDocumentProvider.getCurrent();
+                System.out.println("Downloading document "+current);
+                if(current > 12000) {
+                    downloadDocument(tpDocument, path);
+                }
+            }else{
+                System.out.println("Thread finished");
+                break;
+            }
+        }
+
+    }
+
 
 
     private void downloadDocument(TpDocument tpDocument, String path){
@@ -295,9 +317,6 @@ public class TransparenzResourceDownloader {
     }
 
 
-    public synchronized TpDocument getNextTpDocument(){
-      return null;
-    }
 
 
     //TODO java-doc comments
@@ -344,5 +363,28 @@ public class TransparenzResourceDownloader {
         return !(docResFormats == null || docResUrls == null || docResNames==null || outerId == null ||
                 docResFormats.isEmpty() || docResUrls.isEmpty() || docResNames.isEmpty() ||
                 docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
+    }
+
+    private class TpDocumentProvider{
+        Iterator<TpDocument> tpDocumentIterator;
+        int current;
+
+        public TpDocumentProvider(List<TpDocument> tpDocuments){
+            tpDocumentIterator = tpDocuments.iterator();
+        }
+
+        public synchronized TpDocument getNextTpDocument(){
+            TpDocument tpDocument = null;
+            if(tpDocumentsIterator.hasNext()){
+                current++;
+                tpDocument = tpDocumentsIterator.next();
+            }
+
+            return tpDocument;
+        }
+
+        public synchronized int getCurrent(){
+            return current;
+        }
     }
 }
