@@ -7,11 +7,12 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.uima.resource.ResourceInitializationException;
 import uhh_lt.newsleak.types.TpDocument;
 
 import java.io.*;
 import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class TransparenzResourceDownloader {
@@ -40,12 +41,15 @@ public class TransparenzResourceDownloader {
 
     public static void main(String[] args){
         TransparenzResourceDownloader transparenzResourceDownloader = new TransparenzResourceDownloader("http://localhost:8983/solr/simfin");
+        Instant start = Instant.now();
         try {
-            transparenzResourceDownloader.download("/home/phillip/BA/data/transparenz/");
-        }catch(ResourceInitializationException e){
+            transparenzResourceDownloader.download("/home/phillip/BA/data/transparenz2/", 150000);
+        }catch(InstantiationException e){
             System.out.println("Couldn't retrieve IDs!");
             e.printStackTrace();
         }
+        Instant end = Instant.now();
+        System.out.println("Downloaded all documents in "+ Duration.between(start,end).getSeconds()+" seconds");
     }
 
 
@@ -63,17 +67,17 @@ public class TransparenzResourceDownloader {
 
 
 
-    public void download(String path) throws ResourceInitializationException{
+    public void download(String path, int numOfDocs) throws InstantiationException{
         List<TpDocument> tpDocuments = new ArrayList<>();
 
-        SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex();
+        SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
         totalDocuments = solrDocuments.size();
 
         for(SolrDocument solrDoc: solrDocuments) {
             currentDocument++;
             String outerId = (String) solrDoc.getFieldValue("id");
             List<TpDocument> innerDocuments = new ArrayList<>();
-            if(currentDocument < 3) {
+
                 try {
                     innerDocuments = getInnerDocsFromSolrIndex(outerId);
                 } catch (IOException ioE) {
@@ -81,9 +85,7 @@ public class TransparenzResourceDownloader {
                 }
 
                 tpDocuments.addAll(innerDocuments);
-            }else{
-                break;
-            }
+
         }
 
         downloadAllDocuments(tpDocuments, path);
@@ -144,7 +146,6 @@ public class TransparenzResourceDownloader {
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
-        documentQuery.addField("res_fulltext");
         documentQuery.addField("res_name");
         documentQuery.addField("title");
         documentQuery.addField("publishing_date");
@@ -152,7 +153,9 @@ public class TransparenzResourceDownloader {
 
 
         try {
-          System.out.println("Getting outer document number '"+currentDocument+"' of '"+totalDocuments+"' from index " + solrCoreAddress);
+          if(currentDocument%20 == 0) {
+              System.out.println("Getting outer document number '" + currentDocument + "' of '" + totalDocuments + "' from index " + solrCoreAddress);
+          }
           response = solrClient.query(documentQuery);
 
             if (response == null) {
@@ -211,7 +214,6 @@ public class TransparenzResourceDownloader {
 
         List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
         List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        List<String> docResFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
         List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
         String outerId = (String) solrDoc.getFieldValue("id");
         String outerName = (String) solrDoc.getFieldValue("title");
@@ -221,18 +223,16 @@ public class TransparenzResourceDownloader {
 
         try {
  //           System.out.println("Processing inner document "+relativeInnerId+" from outer document "+outerId+"."); //TODO log-level korrekt?
-            if (!isSolrDocWellFormed(docResFormats, docResUrls, docResFulltexts, docResNames, outerId)) {
+            if (!isSolrDocWellFormed(docResFormats, docResUrls, docResNames, outerId)) {
                 throw new IllegalArgumentException();
             }
 
             String innerDocFormat = docResFormats.get(relativeInnerId);
             String url = docResUrls.get(relativeInnerId);
-            String fulltext = docResFulltexts.get(relativeInnerId);
             String name = docResNames.get(relativeInnerId);
             tpDocument.setResFormat(innerDocFormat);
             tpDocument.setInnerId(String.valueOf(relativeInnerId));
             tpDocument.setResUrl(url);
-            tpDocument.setResFulltext(fulltext);
             tpDocument.setResName(name);
             tpDocument.setOuterId(outerId);
             tpDocument.setTitle(outerName);
@@ -255,16 +255,16 @@ public class TransparenzResourceDownloader {
      * Gets all outer document ids from the solr index that match the query.
      * The additional lists are retrieved to verify that the documents are well formed.
      * @return SolrDocumentList
-     * @throws ResourceInitializationException
+     * @throws InstantiationException
      */
-    private SolrDocumentList getOuterDocIdsFromSolrIndex() throws ResourceInitializationException {
+    private SolrDocumentList getOuterDocIdsFromSolrIndex(int amountOfDocs) throws InstantiationException {
         QueryResponse response = null;
 
         SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
-        documentQuery.setRows(Integer.MAX_VALUE);
+        documentQuery.setRows(amountOfDocs);
 
         try {
            System.out.println("Getting outer document ids from index " + solrCoreAddress+" with filter '"+documentQuery.getQuery()+"'");
@@ -276,7 +276,7 @@ public class TransparenzResourceDownloader {
         } catch (SolrServerException | IOException e) {
             System.out.println("Failed retrieving outer document ids from index "+solrCoreAddress);
             e.printStackTrace();
-            throw new ResourceInitializationException();
+            throw new InstantiationException();
         }
 
         return response.getResults();
@@ -319,14 +319,13 @@ public class TransparenzResourceDownloader {
      *
      * @param docResFormats The list of file-formats of the inner documents
      * @param docResUrls The list of URLs to the original files of the inner documents
-     * @param docResFulltexts The list of fulltexts of the inner documents
      * @param outerId The ID of the outer document (containing the inner documents)
      * @return boolean - True if the outer document is wellformed.
      */
-    private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResFulltexts, List<String> docResNames, String outerId) {
+    private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResNames, String outerId) {
         //TODO ps 2019-08-20 auch abfragen ob die listen empty sind
-        return !(docResFormats == null || docResUrls == null || docResFulltexts == null || docResNames==null || outerId == null ||
-                docResFormats.isEmpty() || docResUrls.isEmpty() || docResFulltexts.isEmpty() || docResNames.isEmpty() ||
-                docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size() || docResFormats.size() != docResNames.size());
+        return !(docResFormats == null || docResUrls == null || docResNames==null || outerId == null ||
+                docResFormats.isEmpty() || docResUrls.isEmpty() || docResNames.isEmpty() ||
+                docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
     }
 }
