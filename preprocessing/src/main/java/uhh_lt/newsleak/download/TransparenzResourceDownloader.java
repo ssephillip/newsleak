@@ -42,16 +42,19 @@ public class TransparenzResourceDownloader {
 
 
     public static void main(String[] args){
-        String solrAddress;
-        String path;
-        int startFrom;
-        int downloadUntil;
+        //example parameters: "http://localhost:8983/solr/simfin" "/home/phillip/BA/data/transparenz3/" 150000 10000 11000 3
+        String solrAddress = args[0];
+        String path = args[1];
+        int numOfDocs = Integer.valueOf(args[2]);
+        int startFrom = Integer.valueOf(args[3]);
+        int downloadUntil = Integer.valueOf(args[4]);
+        int numOfThreads =Integer.valueOf(args[5]);
 
 
-        TransparenzResourceDownloader transparenzResourceDownloader = new TransparenzResourceDownloader("http://localhost:8983/solr/simfin");
+        TransparenzResourceDownloader transparenzResourceDownloader = new TransparenzResourceDownloader(solrAddress);
         Instant start = Instant.now();
         try {
-            transparenzResourceDownloader.download("/home/phillip/BA/data/transparenz2/", 150000);
+            transparenzResourceDownloader.download(path, numOfDocs, startFrom, downloadUntil, numOfThreads);
         }catch(InstantiationException e){
             System.out.println("Couldn't retrieve IDs!");
             e.printStackTrace();
@@ -75,7 +78,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    public void download(String path, int numOfDocs) throws InstantiationException{
+    public void download(String path, int numOfDocs, int startFrom, int downloadUntil, int numOfThreads) throws InstantiationException{
         List<TpDocument> tpDocuments = new ArrayList<>();
 
         //       SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
@@ -95,7 +98,7 @@ public class TransparenzResourceDownloader {
         //to empty the cache with certainty
         solrDocuments = new SolrDocumentList();
 
-        downloadAllDocuments(tpDocuments, path);
+        downloadAllDocuments(tpDocuments, path, startFrom, downloadUntil, numOfThreads);
 
     }
 
@@ -210,34 +213,37 @@ public class TransparenzResourceDownloader {
     }
 
 
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path){
+    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int startFrom, int downloadUntil, int numOfThreads){
         final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
+        final int start = startFrom;
+        final int end = downloadUntil;
 
-        for(int i= 0; i < 10; i++){
+        for(int i= 0; i < numOfThreads; i++){
             Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    downloadDocuments(tpDocumentProvider, path);
+                    downloadDocuments(tpDocumentProvider, path, start, end);
                 }
             });
             thread.start();
         }
     }
 
-    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path) {
+    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int startFrom, int downloadUntil) {
         System.out.println("Starting to download files.");
+        int threadNumber = tpDocumentProvider.getCurrentThreadCount();
 
         while(true) {
             TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
             if(tpDocument != null) {
                 int current = tpDocumentProvider.getCurrent();
-                System.out.println("Downloading document "+current);
-                if(current > 12000) {
+                System.out.println("Thread '"+threadNumber+"'Downloading document "+current);
+                if(current > startFrom && current<downloadUntil) {
                     downloadDocument(tpDocument, path);
                 }
             }else{
-                System.out.println("Thread finished");
+                System.out.println("Thread '"+threadNumber+"' finished");
                 break;
             }
         }
@@ -325,6 +331,7 @@ public class TransparenzResourceDownloader {
     private class TpDocumentProvider{
         Iterator<TpDocument> tpDocumentIterator;
         int current;
+        int threadCounter;
 
         public TpDocumentProvider(List<TpDocument> tpDocuments){
             tpDocumentIterator = tpDocuments.iterator();
@@ -338,6 +345,11 @@ public class TransparenzResourceDownloader {
             }
 
             return tpDocument;
+        }
+
+        public synchronized int getCurrentThreadCount(){
+            threadCounter++;
+            return threadCounter;
         }
 
         public synchronized int getCurrent(){
