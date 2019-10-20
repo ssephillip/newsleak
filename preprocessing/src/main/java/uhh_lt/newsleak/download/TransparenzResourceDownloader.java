@@ -38,6 +38,8 @@ public class TransparenzResourceDownloader {
 
     String solrCoreAddress;
 
+    Iterator<TpDocument> tpDocumentsIterator;
+
 
     public static void main(String[] args){
         TransparenzResourceDownloader transparenzResourceDownloader = new TransparenzResourceDownloader("http://localhost:8983/solr/simfin");
@@ -70,23 +72,21 @@ public class TransparenzResourceDownloader {
     public void download(String path, int numOfDocs) throws InstantiationException{
         List<TpDocument> tpDocuments = new ArrayList<>();
 
-        SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
+        //       SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
+        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr(numOfDocs);
         totalDocuments = solrDocuments.size();
 
         for(SolrDocument solrDoc: solrDocuments) {
             currentDocument++;
-            String outerId = (String) solrDoc.getFieldValue("id");
-            List<TpDocument> innerDocuments = new ArrayList<>();
 
-                try {
-                    innerDocuments = getInnerDocsFromSolrIndex(outerId);
-                } catch (IOException ioE) {
-                    ioE.printStackTrace();
-                }
+            List<TpDocument> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc);
 
-                tpDocuments.addAll(innerDocuments);
-
+            tpDocuments.addAll(innerDocuments);
         }
+
+        tpDocumentsIterator = tpDocuments.iterator();
+        //to empty the cache with certainty
+        solrDocuments = new SolrDocumentList();
 
         downloadAllDocuments(tpDocuments, path);
 
@@ -137,42 +137,50 @@ public class TransparenzResourceDownloader {
      * @return List of SolrDocument
      * @throws IOException
      */
-    private List<TpDocument> getInnerDocsFromSolrIndex(String outerId) throws IOException {
-        QueryResponse response = null;
+    private List<TpDocument> getInnerDocsFromSolrIndex(SolrDocument outerDocument) throws IOException {
         List<TpDocument> innerDocuments = new ArrayList<>();
 
+        if(currentDocument%20 == 0) {
+            System.out.println("Getting outer document number '" + currentDocument + "' of '" + totalDocuments + "' from index " + solrCoreAddress);
+        }
 
-        SolrQuery documentQuery = new SolrQuery("id:"+outerId);
+        innerDocuments = getAllInnerDocumentsFromOuterDoc(outerDocument);
+
+        return innerDocuments;
+    }
+
+
+
+    public SolrDocumentList getAllOuterDocumentsFromSolr(int numberOfDocs) throws InstantiationException{
+        QueryResponse response = null;
+
+        SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
         documentQuery.addField("res_name");
         documentQuery.addField("title");
         documentQuery.addField("publishing_date");
-        documentQuery.setRows(Integer.MAX_VALUE); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
+        documentQuery.setRows(numberOfDocs); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
 
 
         try {
-          if(currentDocument%20 == 0) {
-              System.out.println("Getting outer document number '" + currentDocument + "' of '" + totalDocuments + "' from index " + solrCoreAddress);
-          }
-          response = solrClient.query(documentQuery);
+
+            response = solrClient.query(documentQuery);
 
             if (response == null) {
-                throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
+                throw new InstantiationException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
 
-            SolrDocument outerDocument = response.getResults().get(0);
-            innerDocuments = getAllInnerDocumentsFromOuterDoc(outerDocument);
 
-        } catch (SolrServerException | IOException e) {
-            System.out.println("Failed retrieving outer document '"+outerId+"' from index "+solrCoreAddress);
+        } catch (Exception e) {
+            System.out.println("Failed retrieving outer documents from index "+solrCoreAddress);
 
             e.printStackTrace();
-            throw new IOException(); //TODO 2019-08-20 ps: sinnvolle exception schmeißen
+            throw new InstantiationException(); //TODO 2019-08-20 ps: sinnvolle exception schmeißen
         }
 
-        return innerDocuments;
+        return response.getResults();
     }
 
 
@@ -181,6 +189,9 @@ public class TransparenzResourceDownloader {
         List<TpDocument> innerDocuments = new ArrayList<>();
         List<String> outerDocResUrls = (List<String>) outerDocument.getFieldValue("res_url");
 
+        if(currentDocument%100 == 0) {
+            System.out.println("Getting outer document number '" + currentDocument + "' of '" + totalDocuments + "' from index " + solrCoreAddress);
+        }
 
         if(outerDocResUrls != null){
             for (int i = 0; i < outerDocResUrls.size(); i++){
@@ -189,6 +200,7 @@ public class TransparenzResourceDownloader {
                     innerDocuments.add(innerDocument);
                 }else{
                     innerDocuments = new ArrayList<>();
+                    System.out.println("Failed retrieving outer document from index "+solrCoreAddress);
                     break;
                 }
             }
@@ -280,6 +292,11 @@ public class TransparenzResourceDownloader {
         }
 
         return response.getResults();
+    }
+
+
+    public synchronized TpDocument getNextTpDocument(){
+      return null;
     }
 
 
