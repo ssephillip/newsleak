@@ -238,8 +238,8 @@ public class TransparenzResourceDownloader {
             TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
             if(tpDocument != null) {
                 int current = tpDocumentProvider.getCurrent();
-                System.out.println("Thread '"+threadNumber+"'Downloading document "+current);
                 if(current > startFrom && current<downloadUntil) {
+                    System.out.println("Thread '"+threadNumber+"'Downloading document "+current);
                     downloadDocument(tpDocument, path);
                 }
             }else{
