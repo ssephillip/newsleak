@@ -100,68 +100,6 @@ public class TransparenzResourceDownloader {
     }
 
 
-
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path){
-        final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
-
-        for(int i= 0; i < 10; i++){
-            Thread thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    downloadDocuments(tpDocumentProvider, path);
-                }
-            });
-            thread.start();
-        }
-    }
-
-    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path) {
-        System.out.println("Starting to download files.");
-
-        while(true) {
-            TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
-            if(tpDocument != null) {
-                int current = tpDocumentProvider.getCurrent();
-                System.out.println("Downloading document "+current);
-                if(current > 12000) {
-                    downloadDocument(tpDocument, path);
-                }
-            }else{
-                System.out.println("Thread finished");
-                break;
-            }
-        }
-
-    }
-
-
-
-    private void downloadDocument(TpDocument tpDocument, String path){
-            String urlString = tpDocument.getResUrl();
-            String docFormat = tpDocument.getResFormat().toLowerCase();
-            String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
-            String docName = tpDocument.getResName();
-            String pathToFile = path+docId+"."+docFormat;
-
-            try {
-                URL url = new URL(urlString);
-                InputStream in = new BufferedInputStream(url.openStream());
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
-
-                for (int i; (i = in.read()) != -1; ) {
-                    out.write(i);
-                }
-                in.close();
-                out.close();
-            }catch(Exception e){
-                System.out.println("Couldn't download dcoument.");
-                e.printStackTrace();
-            }
-
-    }
-
-
     public SolrDocumentList getAllOuterDocumentsFromSolr(int numberOfDocs) throws InstantiationException{
         QueryResponse response = null;
 
@@ -270,6 +208,69 @@ public class TransparenzResourceDownloader {
 
         return tpDocument;
     }
+
+
+    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path){
+        final TpDocumentProvider tpDocumentProvider = new TpDocumentProvider(tpDocuments);
+
+        for(int i= 0; i < 10; i++){
+            Thread thread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    downloadDocuments(tpDocumentProvider, path);
+                }
+            });
+            thread.start();
+        }
+    }
+
+    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path) {
+        System.out.println("Starting to download files.");
+
+        while(true) {
+            TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
+            if(tpDocument != null) {
+                int current = tpDocumentProvider.getCurrent();
+                System.out.println("Downloading document "+current);
+                if(current > 12000) {
+                    downloadDocument(tpDocument, path);
+                }
+            }else{
+                System.out.println("Thread finished");
+                break;
+            }
+        }
+
+    }
+
+
+
+    private void downloadDocument(TpDocument tpDocument, String path){
+            String urlString = tpDocument.getResUrl();
+            String docFormat = tpDocument.getResFormat().toLowerCase();
+            String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
+            String docName = tpDocument.getResName();
+            String pathToFile = path+docId+"."+docFormat;
+
+            try {
+                URL url = new URL(urlString);
+                InputStream in = new BufferedInputStream(url.openStream());
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
+
+                for (int i; (i = in.read()) != -1; ) {
+                    out.write(i);
+                }
+                in.close();
+                out.close();
+            }catch(Exception e){
+                System.out.println("Couldn't download dcoument.");
+                e.printStackTrace();
+            }
+
+    }
+
+
 
 
 
