@@ -81,7 +81,7 @@ public class TransparenzResourceDownloader {
     public SolrDocumentList getAllOuterDocumentsFromSolr(int numberOfDocs) throws InstantiationException{
         QueryResponse response = null;
 
-        SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
+        SolrQuery documentQuery = new SolrQuery("res_format:*");    // TODO change back to this --> \"PDF\"");
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
@@ -302,6 +302,36 @@ public class TransparenzResourceDownloader {
         return !(docResFormats == null || docResUrls == null || docResNames==null || outerId == null ||
                 docResFormats.isEmpty() || docResUrls.isEmpty() || docResNames.isEmpty() ||
                 docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
+    }
+
+
+    public void getAllFileFormats(int numOfDocs) throws InstantiationException {
+        Set<String> fileFormats = new HashSet<>();
+
+        //       SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
+        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr(numOfDocs);
+
+        for (SolrDocument solrDoc : solrDocuments) {
+
+            List<TpDocument> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc);
+
+            for(TpDocument tpDocument: innerDocuments){
+                String fileFormat = tpDocument.getResFormat();
+                fileFormats.add(fileFormat);
+            }
+        }
+
+
+
+        try {
+            FileWriter fileWriter = new FileWriter("/home/phillip/BA/data/fileformats.txt", true);
+            for(String fileFormat: fileFormats) {
+                fileWriter.write(fileFormat+"\n");
+            }
+            fileWriter.close();
+        } catch (IOException e) {
+           e.printStackTrace();
+        }
     }
 
 }
