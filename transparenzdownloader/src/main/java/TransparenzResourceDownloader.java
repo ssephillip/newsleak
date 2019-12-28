@@ -6,6 +6,7 @@ import org.apache.solr.common.SolrDocumentList;
 
 import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -13,8 +14,12 @@ import java.util.*;
 public class TransparenzResourceDownloader {
 
 
-    /** Number of total documents in the Solr Index. */
-    private int totalDocuments = 0;
+    /** Number of outer documents in the Solr Index. */
+    private int numOfOuterDocs = 0;
+
+    private int totalNumOfInnerDocs = 0;
+
+    private int filteredNumOfInnerDocs = 0;
 
     /** Current document number. */
     private int currentDocument = 0;
@@ -53,53 +58,67 @@ public class TransparenzResourceDownloader {
 
 
 
-    public void download(String path, int numOfDocs, int startFrom, int downloadUntil, int numOfThreads) throws InstantiationException{
+    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocs, int startFrom, int downloadUntil, int numOfThreads) throws InstantiationException{
         List<TpDocument> tpDocuments = new ArrayList<>();
+        Instant startTime = Instant.now();
 
         //       SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
-        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr(numOfDocs);
-        totalDocuments = solrDocuments.size();
+        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr(formatsToDownload);
+        numOfOuterDocs = solrDocuments.size();
+        int outerDocsProcessed = 0;
 
         for(SolrDocument solrDoc: solrDocuments) {
-            currentDocument++;
+            outerDocsProcessed++;
 
-            List<TpDocument> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc);
+            List<TpDocument> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed);
 
             tpDocuments.addAll(innerDocuments);
-            totalDocuments = tpDocuments.size();
         }
-
+        totalNumOfInnerDocs = tpDocuments.size();
+        tpDocuments.removeIf(tp -> !formatsToDownload.contains(tp.getResFormat()));
+        filteredNumOfInnerDocs = tpDocuments.size();
         tpDocumentsIterator = tpDocuments.iterator();
-        //to empty the cache with certainty
-        solrDocuments = new SolrDocumentList();
 
-        downloadAllDocuments(tpDocuments, path, startFrom, downloadUntil, numOfThreads);
+        System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds());
+        downloadAllDocuments(tpDocuments, path, numOfDocs, startFrom, downloadUntil, numOfThreads);
+
+
+        writeStatsWhenFinished(startTime, pathToStats, formatsToDownload, numOfThreads);
+
 
     }
 
 
-    public SolrDocumentList getAllOuterDocumentsFromSolr(int numberOfDocs) throws InstantiationException{
-        QueryResponse response = null;
 
-        SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
+    public SolrDocumentList getAllOuterDocumentsFromSolr(List<String> fileFormatsToDownload) throws InstantiationException{
+        QueryResponse response = null;
+        String queryString;
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 1; i < fileFormatsToDownload.size(); i++){
+            stringBuilder.append(" OR res_format:\""+fileFormatsToDownload.get(i)+"\"");
+        }
+        queryString = stringBuilder.toString();
+        if(queryString == null){
+            queryString = "";
+        }
+
+
+        SolrQuery documentQuery = new SolrQuery("res_format:\""+fileFormatsToDownload.get(0)+"\""+queryString);
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
         documentQuery.addField("res_name");
         documentQuery.addField("title");
         documentQuery.addField("publishing_date");
-        documentQuery.setRows(numberOfDocs); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
+        documentQuery.setRows(Integer.MAX_VALUE); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
 
 
         try {
-
             response = solrClient.query(documentQuery);
 
             if (response == null) {
                 throw new InstantiationException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
-
-
         } catch (Exception e) {
             System.out.println("Failed retrieving outer documents from index "+solrCoreAddress);
 
@@ -112,25 +131,26 @@ public class TransparenzResourceDownloader {
 
 
 
-    public List<TpDocument> getAllInnerDocumentsFromOuterDoc(SolrDocument outerDocument){
+    public List<TpDocument> getAllInnerDocumentsFromOuterDoc(SolrDocument outerDocument, int outerDocsProcessed){
         List<TpDocument> innerDocuments = new ArrayList<>();
-        List<String> outerDocResUrls = (List<String>) outerDocument.getFieldValue("res_url");
+        List<String> docResFormats = (List<String>) outerDocument.getFieldValue("res_format");
+        List<String> docResUrls = (List<String>) outerDocument.getFieldValue("res_url");
+        List<String> docResNames = (List<String>) outerDocument.getFieldValue("res_name");
+        String outerId = (String) outerDocument.getFieldValue("id");
 
-        if(currentDocument%100 == 0) {
-            System.out.println("Getting outer document number '" + currentDocument + "' of '" + totalDocuments + "' from index " + solrCoreAddress);
+
+        if(outerDocsProcessed%100 == 0) {
+            System.out.println("Getting inner documents from outer document number '" + outerDocsProcessed + "' of '" + numOfOuterDocs + "' from index " + solrCoreAddress);
         }
 
-        if(outerDocResUrls != null){
-            for (int i = 0; i < outerDocResUrls.size(); i++){
+        if(isSolrDocWellFormed(docResFormats, docResUrls, docResNames, outerId)){
+            for (int i = 0; i < docResUrls.size(); i++){
                 TpDocument innerDocument = getInnerDocFromOuterDoc(outerDocument, i);
-                if(innerDocument != null){
-                    innerDocuments.add(innerDocument);
-                }else{
-                    innerDocuments = new ArrayList<>();
-                    System.out.println("Failed retrieving outer document from index "+solrCoreAddress);
-                    break;
-                }
+                innerDocuments.add(innerDocument);
             }
+        }else{
+            malformedSolrDocCounter++;
+            System.out.println("Malformed outer document: "+outerId+". Discarding document.");
         }
 
         return innerDocuments;
@@ -144,6 +164,7 @@ public class TransparenzResourceDownloader {
      * Each document in this group is called inner document.
      * The SolrDocument itself is called outer document.
      * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
+     * @assert solrDoc is wellformed
      * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
      * @param relativeInnerId An int specifying which of the inner documents shall be extracted.
      * @return TpDocument The inner document "extracted" from the given outer document.
@@ -158,55 +179,40 @@ public class TransparenzResourceDownloader {
         String outerName = (String) solrDoc.getFieldValue("title");
         String date = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
 
-
-
-        try {
-            //           System.out.println("Processing inner document "+relativeInnerId+" from outer document "+outerId+"."); //TODO log-level korrekt?
-            if (!isSolrDocWellFormed(docResFormats, docResUrls, docResNames, outerId)) {
-                throw new IllegalArgumentException();
-            }
-
-            String innerDocFormat = docResFormats.get(relativeInnerId);
-            String url = docResUrls.get(relativeInnerId);
-            String name = docResNames.get(relativeInnerId);
-            tpDocument.setResFormat(innerDocFormat);
-            tpDocument.setInnerId(String.valueOf(relativeInnerId));
-            tpDocument.setResUrl(url);
-            tpDocument.setResName(name);
-            tpDocument.setOuterId(outerId);
-            tpDocument.setTitle(outerName);
-            tpDocument.setDate(date);
-        } catch (IllegalArgumentException e) {
-            /** A SolrDocument is malformed if some mandatory information is missing.
-             *  E.g. the number of fulltexts does not match the number of inner documents. */
-            malformedSolrDocCounter++;
-            System.out.println("Malformed outer document: "+outerId+". Discarding document."); //TODO evtl. level fine oder finest
-            return null;
-        }
+        String innerDocFormat = docResFormats.get(relativeInnerId);
+        String url = docResUrls.get(relativeInnerId);
+        String name = docResNames.get(relativeInnerId);
+        tpDocument.setResFormat(innerDocFormat.toLowerCase());
+        tpDocument.setInnerId(String.valueOf(relativeInnerId));
+        tpDocument.setResUrl(url);
+        tpDocument.setResName(name);
+        tpDocument.setOuterId(outerId);
+        tpDocument.setTitle(outerName);
+        tpDocument.setDate(date);
 
         return tpDocument;
     }
 
 
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int startFrom, int downloadUntil, int numOfThreads){
-        final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpDocuments);
+    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int numOfDocsToDownload, int startFrom, int downloadUntil, int numOfThreads){
+        final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpDocuments, numOfDocsToDownload);
         final int start = startFrom;
         final int end = downloadUntil;
-        final int totalNumOfDocs = totalDocuments;
+        final int totalNumOfInnerDocs = filteredNumOfInnerDocs;
 
         for(int i= 0; i < numOfThreads; i++){
             Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    downloadDocuments(tpDocumentProvider, path, start, end, totalNumOfDocs);
+                    downloadDocuments(tpDocumentProvider, path, start, end, numOfDocsToDownload, totalNumOfInnerDocs);
                 }
             });
             thread.start();
         }
     }
 
-    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int startFrom, int downloadUntil, int totalNumOfDocs) {
+    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int startFrom, int downloadUntil, int numOfDocsToDownload, int totalNumOfInnerDocs) {
         System.out.println("Starting to download files.");
         int threadNumber = tpDocumentProvider.getCurrentThreadCount();
 
@@ -214,9 +220,9 @@ public class TransparenzResourceDownloader {
             TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
             if(tpDocument != null) {
                 int current = tpDocumentProvider.getCurrent();
-                if(current > startFrom && current<downloadUntil) {
-                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+current+"' of '"+totalNumOfDocs+"'");
-                    downloadDocument(tpDocument, path);
+                if(current >= startFrom && current<downloadUntil && current < numOfDocsToDownload) {
+                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+current+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpDocument.getOuterId()+"_"+tpDocument.innerId);
+                    downloadDocument(tpDocument, tpDocumentProvider, path);
                 }
             }else{
                 System.out.println("Thread '"+threadNumber+"' finished");
@@ -228,7 +234,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadDocument(TpDocument tpDocument, String path){
+    private void downloadDocument(TpDocument tpDocument,  TpDocumentProvider tpDocumentProvider, String path){
             String urlString = tpDocument.getResUrl();
             String docFormat = tpDocument.getResFormat().toLowerCase();
             String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
@@ -237,7 +243,10 @@ public class TransparenzResourceDownloader {
 
             try {
                 URL url = new URL(urlString);
-                InputStream in = new BufferedInputStream(url.openStream());
+                URLConnection urlConnection = url.openConnection();
+                urlConnection.setReadTimeout(1000000);
+                urlConnection.connect();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
 
                 for (int i; (i = in.read()) != -1; ) {
@@ -245,9 +254,11 @@ public class TransparenzResourceDownloader {
                 }
                 in.close();
                 out.close();
+                tpDocumentProvider.incrementNumOfDocsDownloaded();
             }catch(Exception e){
                 System.out.println("Couldn't download dcoument.");
                 e.printStackTrace();
+                tpDocumentProvider.incrementNumOfDocsFailed();
             }
 
     }
@@ -304,6 +315,49 @@ public class TransparenzResourceDownloader {
                 docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
     }
 
+
+
+    private void writeStatsWhenFinished(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {
+        while(true){
+            TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance();
+            if(tpDocumentProvider != null && tpDocumentProvider.isFinished()){
+                Instant endTime = Instant.now();
+                long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
+                writeDownloadStatsToFile(secondsElapsed, tpDocumentProvider.getNumOfInnerDocsDownloaded(), tpDocumentProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToStats, numOfThreads);
+                break;
+            }
+
+            try {
+                Thread.sleep(100);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void writeDownloadStatsToFile(long secondsElapsed, int numOfDocsDownloaded, int numOfDocsFailedToDownload, List<String> downloadedFormats, String filePath, int numOfThreads){
+        try {
+            FileWriter fileWriter = new FileWriter(filePath, true);
+            fileWriter.write("--------------------------------------------------");
+            fileWriter.write("--------------------------------------------------");
+            fileWriter.write("Run: "+Instant.now().toString()+"\n");
+            fileWriter.write("Number of threads: "+numOfThreads+"\n");
+            fileWriter.write("Total number of outer documents: "+numOfOuterDocs+"\n");
+            fileWriter.write("Number of malformed outer documents: "+malformedSolrDocCounter+"\n");
+            fileWriter.write("Total number of inner documents: "+totalNumOfInnerDocs+"\n");
+            fileWriter.write("Number of inner documents of desired formats: "+filteredNumOfInnerDocs+"\n");
+            fileWriter.write("Number of inner documents downloaded: "+numOfDocsDownloaded+"\n");
+            fileWriter.write("Number of inner documents failed to download: "+numOfDocsFailedToDownload+"\n");
+            fileWriter.write("Time elapsed: "+secondsElapsed+"\n");
+            fileWriter.write("Formats downloaded: "+downloadedFormats.toString()+"\n");
+            fileWriter.write("--------------------------------------------------");
+            fileWriter.write("--------------------------------------------------");
+
+            fileWriter.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 
 
 }
