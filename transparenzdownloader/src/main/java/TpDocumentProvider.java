@@ -5,16 +5,32 @@ public class TpDocumentProvider{
     Iterator<TpDocument> tpDocumentIterator;
     int current;
     int threadCounter;
+    int numOfInnerDocsDownloaded;
+    int numOfInnerDocsFailed;
+    int numOfDocsTotal;
+    int numOfDocsToDownload;
+
+
     static TpDocumentProvider tpDocumentProvider;
 
-    private TpDocumentProvider(List<TpDocument> tpDocuments){
+    private TpDocumentProvider(List<TpDocument> tpDocuments, int numofDocsToDownload){
         tpDocumentIterator = tpDocuments.iterator();
-        current = 0;
+        numOfDocsTotal = tpDocuments.size();
+        this.numOfDocsToDownload = numofDocsToDownload;
+        current = -1;
     }
 
-    public static TpDocumentProvider getInstance(List<TpDocument> tpDocuments){
+    public static TpDocumentProvider getInstance(){
         if(tpDocumentProvider == null){
-            tpDocumentProvider = new TpDocumentProvider(tpDocuments);
+            return null;
+        }
+
+        return tpDocumentProvider;
+    }
+
+    public static TpDocumentProvider getInstance(List<TpDocument> tpDocuments, int numofDocsToDownload){
+        if(tpDocumentProvider == null){
+            tpDocumentProvider = new TpDocumentProvider(tpDocuments, numofDocsToDownload);
         }
         return tpDocumentProvider;
     }
@@ -36,5 +52,25 @@ public class TpDocumentProvider{
 
     public synchronized int getCurrent(){
         return current;
+    }
+
+    public synchronized boolean isFinished(){
+        return (numOfInnerDocsDownloaded + numOfInnerDocsFailed == numOfDocsTotal) || (numOfInnerDocsDownloaded + numOfInnerDocsFailed == numOfDocsToDownload);
+    }
+
+    public synchronized void incrementNumOfDocsDownloaded(){
+        numOfInnerDocsDownloaded++;
+    }
+
+    public synchronized void incrementNumOfDocsFailed(){
+        numOfInnerDocsFailed++;
+    }
+
+    public int getNumOfInnerDocsDownloaded(){
+        return numOfInnerDocsDownloaded;
+    }
+
+    public int getNumOfInnerDocsFailed(){
+        return numOfInnerDocsFailed;
     }
 }
