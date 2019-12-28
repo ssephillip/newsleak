@@ -63,7 +63,7 @@ public class TransparenzResourceDownloader {
         Instant startTime = Instant.now();
 
         //       SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
-        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr(formatsToDownload);
+        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr();
         numOfOuterDocs = solrDocuments.size();
         int outerDocsProcessed = 0;
 
@@ -90,20 +90,12 @@ public class TransparenzResourceDownloader {
 
 
 
-    public SolrDocumentList getAllOuterDocumentsFromSolr(List<String> fileFormatsToDownload) throws InstantiationException{
+    public SolrDocumentList getAllOuterDocumentsFromSolr() throws InstantiationException{
         QueryResponse response = null;
-        String queryString;
-        StringBuilder stringBuilder = new StringBuilder();
-        for(int i = 1; i < fileFormatsToDownload.size(); i++){
-            stringBuilder.append(" OR res_format:\""+fileFormatsToDownload.get(i)+"\"");
-        }
-        queryString = stringBuilder.toString();
-        if(queryString == null){
-            queryString = "";
-        }
 
 
-        SolrQuery documentQuery = new SolrQuery("res_format:\""+fileFormatsToDownload.get(0)+"\""+queryString);
+
+        SolrQuery documentQuery = new SolrQuery("*:*");
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
