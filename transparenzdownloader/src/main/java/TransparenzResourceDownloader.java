@@ -310,6 +310,8 @@ public class TransparenzResourceDownloader {
 
 
     private void writeStatsWhenFinished(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {
+        String pathToTempStats = pathToStats+"--temp.txt";
+
         while(true){
             TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance();
             if(tpDocumentProvider != null && tpDocumentProvider.isFinished()){
@@ -317,6 +319,12 @@ public class TransparenzResourceDownloader {
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
                 writeDownloadStatsToFile(secondsElapsed, tpDocumentProvider.getNumOfInnerDocsDownloaded(), tpDocumentProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToStats, numOfThreads);
                 break;
+            }else if(tpDocumentProvider != null &&  tpDocumentProvider.getCurrent()%500==0){ //TODO determine time for temp-stat print better (e.g. with a callback)
+                //TODO zwischen stats ausbauen wenn fertig, da zwischen stats funktion zu unstabil.
+                Instant endTime = Instant.now();
+                long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
+                writeDownloadStatsToFile(secondsElapsed, tpDocumentProvider.getNumOfInnerDocsDownloaded(), tpDocumentProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToTempStats, numOfThreads);
+
             }
 
             try {
@@ -341,10 +349,13 @@ public class TransparenzResourceDownloader {
             fileWriter.write("Number of inner documents downloaded: "+numOfDocsDownloaded+"\n");
             fileWriter.write("Number of inner documents failed to download: "+numOfDocsFailedToDownload+"\n");
             fileWriter.write("Time elapsed: "+secondsElapsed+"\n");
+            fileWriter.write("Documents per second: "+((double) numOfDocsDownloaded)/secondsElapsed+"\n");
             fileWriter.write("Formats downloaded: "+downloadedFormats.toString()+"\n");
             fileWriter.write("--------------------------------------------------");
             fileWriter.write("--------------------------------------------------");
 
+
+            fileWriter.flush();
             fileWriter.close();
         }catch(IOException e){
             e.printStackTrace();
