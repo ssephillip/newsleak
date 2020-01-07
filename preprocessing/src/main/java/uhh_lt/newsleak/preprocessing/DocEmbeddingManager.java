@@ -24,9 +24,16 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
     public static void main(String[] args) {
         DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
         docEmbeddingManager.getConfiguration(args);
-
+        long startCreateEmbedding = System.currentTimeMillis();
         docEmbeddingManager.createEmbeddings();
+        long timeCreateEmbedding = System.currentTimeMillis()-startCreateEmbedding;
+
+        long startVectorIndexing = System.currentTimeMillis();
         docEmbeddingManager.indexVectors();
+        long timeVectorIndexing = System.currentTimeMillis()-startVectorIndexing;
+
+        System.out.println("Time spent for creating embeddings (seconds): " + timeCreateEmbedding / 1000);
+        System.out.println("Time spent for indexing the (vector) embeddings (seconds): " + timeVectorIndexing / 1000);
     }
 
 
