@@ -22,6 +22,9 @@ public class TpDocument {
     /** The id of the inner document (represented by this object). */
     String innerId; //TODO ps 2019-08-20: evtl. auf int umstellen
 
+    /** The concatenation of the outer id and the inner id */
+    String id;
+
     /** The URL to the original resource. */
     String resUrl;
 
@@ -69,6 +72,14 @@ public class TpDocument {
 
     public void setInnerId(String innerId) {
         this.innerId = innerId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getResUrl() {
