@@ -9,11 +9,13 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.uima.util.Level;
+import uhh_lt.newsleak.util.StatsService;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Instant;
 
 /**
  * Provides functionality to create document embedding vectors and store these vectors to a remote vector index (via WebService)
@@ -25,11 +27,15 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
         DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
         docEmbeddingManager.getConfiguration(args);
         long startCreateEmbedding = System.currentTimeMillis();
+        StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.EMBEDDING, Instant.now());
         docEmbeddingManager.createEmbeddings();
+        StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.EMBEDDING, Instant.now());
         long timeCreateEmbedding = System.currentTimeMillis()-startCreateEmbedding;
 
         long startVectorIndexing = System.currentTimeMillis();
+        StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.EMBEDDING_INDEXING, Instant.now());
         docEmbeddingManager.indexVectors();
+        StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.EMBEDDING_INDEXING, Instant.now());
         long timeVectorIndexing = System.currentTimeMillis()-startVectorIndexing;
 
         System.out.println("Time spent for creating embeddings (seconds): " + timeCreateEmbedding / 1000);

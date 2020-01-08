@@ -3,6 +3,7 @@ package uhh_lt.newsleak.annotator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import opennlp.tools.langdetect.LanguageDetectorME;
 import uhh_lt.newsleak.resources.LanguageDetectorResource;
 import uhh_lt.newsleak.resources.MetadataResource;
 import uhh_lt.newsleak.types.Metadata;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * Detects the language of a document based on the first 3000 characters of its
@@ -115,6 +117,7 @@ public class LanguageDetector extends JCasAnnotator_ImplBase {
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.LANGUAGE_DETECTOR, Instant.now());
 		String docText = jcas.getDocumentText();
 		Integer maxLength = Math.min(docText.length(), 3000);
 		String docBeginning = docText.substring(0, maxLength);
@@ -135,6 +138,7 @@ public class LanguageDetector extends JCasAnnotator_ImplBase {
 			metadataResource.appendMetadata(langmetadata);
 		}
 
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.LANGUAGE_DETECTOR, Instant.now());
 	}
 
 	/**

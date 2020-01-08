@@ -1,5 +1,6 @@
 package uhh_lt.newsleak.annotator;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import com.ibm.icu.text.DateFormatSymbols;
 
 import opennlp.uima.Sentence;
 import opennlp.uima.Token;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * Annotator to remove implausible Sentences. The ICU4J sentence segmentation
@@ -79,7 +81,7 @@ public class SentenceCleaner extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.SENTENCE_CLEANER, Instant.now());
 		// step 1
 		cleanTokens(jcas);
 
@@ -88,7 +90,7 @@ public class SentenceCleaner extends JCasAnnotator_ImplBase {
 
 		// step 3
 		restructureSentences(jcas);
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.SENTENCE_CLEANER, Instant.now());
 	}
 
 	/**

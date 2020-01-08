@@ -1,6 +1,7 @@
 package uhh_lt.newsleak.annotator;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import opennlp.uima.Token;
 import uhh_lt.keyterms.Extractor;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.Paragraph;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * UIMA annotator for key term extraction. Uses the uhh-lt/lt-keyterms maven
@@ -75,7 +77,7 @@ public class KeytermExtractor extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.KEYTERMS, Instant.now());
 		Set<String> keytermSet = getKeyWords(jcas);
 		HashSet<String> namedEntities = getNamedEntities(jcas);
 
@@ -101,6 +103,7 @@ public class KeytermExtractor extends JCasAnnotator_ImplBase {
 		Metadata metadata = (Metadata) jcas.getAnnotationIndex(Metadata.type).iterator().next();
 		metadata.setKeyterms(keyterms.toString());
 		metadata.addToIndexes();
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.KEYTERMS, Instant.now());
 	}
 
 	/**

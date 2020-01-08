@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class StatsService {
     private static StatsService statsService;
@@ -28,6 +29,8 @@ public class StatsService {
     public static final String POSTGRES_TO_ELASTIC = "Postgres to Elastic indexing";
     public static final String EMBEDDING = "Doc embedding";
     public static final String EMBEDDING_INDEXING = "Doc embedding indexing";
+    public static final String INITIALIZE_TRANSPARENZ = "Transparenz(reader) initialization";
+    public static final String INITIALIZE_HOOVER = "Hoover(reader) initialization";
     public static final String EVENT_TYPE_START = "start";
     public static final String EVENT_TYPE_STOP = "stop";
     String statsFilePath;

@@ -1,6 +1,7 @@
 package uhh_lt.newsleak.annotator;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -39,6 +40,7 @@ import opennlp.uima.Sentence;
 import opennlp.uima.Token;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.Paragraph;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * Annotator for Named Entity Recognition. The annotator queries a micro-service
@@ -105,7 +107,7 @@ public class NerMicroservice extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.NER, Instant.now());
 		// document language in ISO-639-1 format
 		String docLang = localeMap.get(jcas.getDocumentLanguage()).getLanguage();
 
@@ -142,7 +144,7 @@ public class NerMicroservice extends JCasAnnotator_ImplBase {
 
 		// remove unlikely entities
 		cleanNerAnnotations(jcas);
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.NER, Instant.now());
 	}
 
 	private void annotateNer(JCas jcas, String docLang, Collection<Sentence> sentences)

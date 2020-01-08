@@ -1,6 +1,7 @@
 package uhh_lt.newsleak.annotator;
 
 import java.text.BreakIterator;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import opennlp.uima.Sentence;
 import opennlp.uima.Token;
 import uhh_lt.newsleak.types.Paragraph;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * Tokenization, sentence and paragraph annotation with the ICU4J library. ICU4J
@@ -83,6 +85,7 @@ public class SegmenterICU extends JCasAnnotator_ImplBase {
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.SEGMENTER_ICU, Instant.now());
 		// annotate paragraphs in document text
 		annotateParagraphs(jcas);
 
@@ -139,7 +142,7 @@ public class SegmenterICU extends JCasAnnotator_ImplBase {
 
 		// flag unlikely fulltext paragraphs (e.g. log files)
 		flagDubiousParagraphs(jcas);
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.SEGMENTER_ICU, Instant.now());
 	}
 
 	

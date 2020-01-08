@@ -6,15 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -25,7 +22,6 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.collection.CollectionProcessingEngine;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.cpe.CpeBuilder;
-import org.apache.uima.fit.examples.experiment.pos.XmiWriter;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
@@ -44,10 +40,10 @@ import uhh_lt.newsleak.annotator.SegmenterICU;
 import uhh_lt.newsleak.reader.*;
 import uhh_lt.newsleak.resources.*;
 import uhh_lt.newsleak.util.Doc2VecUtil;
+import uhh_lt.newsleak.util.StatsService;
 import uhh_lt.newsleak.writer.Doc2VecWriter;
 import uhh_lt.newsleak.writer.ElasticsearchDocumentWriter;
 import uhh_lt.newsleak.writer.PostgresDbWriter;
-import uhh_lt.newsleak.writer.TextLineWriter;
 
 /**
  * Information extraction pipeline. The process iterates over the entire dataset
@@ -84,6 +80,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 		// read configuration file
 		np.getConfiguration(args);
+		StatsService.getInstance().startNewRun(np.dataDirectory, np.threads); //TODO richtige variable einführen
 
 
 		Doc2VecUtil.deleteOldTrainingData(np.doc2vecTrainingDir+File.separator+np.trainingFileName+".txt", np.logger);

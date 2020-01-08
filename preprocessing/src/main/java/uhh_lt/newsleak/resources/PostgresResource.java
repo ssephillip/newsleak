@@ -454,4 +454,10 @@ public class PostgresResource extends Resource_ImplBase {
 		}
 	}
 
+
+	public synchronized int getDocumentCounter() {
+		return documentCounter;
+	}
+
+
 }

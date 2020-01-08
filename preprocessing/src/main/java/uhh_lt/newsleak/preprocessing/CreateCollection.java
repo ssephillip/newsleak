@@ -1,5 +1,9 @@
 package uhh_lt.newsleak.preprocessing;
 
+import uhh_lt.newsleak.util.StatsService;
+
+import java.time.Instant;
+
 /**
  * Main class to create a new newsleak collection. It runs the information
  * extraction pipeline which writes to a relational database. The second step
@@ -24,9 +28,11 @@ public class CreateCollection {
 		Class.forName("org.postgresql.Driver");
 
 		// extract fulltext, entities and metdadata and write to DB
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.TOTAL, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.UIMA_PIPELINE, Instant.now());
 		InformationExtraction2Postgres.main(args);
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.UIMA_PIPELINE, Instant.now());
 		long timeUIMAPipeline = System.currentTimeMillis() - startTime;
-
 
 		long startEmbedding = System.currentTimeMillis();
 		DocEmbeddingManager.main(args);
@@ -35,10 +41,14 @@ public class CreateCollection {
 
 		// read from DB and write to fullext index
 		long startPost2Elastic = System.currentTimeMillis();
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.POSTGRES_TO_ELASTIC, Instant.now());
 		Postgres2ElasticsearchIndexer.main(args);
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.POSTGRES_TO_ELASTIC, Instant.now());
 		long timePost2Elastic = System.currentTimeMillis()-startPost2Elastic;
 
 		long estimatedTime = System.currentTimeMillis() - startTime;
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.TOTAL, Instant.now());
+		StatsService.getInstance().writeStatsForStartedRun();
 
 		System.out.println("Processing time passed (seconds): " + estimatedTime / 1000);
 		System.out.println("Time spent for UIMA pipeline (seconds): " + timeUIMAPipeline / 1000);

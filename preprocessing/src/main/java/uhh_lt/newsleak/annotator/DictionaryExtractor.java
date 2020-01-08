@@ -1,5 +1,6 @@
 package uhh_lt.newsleak.annotator;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import opennlp.uima.Token;
 import uhh_lt.newsleak.resources.DictionaryResource;
 import uhh_lt.newsleak.resources.DictionaryResource.Dictionary;
 import uhh_lt.newsleak.types.DictTerm;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * A UIMA annotator to annotate regular expression patterns and dictionary
@@ -110,7 +112,7 @@ public class DictionaryExtractor extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.DICTIONARY, Instant.now());
 		ArrayList<DictTerm> termsToTokenList = new ArrayList<DictTerm>();
 
 		// EMAIL
@@ -140,6 +142,7 @@ public class DictionaryExtractor extends JCasAnnotator_ImplBase {
 		for (Token t : tokens) {
 			annotateDictTypes(jcas, t);
 		}
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.DICTIONARY, Instant.now());
 
 	}
 

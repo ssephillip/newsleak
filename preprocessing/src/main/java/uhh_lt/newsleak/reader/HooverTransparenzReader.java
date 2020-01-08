@@ -30,6 +30,7 @@ import uhh_lt.newsleak.resources.HooverResource;
 import uhh_lt.newsleak.resources.MetadataResource;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.TpDocument;
+import uhh_lt.newsleak.util.StatsService;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -137,9 +138,13 @@ public class HooverTransparenzReader extends NewsleakReader {
 		super.initialize(context);
 		logger = context.getLogger();
 
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.INITIALIZE_TRANSPARENZ, Instant.now());
 		transparenzInitialize(context);
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.INITIALIZE_TRANSPARENZ, Instant.now());
 
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.INITIALIZE_HOOVER, Instant.now());
 		hooverInitialize(context);
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.INITIALIZE_HOOVER, Instant.now());
 
 	}
 

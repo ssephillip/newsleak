@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -31,6 +32,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import uhh_lt.newsleak.resources.ElasticsearchResource;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.Paragraph;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * A writer to populate a temporary elasticsearch index with fulltexts from a
@@ -115,7 +117,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.ELASTICSEARCH_WRITER, Instant.now());
 		String docText = jcas.getDocumentText();
 
 		// skip indexing empty documents
@@ -319,6 +321,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 			throw new AnalysisEngineProcessException(e);
 		}
 		super.collectionProcessComplete();
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.ELASTICSEARCH_WRITER, Instant.now());
 	}
 
 }

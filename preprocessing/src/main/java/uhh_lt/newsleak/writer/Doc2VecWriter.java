@@ -15,9 +15,11 @@ import org.apache.uima.util.Logger;
 import uhh_lt.newsleak.resources.Doc2VecWriterResource;
 import uhh_lt.newsleak.resources.TextLineWriterResource;
 import uhh_lt.newsleak.types.Metadata;
+import uhh_lt.newsleak.util.StatsService;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class Doc2VecWriter extends JCasAnnotator_ImplBase {
      */
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+        StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.DOC2VEC_WRITER, Instant.now());
         Metadata metadata = (Metadata) jcas.getAnnotationIndex(Metadata.type).iterator().next();
         String docId = metadata.getDocId();
         String docText = jcas.getDocumentText();
@@ -66,6 +68,7 @@ public class Doc2VecWriter extends JCasAnnotator_ImplBase {
         String outputText = docId+"\t"+docText;
 
         doc2vecWriter.append(outputText);
+        StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.DOC2VEC_WRITER, Instant.now());
     }
 
     /*

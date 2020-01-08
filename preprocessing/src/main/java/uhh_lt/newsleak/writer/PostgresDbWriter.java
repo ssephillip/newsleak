@@ -1,6 +1,7 @@
 package uhh_lt.newsleak.writer;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import opennlp.uima.Person;
 import uhh_lt.newsleak.resources.PostgresResource;
 import uhh_lt.newsleak.types.DictTerm;
 import uhh_lt.newsleak.types.Metadata;
+import uhh_lt.newsleak.util.StatsService;
 
 /**
  * A writer to populate the newsleak postgres database with final fulltexts and
@@ -69,6 +71,7 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void collectionProcessComplete() throws AnalysisEngineProcessException {
+		StatsService.getInstance().setNumOfDocsProcessed(postgresResource.getDocumentCounter()+1);
 		super.collectionProcessComplete();
 		// commit final inserts/updates
 		postgresResource.commit();
@@ -83,7 +86,7 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.POSTGRES_DB_WRITER, Instant.now());
 		Metadata metadata = (Metadata) jcas.getAnnotationIndex(Metadata.type).iterator().next();
 		Integer docId = Integer.parseInt(metadata.getDocId());
 
@@ -164,6 +167,8 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 			e.printStackTrace();
 			System.exit(1);
 		}
+
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.POSTGRES_DB_WRITER, Instant.now());
 
 	}
 
