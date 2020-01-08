@@ -217,6 +217,17 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					TransparenzReader.TRANSPARENZ_CORE_ADDRESS, this.transparenzCoreAddress,
 					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
 					this.maxDocumentLength);
+		}else if(type.equals("hoover-transparenz")){
+			this.metadataFile = this.hooverTmpMetadata;
+			ExternalResourceDescription hooverResource = ExternalResourceFactory.createExternalResourceDescription(
+					HooverResource.class, HooverResource.PARAM_HOST, this.hooverHost, HooverResource.PARAM_CLUSTERNAME,
+					this.hooverClustername, HooverResource.PARAM_INDEX, this.hooverIndex, HooverResource.PARAM_PORT,
+					this.hooverPort, HooverResource.PARAM_SEARCHURL, this.hooverSearchUrl);
+			reader = CollectionReaderFactory.createReaderDescription(HooverTransparenzReader.class, this.typeSystem,
+					HooverElasticsearchReader.RESOURCE_HOOVER, hooverResource,
+					HooverElasticsearchReader.RESOURCE_METADATA, this.getMetadataResourceDescription(), HooverTransparenzReader.TRANSPARENZ_CORE_ADDRESS, this.transparenzCoreAddress,
+					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
+					this.maxDocumentLength);
 		}else {
 			this.logger.log(Level.SEVERE, "Unknown reader type: " + type);
 			System.exit(1);
@@ -383,7 +394,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// define pipeline
 			AnalysisEngineDescription pipeline = AnalysisEngineFactory.createEngineDescription(sentenceICU,
-					sentenceCleaner, dictionaries, heideltime, nerMicroservice, keyterms,
+					sentenceCleaner, dictionaries, nerMicroservice, keyterms, //heideltime, TODO heideltime wieder einkommentieren
 					doc2vecWriter,
 					// linewriter,
 					// xmi,
