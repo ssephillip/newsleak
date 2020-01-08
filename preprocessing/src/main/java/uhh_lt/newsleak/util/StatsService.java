@@ -85,8 +85,8 @@ public class StatsService {
     public void writeStatsForStartedRun(){
         if(isRunStarted) {
             Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes);
-
-            for (Map.Entry startEntry : startTimesCopy.entrySet()) {
+            Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimesCopy.entrySet();
+            for (Map.Entry startEntry : startTimesEntrySet) {
                 String componentName = (String) startEntry.getKey();
                 Instant endTime = endTimes.get(componentName);
                 if (endTime != null) {
@@ -159,7 +159,7 @@ public class StatsService {
         if(eventType.equals(EVENT_TYPE_START)){
             startTimes.putIfAbsent(serviceName, instant);
         }else if (eventType.equals(EVENT_TYPE_STOP)){
-                endTimes.put(serviceName, instant);
+            endTimes.put(serviceName, instant);
         }
 
     }

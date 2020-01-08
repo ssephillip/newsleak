@@ -424,14 +424,14 @@ public class HooverTransparenzReader extends NewsleakReader {
 	public SolrDocumentList getAllOuterDocumentsFromSolr() throws ResourceInitializationException{
 		QueryResponse response = null;
 
-		SolrQuery documentQuery = new SolrQuery("*:*");
+		SolrQuery documentQuery = new SolrQuery("*:*");//"id:f4c2d114-65fe-4e68-a162-ceefed275aa0");
 		documentQuery.addField("id");
 		documentQuery.addField("res_format");
 		documentQuery.addField("res_url");
 		documentQuery.addField("res_name");
 		documentQuery.addField("title");
 		documentQuery.addField("publishing_date");
-		documentQuery.setRows(Integer.MAX_VALUE); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
+		documentQuery.setRows(Integer.MAX_VALUE);
 
 
 		try {
