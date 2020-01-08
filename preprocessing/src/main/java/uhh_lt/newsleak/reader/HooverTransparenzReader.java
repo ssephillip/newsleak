@@ -264,64 +264,66 @@ public class HooverTransparenzReader extends NewsleakReader {
 			tpDocument = tpDocumentsMap.get(fileName);
 
 			if(tpDocument == null){
-				logger.log(Level.INFO, "No corresponding document found in Transparenzportal solr index. Discarding document: " + docIdHoover);
+				logger.log(Level.INFO, "No corresponding document found in Transparenzportal solr index for file: "+fileName+". Discarding document: " + docIdHoover);
 				if(!hasNext()){ //TODO relies on the "current" counter being incremented in the hasNext method. When this weird implementation changes the "current" counter needs to be incremented here
 					tpDocument = new TpDocument();
 					break;
 				}
-			}else{
-				logger.log(Level.INFO, "breakkkpoint");
 			}
 		}
 
-		String docText = "";
+		String origDocText = getField(source, "text");
+		String newDocText = "";
 		String field;
+		JsonArray arrayField = null;
 
-		// put email header information and TP ID in main text
 
-		field = tpDocument.getId();
-		if (field != null) {
-			docText += field+"\n";
-		}
-		field = getField(source, "from");
-		if (field != null) {
-			String fromText = field.trim();
-			docText += "From: " + fromText.replaceAll("<", "[").replaceAll(">", "]") + "\n";
-		}
-		JsonArray arrayField = getFieldArray(source, "to");
-		if (arrayField != null) {
-			String toList = "";
-			for (JsonElement item : arrayField) {
-				String toListItem = item.getAsString().trim();
-				toListItem = toListItem.replaceAll("<", "[").replaceAll(">", "]");
-				toListItem = toListItem.replaceAll("\\s+", " ") + "\n";
-				toList += toList.isEmpty() ? toListItem : "; " + toListItem;
+		// if document is not empty put email header information and TP ID in main text
+		if(origDocText != null && !origDocText.trim().isEmpty()) {
+			field = tpDocument.getId();
+			if (field != null) {
+				newDocText += field + "\n";
 			}
-			docText += "To: " + toList;
-		}
-		field = getField(source, "subject");
-		if (field != null) {
-			docText += "Subject: " + field.trim() + "\n";
-		}
-		field = tpDocument.getTitle();
-		if (field != null) {
-			docText += "Subject/Title: " + field + "\n";
-		}
-		field = tpDocument.getResName();
-		if (field != null) {
-			docText += "Additional Description: " + field + "\n";
-		}
-		if (!docText.isEmpty()) {
-			docText += "\n-- \n\n";
+			field = getField(source, "from");
+			if (field != null) {
+				String fromText = field.trim();
+				newDocText += "From: " + fromText.replaceAll("<", "[").replaceAll(">", "]") + "\n";
+			}
+			arrayField = getFieldArray(source, "to");
+			if (arrayField != null) {
+				String toList = "";
+				for (JsonElement item : arrayField) {
+					String toListItem = item.getAsString().trim();
+					toListItem = toListItem.replaceAll("<", "[").replaceAll(">", "]");
+					toListItem = toListItem.replaceAll("\\s+", " ") + "\n";
+					toList += toList.isEmpty() ? toListItem : "; " + toListItem;
+				}
+				newDocText += "To: " + toList;
+			}
+			field = getField(source, "subject");
+			if (field != null) {
+				newDocText += "Subject: " + field.trim() + "\n";
+			}
+			field = tpDocument.getTitle();
+			if (field != null) {
+				newDocText += "Subject/Title: " + field + "\n";
+			}
+			field = tpDocument.getResName();
+			if (field != null) {
+				newDocText += "Additional Description: " + field + "\n";
+			}
+			if (!newDocText.isEmpty()) {
+				newDocText += "\n-- \n\n";
+			}
 		}
 
 		// add main text
-		field = getField(source, "text");
+		field = origDocText;
 		if (field != null) {
 			String completeText = field.trim();
-			docText += cleanBodyText(completeText);
+			newDocText += cleanBodyText(completeText);
 		}
-		jcas.setDocumentText(docText);
+		jcas.setDocumentText(newDocText);
 
 
 
