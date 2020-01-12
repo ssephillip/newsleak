@@ -5,6 +5,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
@@ -232,20 +233,37 @@ public class TransparenzResourceDownloader {
             String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
             String docName = tpDocument.getResName();
             String pathToFile = path+docId+"."+docFormat;
+            int readTimeout = 1000000;
 
             try {
                 URL url = new URL(urlString);
-                URLConnection urlConnection = url.openConnection();
-                urlConnection.setReadTimeout(1000000);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(readTimeout);
                 urlConnection.connect();
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
+                int responseCode = urlConnection.getResponseCode();
+                if(responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_SEE_OTHER){
 
-                for (int i; (i = in.read()) != -1; ) {
-                    out.write(i);
+                    while(responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+                        url = new URL(urlConnection.getHeaderField("Location"));
+                        urlConnection = (HttpURLConnection) url.openConnection();
+                        urlConnection.setReadTimeout(readTimeout);
+                        urlConnection.connect();
+                        responseCode = urlConnection.getResponseCode();
+                    }
+
+                    System.out.println("Downloading...");
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
+
+                    for (int i; (i = in.read()) != -1; ) {
+                        out.write(i);
+                    }
+                    in.close();
+                    out.close();
+                }else{
+                    System.out.println("Skipping document");
                 }
-                in.close();
-                out.close();
+
                 tpDocumentProvider.incrementNumOfDocsDownloaded();
             }catch(Exception e){
                 System.out.println("Couldn't download dcoument.");
