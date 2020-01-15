@@ -720,10 +720,7 @@ define([
                             var docid = $scope.tabs[tabIndex - 1].id;
                             var method = $scope.selectedMethod.name;
 
-                            $scope.debugSimilarDocs();
-
                             if (method === $scope.availableMethods[0].name) {
-
                                 //selected method is Doc2VecC
                                 $scope.getSimilarDocsDoc2VecC(docid);
                             } else if (method === $scope.availableMethods[1].name) {
@@ -752,7 +749,7 @@ define([
                         } else { //a tab with a document is selected
                             var selectedDoc = $scope.tabs[tabIndex - 1];
                             var docid = selectedDoc.id;
-                            var docidTransparenz = selectedDoc.metadata["Transparenz-ID"].value + "_"+selectedDoc.metadata["Inner-ID"].value;
+                            var docidTransparenz = selectedDoc.meta["Transparenz-id"][0].val + "_"+selectedDoc.meta["Inner transparenz-id"][0].val;
                             var doc2vecIDs = "";
                             var elasticIDs = "";
                             var doc2vecIDsList = [];
@@ -764,20 +761,23 @@ define([
 
                             $scope.getSimilarDocsDoc2VecC(docid);
 
-                            angular.forEach($scope.similarDocuments, function (doc) {
-
-                                var transparenzID = doc.metadata["Transparenz-ID"].value + "_"+doc.metadata["Inner-ID"].value;
+                            setTimeout(5000);
+                            var j;
+                            for (j = 0; j < $scope.numOfDocs; j++) {
+                                var transparenzID = $scope.similarDocuments[j].metadata["Transparenz-id"][0].val + "_"+$scope.similarDocuments.metadata["Inner transparenz-id"][0].val;
                                 doc2vecIDs = doc2vecIDs + transparenzID+".pdf,";
                                 doc2vecIDsList.push(transparenzID);
                                 doc2vecScoresList.push(doc.score);
-                            });
+                            }
+
+
 
 
                             $scope.getSimilarDocsElasticsearch(docid);
 
                             angular.forEach($scope.similarDocuments, function (doc) {
 
-                                var transparenzID = doc.metadata["Transparenz-ID"].value + doc.metadata["Inner-ID"].value;
+                                var transparenzID = doc.metadata["Transparenz-id"].value + "_" + doc.metadata["Inner transparenz-id"].value;
                                 elasticIDs = elasticIDs + "," + transparenzID;
                                 elasticIDsList.push(transparenzID);
                                 elasticScoresList.push(doc.score);
@@ -785,6 +785,7 @@ define([
 
                             var formatString = "%s\\n\\n%s\\t%s\\t%s\\t%s\\t%s\\t%s\\n";
                             var argumentsString = "'"+docidTransparenz+"' 'Doc2VecC ID' 'Doc2VecC score' 'similar?' 'Elastic ID' 'Elastic score' 'similar?' ";
+                            var i;
                             for (i = 0; i < Math.min(doc2vecIDsList.length+elasticIDsList.length); i++) {
                                 formatString = formatString+"%s\\t%s\\t\\t%s\\t%s\\t\\n";
                                 argumentsString = argumentsString+"'"+doc2vecIDsList[i]+"' '"+doc2vecScoresList[i]+"' '"+elasticIDsList[i]+"' '"+elasticScoresList[i]+"' ";
@@ -863,6 +864,24 @@ define([
 
                             $scope.similarDocuments = $filter('orderBy')($scope.similarDocuments, 'score', reverseOrder);
                             $scope.similarDocsAvailable = $scope.similarDocuments.length > 0;
+
+
+                            var selectedDoc = $scope.tabs[$scope.selectedTab.index - 1];
+                            var argumentString = "./document_selection_script.sh \""+ selectedDoc.meta["Transparenz-id"][0].val + "_"+selectedDoc.meta["Inner transparenz-id"][0].val+"\" ";
+                            var argumentIds = "";
+                            var argumentScores = "";
+
+                            angular.forEach($scope.similarDocuments, function (doc) {
+
+                                var transparenzID = doc.metadata["Transparenz-id"][0].val + "_"+doc.metadata["Inner transparenz-id"][0].val;
+                                var score = doc.score;
+                                argumentIds += transparenzID+",";
+                                argumentScores += score+",";
+
+                            });
+                            argumentString += "\""+argumentIds+"\" \""+argumentScores+"\" \"doc2vec\"";
+                            console.log(argumentString);
+
                         });
                     }
 
