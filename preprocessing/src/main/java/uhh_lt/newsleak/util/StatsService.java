@@ -92,9 +92,6 @@ public class StatsService {
                 if (endTime != null) {
                     Duration duration = Duration.between((Instant) startEntry.getValue(), endTime);
                     writeStatsForComponent(componentName, duration);
-
-                    startTimes.remove(componentName);
-                    endTimes.remove(componentName);
                 }
             }
 
@@ -124,6 +121,28 @@ public class StatsService {
             e.printStackTrace();
         }
 
+    }
+
+    //TODO stats so printen das es eine tabelle ist
+    public void writeFinalStatsTable(){
+        if(isRunStarted) {
+            Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes);
+            Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimesCopy.entrySet();
+            for (Map.Entry startEntry : startTimesEntrySet) {
+                String componentName = (String) startEntry.getKey();
+                Instant endTime = endTimes.get(componentName);
+                if (endTime != null) {
+                    Duration duration = Duration.between((Instant) startEntry.getValue(), endTime);
+                    writeStatsForComponent(componentName, duration);
+
+                    startTimes.remove(componentName);
+                    endTimes.remove(componentName);
+                }
+            }
+
+        }else{
+            System.out.println("Stats could not be written because no run was started!"); //TODO maybe better to throw exception or log the error. Problem: logger is not available in the calling method.
+        }
     }
 
 
