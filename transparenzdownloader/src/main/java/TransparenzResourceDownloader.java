@@ -228,7 +228,8 @@ public class TransparenzResourceDownloader {
 
 
     private void downloadDocument(TpDocument tpDocument,  TpDocumentProvider tpDocumentProvider, String path){
-            String urlString = tpDocument.getResUrl();
+            String origUrlString = tpDocument.getResUrl();
+            String urlString = "";
             String docFormat = tpDocument.getResFormat().toLowerCase();
             String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
             String docName = tpDocument.getResName();
@@ -236,7 +237,7 @@ public class TransparenzResourceDownloader {
             int readTimeout = 1000000;
 
             try {
-                URL url = new URL(urlString);
+                URL url = new URL(origUrlString);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(readTimeout);
                 urlConnection.connect();
@@ -244,14 +245,28 @@ public class TransparenzResourceDownloader {
                 if(responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_SEE_OTHER){
 
                     while(responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
-                        url = new URL(urlConnection.getHeaderField("Location"));
+                        urlString = urlConnection.getHeaderField("Location");
+
+                        if(responseCode == HttpURLConnection.HTTP_MOVED_TEMP && !urlString.startsWith("http")){
+                            String host = urlConnection.getURL().getHost();
+                            String protocol = urlConnection.getURL().getProtocol();
+                            if(urlString.startsWith("___tmp")){
+                                urlString = protocol + "://" + host + "/bi/" + urlString;
+                            }else {
+                                urlString = protocol + "://" + host +  urlString;
+                            }
+                        }
+
+                        System.out.println("Downloading from url: "+ urlString +" Orig URL: "+origUrlString);
+                        url = new URL(urlString);
                         urlConnection = (HttpURLConnection) url.openConnection();
                         urlConnection.setReadTimeout(readTimeout);
+                        urlConnection.setInstanceFollowRedirects(false);
+                       // urlConnection.addRequestProperty("Accept", "application/pdf, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2");
                         urlConnection.connect();
                         responseCode = urlConnection.getResponseCode();
                     }
 
-                    System.out.println("Downloading...");
                     InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
 
