@@ -77,10 +77,10 @@ public abstract class NewsleakPreprocessor {
 	//doc2vec training configuration
 	protected String doc2vecTrainingDir;
 	protected String doc2vecResultDir;
-	protected String trainingFileName = "training_file";
-	protected String trainingFileNameDocOnly = "training_file_doc_only";
-	protected String trainingFileNameIdOnly = "training_file_id_only";
-	protected String doc2vecResultFileName = "docvectors";
+	protected String trainingFileName;
+	protected String trainingFileNameDocOnly;
+	protected String trainingFileNameIdOnly;
+	protected String doc2vecResultFileName;
 	protected String doc2vecIndexUrl;
 	protected String doc2vecIndexPort;
 
@@ -156,6 +156,10 @@ public abstract class NewsleakPreprocessor {
 
 			doc2vecTrainingDir = prop.getProperty("doc2vectrainingdir");
 			doc2vecResultDir = doc2vecTrainingDir + File.separator + "result";
+			trainingFileName = "training_file";
+			trainingFileNameDocOnly = "training_file_doc_only";
+			trainingFileNameIdOnly = "training_file_id_only";
+			doc2vecResultFileName = "docvectors";
 			doc2vecIndexUrl = prop.getProperty("doc2vecindexurl");
 			doc2vecIndexPort = prop.getProperty("doc2vecindexport");
 
