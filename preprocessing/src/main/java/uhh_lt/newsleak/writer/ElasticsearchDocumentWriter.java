@@ -154,6 +154,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 
 		}
 
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.ELASTICSEARCH_WRITER, Instant.now());
 	}
 
 	/**
@@ -193,7 +194,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 				IndexResponse response = client
 						.prepareIndex(esResource.getIndex(), ES_TYPE_DOCUMENT, newsleakDocId.toString())
 						.setSource(builder).get();
-				logger.log(Level.INFO, response.toString());  //TODO ps 2019-08-20 (maybe) comment out for performance increase (at the cost of maintainability)
+				logger.log(Level.INFO, response.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ParseException e) {
@@ -321,7 +322,6 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 			throw new AnalysisEngineProcessException(e);
 		}
 		super.collectionProcessComplete();
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.ELASTICSEARCH_WRITER, Instant.now());
 	}
 
 }

@@ -71,7 +71,6 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void collectionProcessComplete() throws AnalysisEngineProcessException {
-		StatsService.getInstance().setNumOfDocsProcessed(postgresResource.getDocumentCounter()+1);
 		super.collectionProcessComplete();
 		// commit final inserts/updates
 		postgresResource.commit();
@@ -168,8 +167,8 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 			System.exit(1);
 		}
 
+		StatsService.getInstance().setNumOfDocsProcessed(postgresResource.getDocumentCounter());
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.POSTGRES_DB_WRITER, Instant.now());
-
 	}
 
 	/**
