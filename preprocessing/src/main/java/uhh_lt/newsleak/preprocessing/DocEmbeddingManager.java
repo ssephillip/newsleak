@@ -29,7 +29,7 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
         StatsService.getInstance().startNewRun(docEmbeddingManager.dataDirectory, docEmbeddingManager.threads); //TODO wieder entfernen für finale JAR (gehört eigentlich nur in InformationExtraction2Postgres)
         long startCreateEmbedding = System.currentTimeMillis();
         StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.EMBEDDING, Instant.now());
-//        docEmbeddingManager.createEmbeddings();
+        docEmbeddingManager.createEmbeddings();
         StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.EMBEDDING, Instant.now());
         long timeCreateEmbedding = System.currentTimeMillis()-startCreateEmbedding;
 
