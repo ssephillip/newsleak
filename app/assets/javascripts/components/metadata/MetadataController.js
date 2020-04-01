@@ -707,64 +707,34 @@ define([
                     $scope.getSimilarDocsForOpenTab = function () {
                         $scope.updateHeightSimDocs();
                         var tabIndex = $scope.selectedTab.index;
+                        $scope.similarDocuments = [];
 
 
+                        if (tabIndex == 0) {
+                            //first tab (with graphs) is selected
+                            console.log("No similar docs available for selected tab/document")
+                            $scope.similarDocsAvailable = false;
 
-                        if (!$scope.argumentTargets || $scope.argumentTargets === "") {
-                            $scope.argumentTargets = "";
-                            $scope.argumentIds = "";
-                            $scope.argumentScores = "";
-                            $scope.scriptString = "";
-                            $scope.argumentTargetNames="";
-                            $scope.argumentNames="";
+                            return;
+                        } else { //a tab with a document is selected
+                            var docid = $scope.tabs[tabIndex - 1].id;
+                            var method = $scope.selectedMethod.name;
 
-                            $scope.argumentTargetsMulti = "";
-                            $scope.argumentIdsMulti = "";
-                            $scope.argumentScoresMulti = "";
-                            $scope.scriptStringMulti = "";
-                            $scope.argumentTargetNamesMulti="";
-                            $scope.argumentNamesMulti="";
-
-                            $scope.argumentTargetsMultiFive = "";
-                            $scope.argumentIdsMultiFive = "";
-                            $scope.argumentScoresMultiFive = "";
-                            $scope.scriptStringMultiFive = "";
-                            $scope.argumentTargetNamesMultiFive="";
-                            $scope.argumentNamesMultiFive="";
-
+                            if (method === $scope.availableMethods[0].name) {
+                                //selected method is Doc2VecC
+                                $scope.getSimilarDocsDoc2VecC(docid);
+                            } else if (method === $scope.availableMethods[1].name) {
+                                //selected method is Elastic
+                                $scope.getSimilarDocsElasticsearch(docid);
+                            } else {
+                                $scope.similarDocsAvailable = false;
+                                console.log("Unknown method!");
+                            }
 
                         }
 
-                        // angular.forEach(manualIds, function(docidIter) {
-                            $scope.similarDocuments = [];
 
-
-                            if (tabIndex == 0) {
-                                //first tab (with graphs) is selected
-                                console.log("No similar docs available for selected tab/document")
-                                $scope.similarDocsAvailable = false;
-
-                                return;
-                            } else { //a tab with a document is selected
-                                var docid = $scope.tabs[tabIndex - 1].id;
-                                var method = $scope.selectedMethod.name;
-
-                                if (method === $scope.availableMethods[0].name) {
-                                    //selected method is Doc2VecC
-                                    $scope.getSimilarDocsDoc2VecC(docid);
-                                } else if (method === $scope.availableMethods[1].name) {
-                                    //selected method is Elastic
-                                    $scope.getSimilarDocsElasticsearch(docid);
-                                } else {
-                                    $scope.similarDocsAvailable = false;
-                                    console.log("Unknown method!");
-                                }
-
-                            }
-                        //});
                     }
-
-
 
 
                     $scope.getSimilarDocsElasticsearch = function (docid) {
@@ -789,26 +759,20 @@ define([
                         playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function (response) {
                             vectorIndexAddress = response.data.address;
 
-                                //get the ids of the most similar documents
-                                $http.get(vectorIndexAddress + '/' + docid + '?num=' + $scope.numOfDocs)
-                                    .then(function (response) {
-                                        //extract ids from the response
-                                        var docids = response.data.result.map(function (item) { return item[0]; });
-                                        var docIdsAndScores = [];
+                            //get the ids of the most similar documents
+                            $http.get(vectorIndexAddress + '/' + docid + '?num=' + $scope.numOfDocs)
+                                .then(function (response) {
+                                    //extract ids from the response
+                                    var docids = response.data.result.map(function (item) { return item[0]; });
+                                    var docIdsAndScores = [];
 
-                                        //create map with key=docid and value=doc-similarity-score
-                                        angular.forEach(response.data.result, function (item) {
-                                            docIdsAndScores[item[0]] = item[1];
-                                        });
-
-                                        $scope.getAndPushDocs(docids, docIdsAndScores, false);
-
-
+                                    //create map with key=docid and value=doc-similarity-score
+                                    angular.forEach(response.data.result, function (item) {
+                                        docIdsAndScores[item[0]] = item[1];
                                     });
 
-
-
-
+                                    $scope.getAndPushDocs(docids, docIdsAndScores, false);
+                                });
                         })
                     };
 
@@ -823,87 +787,6 @@ define([
 
                             $scope.similarDocuments = $filter('orderBy')($scope.similarDocuments, 'score', reverseOrder);
                             $scope.similarDocsAvailable = $scope.similarDocuments.length > 0;
-
-                            //
-                            // var selectedDoc = $scope.tabs[$scope.selectedTab.index - 1];
-                            // var argumentString = "./document_selection_script.sh \""+ selectedDoc.meta["Transparenz-id"][0].val + "_"+selectedDoc.meta["Inner transparenz-id"][0].val+"\" ";
-                            // var argumentIds = "";
-                            // var argumentScores = "";
-                            //
-                            // angular.forEach($scope.similarDocuments, function (doc) {
-                            //
-                            //     var transparenzID = doc.metadata["Transparenz-id"][0].val + "_"+doc.metadata["Inner transparenz-id"][0].val;
-                            //     var score = doc.score;
-                            //     argumentIds += transparenzID+",";
-                            //     argumentScores += score+",";
-                            //
-                            // });
-                            // argumentString += "\""+argumentIds+"\" \""+argumentScores+"\" \"doc2vec\"";
-                            // console.log(argumentString);
-
-
-
-
-                            var selectedDoc = $scope.tabs[$scope.selectedTab.index - 1];
-                            $scope.argumentTargets += selectedDoc.meta["Transparenz-id"][0].val + "_"+selectedDoc.meta["Inner transparenz-id"][0].val+",";
-                            $scope.argumentTargetNames += selectedDoc.meta["Filename"][0].val+",";
-
-                            var doc = $scope.similarDocuments[1];
-                            var transparenzID = doc.metadata["Transparenz-id"][0].val + "_"+doc.metadata["Inner transparenz-id"][0].val;
-                            var score = doc.score;
-                            var name = doc.metadata["Filename"][0].val;
-
-                            $scope.argumentIds += transparenzID+",";
-                            $scope.argumentScores += score+",";
-                            $scope.argumentNames += name+",";
-
-                            var i;
-                            for (i = 1; i < 4; i++) {
-
-                                $scope.argumentTargetsMulti += selectedDoc.meta["Transparenz-id"][0].val + "_" + selectedDoc.meta["Inner transparenz-id"][0].val + ",";
-                                $scope.argumentTargetNamesMulti += selectedDoc.meta["Filename"][0].val+",";
-
-                                var doc = $scope.similarDocuments[i];
-                                var transparenzID = doc.metadata["Transparenz-id"][0].val + "_" + doc.metadata["Inner transparenz-id"][0].val;
-                                var score = doc.score;
-                                var name = doc.metadata["Filename"][0].val;
-                                $scope.argumentIdsMulti += transparenzID + ",";
-                                $scope.argumentScoresMulti += score + ",";
-                                $scope.argumentNamesMulti += name + ",";
-                            }
-
-                            var i;
-                            for (i = 1; i < 6; i++) {
-
-                                $scope.argumentTargetsMultiFive += selectedDoc.meta["Transparenz-id"][0].val + "_" + selectedDoc.meta["Inner transparenz-id"][0].val + ",";
-                                $scope.argumentTargetNamesMultiFive += selectedDoc.meta["Filename"][0].val+",";
-
-                                var doc = $scope.similarDocuments[i];
-                                var transparenzID = doc.metadata["Transparenz-id"][0].val + "_" + doc.metadata["Inner transparenz-id"][0].val;
-                                var score = doc.score;
-                                var name = doc.metadata["Filename"][0].val;
-                                $scope.argumentIdsMultiFive += transparenzID + ",";
-                                $scope.argumentScoresMultiFive += score + ",";
-                                $scope.argumentNamesMultiFive += name+",";
-                            }
-
-                            var method = "doc2vec-1";
-
-                            $scope.scriptString = "./no-names_document_selection_script.sh \""+ $scope.argumentTargets +"\" \"" + $scope.argumentIds +"\" \""+$scope.argumentScores+"\" \""+method+"\"";
-                            console.log($scope.scriptString);
-
-                            $scope.scriptStringMulti = "./no-names_document_selection_script.sh \""+ $scope.argumentTargetsMulti +"\" \"" + $scope.argumentIdsMulti +"\" \""+$scope.argumentScoresMulti +"\" \""+method+"\"";
-                            console.log($scope.scriptStringMulti);
-
-                            $scope.scriptStringMultiFive = "./no-names_document_selection_script.sh \""+ $scope.argumentTargetsMultiFive +"\" \"" + $scope.argumentIdsMultiFive +"\" \""+$scope.argumentScoresMultiFive +"\" \""+method+"\"";
-                            console.log($scope.scriptStringMultiFive);
-
-                            console.log("blub");
-                            console.log("blub");
-                            console.log("blub");
-
-
-
                         });
                     }
 
@@ -1032,85 +915,6 @@ define([
                         }
                         container.appendChild(self.popupMenu);
                     };*/
-
-                    $scope.debugSimilarDocs = function () {
-                        var tabIndex = $scope.selectedTab.index;
-                        $scope.similarDocuments = [];
-
-
-                        if (tabIndex == 0) {
-                            //first tab (with graphs) is selected
-                            console.log("No similar docs available for selected tab/document")
-                            $scope.similarDocsAvailable = false;
-
-                            return;
-                        } else { //a tab with a document is selected
-                            var selectedDoc = $scope.tabs[tabIndex - 1];
-                            var docid = selectedDoc.id;
-                            var docidTransparenz = selectedDoc.meta["Transparenz-id"][0].val + "_"+selectedDoc.meta["Inner transparenz-id"][0].val;
-                            var doc2vecIDs = "";
-                            var elasticIDs = "";
-                            var doc2vecIDsList = [];
-                            var elasticIDsList = [];
-                            var doc2vecScoresList = [];
-                            var elasticScoresList = [];
-
-
-
-                            $scope.getSimilarDocsDoc2VecC(docid);
-
-                            setTimeout(5000);
-                            var j;
-                            for (j = 0; j < $scope.numOfDocs; j++) {
-                                var transparenzID = $scope.similarDocuments[j].metadata["Transparenz-id"][0].val + "_"+$scope.similarDocuments.metadata["Inner transparenz-id"][0].val;
-                                doc2vecIDs = doc2vecIDs + transparenzID+".pdf,";
-                                doc2vecIDsList.push(transparenzID);
-                                doc2vecScoresList.push(doc.score);
-                            }
-
-
-
-
-                            $scope.getSimilarDocsElasticsearch(docid);
-
-                            angular.forEach($scope.similarDocuments, function (doc) {
-
-                                var transparenzID = doc.metadata["Transparenz-id"].value + "_" + doc.metadata["Inner transparenz-id"].value;
-                                elasticIDs = elasticIDs + "," + transparenzID;
-                                elasticIDsList.push(transparenzID);
-                                elasticScoresList.push(doc.score);
-                            });
-
-                            var formatString = "%s\\n\\n%s\\t%s\\t%s\\t%s\\t%s\\t%s\\n";
-                            var argumentsString = "'"+docidTransparenz+"' 'Doc2VecC ID' 'Doc2VecC score' 'similar?' 'Elastic ID' 'Elastic score' 'similar?' ";
-                            var i;
-                            for (i = 0; i < Math.min(doc2vecIDsList.length+elasticIDsList.length); i++) {
-                                formatString = formatString+"%s\\t%s\\t\\t%s\\t%s\\t\\n";
-                                argumentsString = argumentsString+"'"+doc2vecIDsList[i]+"' '"+doc2vecScoresList[i]+"' '"+elasticIDsList[i]+"' '"+elasticScoresList[i]+"' ";
-                            }
-
-
-                            // var textArea = document.createElement("textarea");
-                            // textArea.value = text;
-                            // textArea.style.position="fixed";  //avoid scrolling to bottom
-                            // document.body.appendChild(textArea);
-                            // textArea.focus();
-                            // textArea.select();
-                            //
-                            // try {
-                            //     var successful = document.execCommand('copy');
-
-                            console.log("mkdir $target_dir/"+docidTransparenz);
-                            console.log("mkdir $target_dir/"+docidTransparenz+"/doc2vec");
-                            console.log("mkdir $target_dir/"+docidTransparenz+"/elastic");
-                            console.log("cp $source_dir/"+docidTransparenz+".pdf $target_dir/{docid}/");
-                            console.log("cp $source_dir/{"+doc2vecIDs+"} $target_dir/"+docidTransparenz+"/doc2vec/");
-                            console.log("cp $source_dir/{"+elasticIDs+"} $target_dir/"+docidTransparenz+"/elastic/");
-                            console.log("printf '"+formatString+"' "+argumentsString+">> $target_dir/"+docidTransparenz+"/table.csv" );
-
-                        }
-
-                    }
 
                 }
             ]
