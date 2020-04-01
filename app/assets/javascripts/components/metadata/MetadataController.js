@@ -889,13 +889,13 @@ define([
 
                             var method = "doc2vec-1";
 
-                            $scope.scriptString = "./no-names_document_selection_script.sh \""+ $scope.argumentTargets +"\" \"" + $scope.argumentIds +"\" \""+$scope.argumentScores+"\" \""+$scope.argumentTargetNames+"\" \""+$scope.argumentNames+"\" \""+method+"\"";
+                            $scope.scriptString = "./no-names_document_selection_script.sh \""+ $scope.argumentTargets +"\" \"" + $scope.argumentIds +"\" \""+$scope.argumentScores+"\" \""+method+"\"";
                             console.log($scope.scriptString);
 
-                            $scope.scriptStringMulti = "./no-names_document_selection_script.sh \""+ $scope.argumentTargetsMulti +"\" \"" + $scope.argumentIdsMulti +"\" \""+$scope.argumentScoresMulti +"\" \""+$scope.argumentTargetNamesMulti+"\" \""+$scope.argumentNamesMulti+"\" \""+method+"\"";
+                            $scope.scriptStringMulti = "./no-names_document_selection_script.sh \""+ $scope.argumentTargetsMulti +"\" \"" + $scope.argumentIdsMulti +"\" \""+$scope.argumentScoresMulti +"\" \""+method+"\"";
                             console.log($scope.scriptStringMulti);
 
-                            $scope.scriptStringMultiFive = "./no-names_document_selection_script.sh \""+ $scope.argumentTargetsMultiFive +"\" \"" + $scope.argumentIdsMultiFive +"\" \""+$scope.argumentScoresMultiFive +"\" \""+$scope.argumentTargetNamesMultiFive+"\" \""+$scope.argumentNamesMultiFive+"\" \""+method+"\"";
+                            $scope.scriptStringMultiFive = "./no-names_document_selection_script.sh \""+ $scope.argumentTargetsMultiFive +"\" \"" + $scope.argumentIdsMultiFive +"\" \""+$scope.argumentScoresMultiFive +"\" \""+method+"\"";
                             console.log($scope.scriptStringMultiFive);
 
                             console.log("blub");
