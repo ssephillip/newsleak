@@ -707,6 +707,8 @@ define([
                     $scope.getSimilarDocsForOpenTab = function () {
                         $scope.updateHeightSimDocs();
                         var tabIndex = $scope.selectedTab.index;
+
+                        //list of similar documents; this list is bound to the list view in the UI
                         $scope.similarDocuments = [];
 
 
@@ -716,7 +718,8 @@ define([
                             $scope.similarDocsAvailable = false;
 
                             return;
-                        } else { //a tab with a document is selected
+                        } else {
+                            //a tab with a document is selected
                             var docid = $scope.tabs[tabIndex - 1].id;
                             var method = $scope.selectedMethod.name;
 
@@ -730,13 +733,10 @@ define([
                                 $scope.similarDocsAvailable = false;
                                 console.log("Unknown method!");
                             }
-
                         }
-
-
                     }
 
-
+                    //gets similar documents from elasticsearch
                     $scope.getSimilarDocsElasticsearch = function (docid) {
                         console.log("Getting similar documents with method 'Elastic");
 
@@ -766,7 +766,7 @@ define([
                                     var docids = response.data.result.map(function (item) { return item[0]; });
                                     var docIdsAndScores = [];
 
-                                    //create map with key=docid and value=doc-similarity-score
+                                    //create map with key = docid and value = doc-similarity-score
                                     angular.forEach(response.data.result, function (item) {
                                         docIdsAndScores[item[0]] = item[1];
                                     });
@@ -783,15 +783,19 @@ define([
                         playRoutes.controllers.DocumentController.getDocsByIds(docids).get().then(function (response) {
                             var docs = response.data.docs;
                             var transformedDocs = $scope.transformDocuments(docs, docIdsAndScores);
+
+                            //adds documents to the list of similar documents
                             transformedDocs.map(doc => $scope.similarDocuments.push(doc));
 
+                            //sorts the list of similar documents; this is necessary because for Doc2VecC a smaller value is better and for elasticsearch a larger value is better
                             $scope.similarDocuments = $filter('orderBy')($scope.similarDocuments, 'score', reverseOrder);
+
                             $scope.similarDocsAvailable = $scope.similarDocuments.length > 0;
                         });
                     }
 
 
-
+                    //transforms the documents into a different data structure
                     $scope.transformDocuments = function (docs, docIdsAndScores) {
                         var transformedDocs = [];
 
@@ -822,6 +826,7 @@ define([
                     }
 
 
+                    //opens a document for reading
                     $scope.loadFullDocument = function (doc) {
                         EntityService.setToggleEntityGraph(true);
                         EntityService.setToggleKeywordGraph(false);

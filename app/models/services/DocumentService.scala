@@ -35,7 +35,6 @@ import util.RichString.richString
 import util.NewsleakConfigReader
 
 import org.elasticsearch.search
-
 /**
  * Defines common data access methods for retrieving and annotating documents.
  *
@@ -79,8 +78,11 @@ trait DocumentService {
   def searchDocuments(facets: Facets, pageSize: Int)(index: String): (Long, Iterator[Document])
 
   /**
-   * TODO add javadoc comment
-   *
+   * Retrieves the IDs of similar documents from Elasticsearch with the "more like this" query for a given document ID
+   * @param id the ID of the document for which similar documents shall be retrieved
+   * @param numOfDocs the number of similar documents that shall be retrieved
+   * @param index the Elasticsearch index
+   * @return
    */
   def searchMoreLikeThis(id: String, numOfDocs: Int)(index: String): Map[String, Float]
 
@@ -444,11 +446,15 @@ abstract class ESDocumentService(clientService: SearchClientService, utils: ESRe
   /** @inheritdoc */
   override def searchMoreLikeThis(id: String, numOfDocs: Int)(index: String): Map[String, Float] = {
     val item: Item = new Item(index, "document", id)
+
+    // defines the query
     val queryBuilder = QueryBuilders.moreLikeThisQuery(utils.docContentField).like(item);
+
+    // constructs the request
     val requestBuilder = clientService.client.prepareSearch(index)
       .setQuery(queryBuilder)
       .setSize(numOfDocs)
-      .addFields("id") // We are only interested in the document id
+      .addFields("id") // We retrieve the document id
 
     val response = requestBuilder.execute().actionGet();
     val hits = response.getHits().hits();

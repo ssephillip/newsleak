@@ -313,6 +313,12 @@ class DocumentController @Inject() (
     Ok(createJsonResponse(docList.toList, iteratorSession.hits))
   }
 
+  /**
+   * Gets the ids of similar documents with the Elasticsearch "more like this" query
+   * @param id the document ID of the document for which similar documents shall be retrieved
+   * @param numOfDocs the number of similar documents that shall be retrieved
+   * @return the ids of the similar documents and the similarity scores
+   */
   def getMoreLikeThis(id: String, numOfDocs: Int) = Action { implicit request =>
 
     val idsAndScores = documentService.searchMoreLikeThis(id, numOfDocs)(currentDataset);
