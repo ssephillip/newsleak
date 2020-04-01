@@ -39,7 +39,6 @@ public class StatsService {
     Map<String, Instant> startTimes;
     Map<String, Instant> endTimes;
     private boolean isRunStarted;
-    private boolean isSetNumOfDocsProcessed;
 
 
     private StatsService(){
@@ -47,7 +46,6 @@ public class StatsService {
         startTimes = new LinkedHashMap<>();
         endTimes = new HashMap<>();
         isRunStarted = false;
-        isSetNumOfDocsProcessed = false;
     }
 
     public static StatsService getInstance(){
@@ -123,56 +121,6 @@ public class StatsService {
 
     }
 
-    //TODO stats so printen das es eine tabelle ist
-    public void writeFinalStatsTable(){
-        if(isRunStarted) {
-            Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes);
-            Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimesCopy.entrySet();
-            for (Map.Entry startEntry : startTimesEntrySet) {
-                String componentName = (String) startEntry.getKey();
-                Instant endTime = endTimes.get(componentName);
-                if (endTime != null) {
-                    Duration duration = Duration.between((Instant) startEntry.getValue(), endTime);
-                    writeStatsForComponent(componentName, duration);
-
-                    startTimes.remove(componentName);
-                    endTimes.remove(componentName);
-                }
-            }
-
-        }else{
-            System.out.println("Stats could not be written because no run was started!"); //TODO maybe better to throw exception or log the error. Problem: logger is not available in the calling method.
-        }
-    }
-
-
-
-//    public static void writeFinalStats(String filePath, int numOfDocsToProcess, int numOfThreads, Duration totalDuration, Duration uimaDuration, Duration embeddingDuration, Duration elasticIndexingDuration) {
-//        double numOfDocsDouble = numOfDocsToProcess;
-//
-//        try {
-//            FileWriter fileWriter = new FileWriter(filePath, true);
-//            fileWriter.write("-------------------------------------------------- \n");
-//            fileWriter.write("Final statistics (in seconds):");
-//            fileWriter.write("Docs to process: "+numOfDocsToProcess +"\n");
-//            fileWriter.write("Threads: "+numOfThreads +"\n");
-//            fileWriter.write("Time spent total: "+ totalDuration.getSeconds() +"\n");
-//            fileWriter.write("Time spent total (per doc): "+ totalDuration.getSeconds()/numOfDocsDouble +"\n");
-//            fileWriter.write("Time spent for UIMA pipeline: "+ totalDuration +"\n");
-//            fileWriter.write("Time spent for UIMA pipeline (per doc): "+ totalDuration +"\n");
-//            fileWriter.write("Time spent document embedding: "+ totalDuration +"\n");
-//            fileWriter.write("Time spent document embedding (per doc): "+ totalDuration +"\n"); //TODO vector indexing auch mit messen
-//            fileWriter.write("Time spent for Postgres to Elastic: "+ totalDuration +"\n");
-//            fileWriter.write("Time spent for Postgres to Elastic (per doc): "+ totalDuration +"\n");
-//
-//
-//            fileWriter.flush();
-//            fileWriter.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
 
     public void addStatsEvent(String eventType, String serviceName, Instant instant){
         if(eventType.equals(EVENT_TYPE_START)){
@@ -186,10 +134,6 @@ public class StatsService {
 
     public void setNumOfDocsProcessed(int numOfDocsProcessed) {
         this.numOfDocsProcessed = numOfDocsProcessed;
-        isSetNumOfDocsProcessed = true;
     }
 
-    public boolean isSetNumOfDocsProcessed(){
-        return isSetNumOfDocsProcessed;
-    }
 }

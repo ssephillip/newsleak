@@ -1,29 +1,17 @@
 package uhh_lt.newsleak.writer;
 
-import opennlp.uima.Sentence;
-import opennlp.uima.Token;
+
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.descriptor.OperationalProperties;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.util.Level;
-import org.apache.uima.util.Logger;
 import uhh_lt.newsleak.resources.Doc2VecWriterResource;
-import uhh_lt.newsleak.resources.TextLineWriterResource;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.util.StatsService;
-
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 
 @OperationalProperties(multipleDeploymentAllowed = true, modifiesCas = false)
 public class Doc2VecWriter extends JCasAnnotator_ImplBase {
@@ -34,6 +22,7 @@ public class Doc2VecWriter extends JCasAnnotator_ImplBase {
     /** The linewriter. */
     @ExternalResource(key = RESOURCE_DOC2VECWRITER)
     private Doc2VecWriterResource doc2vecWriter;
+
 
     /*
      * (non-Javadoc)
@@ -62,6 +51,7 @@ public class Doc2VecWriter extends JCasAnnotator_ImplBase {
         String docId = metadata.getDocId();
         String docText = jcas.getDocumentText();
 
+        //removes linebreaks and multiple spaces so that each document text is one line
         docText = docText.replaceAll("[\\s\\v]+", " ");
         docText = docText.trim();
 
