@@ -80,10 +80,12 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 		// read configuration file
 		np.getConfiguration(args);
+
+		//starts a new run TODO: evtl. so umschreiben, dass der Statsservice sich selber diese daten holt und das hier gar nciht mehr gebraucht wird
 		StatsService.getInstance().startNewRun(np.dataDirectory, np.threads); //TODO richtige variable einführen
 
-
-		Doc2VecUtil.deleteOldTrainingData(np.doc2vecTrainingDir+File.separator+np.trainingFileName+".txt", np.logger);
+		String pathToTrainingFile = np.doc2vecTrainingDir+File.separator+np.trainingFileName+".txt";
+		Doc2VecUtil.deleteOldTrainingData(pathToTrainingFile, np.logger);
 		// run language detection
 		np.pipelineLanguageDetection();
 		// extract information (per language)
@@ -182,7 +184,9 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 	 *
 	 * @param type
 	 *            The reader type (e.g. "csv" for externally preprocessed fulltexts
-	 *            and metadata, or "hoover" for the Hoover text extraction system)
+	 *            and metadata, "hoover" for the Hoover text extraction system,
+	 *            "transparenz" for the Transparenzportal Hamburg Solr Index,
+	 *            or "Hoover-Transparenz" for a combination of Hoover and the Transparenzportal)
 	 * @return the reader
 	 * @throws ResourceInitializationException
 	 *             the resource initialization exception
@@ -214,7 +218,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					TransparenzReader.TRANSPARENZ_CORE_ADDRESS, this.transparenzCoreAddress,
 					NewsleakReader.PARAM_DEBUG_MAX_DOCS, this.debugMaxDocuments, NewsleakReader.PARAM_MAX_DOC_LENGTH,
 					this.maxDocumentLength);
-		}else if(type.equals("hoover-transparenz")){
+		} else if(type.equals("hoover-transparenz")){
 			this.metadataFile = this.hooverTmpMetadata;
 			ExternalResourceDescription hooverResource = ExternalResourceFactory.createExternalResourceDescription(
 					HooverResource.class, HooverResource.PARAM_HOST, this.hooverHost, HooverResource.PARAM_CLUSTERNAME,
@@ -366,11 +370,12 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 					DictionaryExtractor.PARAM_EXTRACT_IP, this.patternIP);
 
 
-			//writes the documents to a textfile (constitutes training data for document embedding)
-			 ExternalResourceDescription resourceDoc2VecWriter =
-			 ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, this.doc2vecTrainingDir+File.separator+this.trainingFileName+".txt");
+			//writes the documents to a textfile (this will be the training data for the document embedding generation)
+			String pathToTrainingFile = this.doc2vecTrainingDir+File.separator+this.trainingFileName+".txt";
+			ExternalResourceDescription resourceDoc2VecWriter =
+					ExternalResourceFactory.createExternalResourceDescription(Doc2VecWriterResource.class,Doc2VecWriterResource.PARAM_TRAINING_FILE, pathToTrainingFile);
 			 AnalysisEngineDescription doc2vecWriter =
-			 AnalysisEngineFactory.createEngineDescription(Doc2VecWriter.class, Doc2VecWriter.RESOURCE_DOC2VECWRITER, resourceDoc2VecWriter);
+					AnalysisEngineFactory.createEngineDescription(Doc2VecWriter.class, Doc2VecWriter.RESOURCE_DOC2VECWRITER, resourceDoc2VecWriter);
 
 			 //
 			// ... xmi writer

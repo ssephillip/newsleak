@@ -41,10 +41,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The HooverElasticsearchReader connects to a running instance of the Hoover
+ * The HooverTransparenzReader connects to a running instance of the Hoover
  * text data extraction system created by the EIC.network (see
- * <a href="https://hoover.github.io">https://hoover.github.io</a>). It utilizes
- * the Hoover API to query for all extracted documents in a collection.
+ * <a href="https://hoover.github.io">https://hoover.github.io</a>) and to a (non-public) Solr Index of the <a href="http://transparenz.hamburg.de/">Transparenzportal Hamburg</a>.
+ * It utilizes the Hoover API to query for all extracted documents in a collection. It retrieves the documents from the Hoover Elasticsearch Index one by one and combines the document text with the metadata that was retrieved from the Transparenzportal Solr Index.
+ * TODO vernünftigen kommentar schreiben
  * 
  * Hoover is expected to extract raw fulltext (regardless of any further NLP
  * application or human analysts requirement). Newsleak takes Hoover's output
@@ -96,7 +97,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	/** The solr client */
 	HttpSolrClient solrClient;
 
-	/** Map containing all inner documents from the Transparenzportal solr index */
+	/** Map containing all data objects (documents) from the Transparenzportal solr index */
 	Map<String, TpDocument> tpDocumentsMap;
 
 	/** JEST client to run JSON API requests. */
@@ -148,8 +149,16 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 	}
 
+	/**
+	 * Retrieves the metadata of all PDF documents from the Transparenzportal SOlr Index and stores it in a map.
+	 * During processing, this metadata is combined with the document texts that are being retrieved from Hoover.
+	 *
+	 * @param context The UIMA context
+	 * @throws ResourceInitializationException
+	 */
 	private void transparenzInitialize(UimaContext context) throws ResourceInitializationException{
 		logger.log(Level.INFO, "Getting metadata from Transparenzportal solr index: "+solrCoreAddress);
+
 		tpDocumentsMap = new HashMap<>();
 		solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 

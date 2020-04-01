@@ -454,7 +454,10 @@ public class PostgresResource extends Resource_ImplBase {
 		}
 	}
 
-
+	/**
+	 * Returns the number of documents that have already been inserted into the PostgresDB
+	 * @return int - number of documents committed to POstgresDB
+	 */
 	public synchronized int getDocumentCounter() {
 		return documentCounter;
 	}
