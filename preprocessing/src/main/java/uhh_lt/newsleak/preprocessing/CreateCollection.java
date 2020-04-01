@@ -30,7 +30,7 @@ public class CreateCollection {
 		// extract fulltext, entities and metdadata and write to DB
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.TOTAL, Instant.now());
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.UIMA_PIPELINE, Instant.now());
-		InformationExtraction2Postgres.main(args);
+//		InformationExtraction2Postgres.main(args);
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.UIMA_PIPELINE, Instant.now());
 		long timeUIMAPipeline = System.currentTimeMillis() - startTime;
 
@@ -42,7 +42,7 @@ public class CreateCollection {
 		// read from DB and write to fullext index
 		long startPost2Elastic = System.currentTimeMillis();
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.POSTGRES_TO_ELASTIC, Instant.now());
-		Postgres2ElasticsearchIndexer.main(args);
+//		Postgres2ElasticsearchIndexer.main(args);
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.POSTGRES_TO_ELASTIC, Instant.now());
 		long timePost2Elastic = System.currentTimeMillis()-startPost2Elastic;
 
