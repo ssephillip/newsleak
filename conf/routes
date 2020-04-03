@@ -73,7 +73,7 @@ GET        /createInitKeyword                     controllers.DocumentController
 GET        /createNewKeyword                      controllers.DocumentController.createNewKeyword(docId: String, keyword: String)
 GET        /createInitEntityTy1pe                 controllers.DocumentController.createInitEntityType(docId: String, entId: Int, entName: String, entType: String)
 GET        /createNewEntityType                   controllers.DocumentController.createNewEntityType(docId: String, entId: Int, entName: String, entType: String)
-GET        /getVectorIndexAddress                 controllers.DocumentController.getVectorIndexAddress()
+GET        /getSimDocsDoc2VecC                    controllers.DocumentController.getSimDocsDoc2VecC(id: String, numOfDocs: Int)
 GET        /getMoreLikeThis                       controllers.DocumentController.getMoreLikeThis(id: String, numOfDocs: Int)
 
 GET        /highlightKeysByEnt                    controllers.NetworkController.highlightKeysByEnt(entName: String)

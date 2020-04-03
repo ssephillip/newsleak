@@ -14,7 +14,8 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc-config" % "2.5.0", // ApacheV2
   "org.scalikejdbc" %% "scalikejdbc-play-initializer" % "2.5.1", // ApacheV2
   "org.elasticsearch" % "elasticsearch" % "2.3.5", // ApacheV2
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+  "org.scalaj" %% "scalaj-http" % "2.4.2"
 )
 
 routesImport += "util.Binders._"

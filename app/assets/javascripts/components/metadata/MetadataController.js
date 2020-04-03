@@ -724,6 +724,7 @@ define([
                             var method = $scope.selectedMethod.name;
 
                             if (method === $scope.availableMethods[0].name) {
+
                                 //selected method is Doc2VecC
                                 $scope.getSimilarDocsDoc2VecC(docid);
                             } else if (method === $scope.availableMethods[1].name) {
@@ -755,13 +756,8 @@ define([
                     $scope.getSimilarDocsDoc2VecC = function (docid) {
                         console.log("Getting similar documents with method 'Doc2VecC");
 
-                        var vectorIndexAddress = "";
-                        playRoutes.controllers.DocumentController.getVectorIndexAddress().get().then(function (response) {
-                            vectorIndexAddress = response.data.address;
+                        playRoutes.controllers.DocumentController.getSimDocsDoc2VecC(docid, $scope.numOfDocs).get().then(function (response) {
 
-                            //get the ids of the most similar documents
-                            $http.get(vectorIndexAddress + '/' + docid + '?num=' + $scope.numOfDocs)
-                                .then(function (response) {
                                     //extract ids from the response
                                     var docids = response.data.result.map(function (item) { return item[0]; });
                                     var docIdsAndScores = [];
@@ -772,7 +768,7 @@ define([
                                     });
 
                                     $scope.getAndPushDocs(docids, docIdsAndScores, false);
-                                });
+
                         })
                     };
 
