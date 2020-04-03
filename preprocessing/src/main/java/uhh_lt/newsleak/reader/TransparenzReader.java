@@ -80,7 +80,7 @@ public class TransparenzReader extends NewsleakReader {
         solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
         List<String> allAbsoluteResourceIds = new ArrayList<>();
-        SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex();
+        SolrDocumentList solrDocuments = getDatasetIdsFromSolrIndex();
 
         logger.log(Level.INFO, "Total number of datasets: " + solrDocuments.size());
         logger.log(Level.INFO, "Getting Transparenzportal resources from dataset.");
@@ -113,7 +113,7 @@ public class TransparenzReader extends NewsleakReader {
         String absoluteResourceId = absoluteResourceIdsIterator.next();
         Integer relativeResourceId = Integer.valueOf(absoluteResourceId.split("_")[0]); //TODO hier (und warsch. im ganzen reader) war die absoluteResourceId noch genau anders herum; dadurch ist der code hier flasch und muss geändert werden (evtl. ist es auch kein problem weil es im ganzen doc so gemacht wird und es nicht mit den filenames zu tun hat). für konsistenz muss man es aber trotzdem ndern.
         String outerId = absoluteResourceId.split("_")[1];
-        SolrDocument solrDocument = getOuterDocumentFromSolrIndex(outerId);
+        SolrDocument solrDocument = getDatasetFromSolrIndex(outerId);
         TpResource document = getTpResourceFromDataset(solrDocument, relativeResourceId);
         if(document == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
@@ -200,7 +200,7 @@ public class TransparenzReader extends NewsleakReader {
      * @return SolrDocumentList
      * @throws ResourceInitializationException
      */
-    private SolrDocumentList getOuterDocIdsFromSolrIndex() throws ResourceInitializationException {
+    private SolrDocumentList getDatasetIdsFromSolrIndex() throws ResourceInitializationException {
         QueryResponse response = null;
 
         SolrQuery documentQuery = new SolrQuery("res_format:\"PDF\"");
@@ -210,14 +210,14 @@ public class TransparenzReader extends NewsleakReader {
         documentQuery.setRows(Integer.MAX_VALUE);
 
         try {
-            logger.log(Level.INFO, "Getting outer document ids from index " + solrCoreAddress+" with filter '"+documentQuery.getQuery()+"'");
+            logger.log(Level.INFO, "Getting dataset ids from index " + solrCoreAddress+" with filter '"+documentQuery.getQuery()+"'");
             response = solrClient.query(documentQuery);
 
             if (response == null) {
                 throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
         } catch (SolrServerException | IOException e) {
-            logger.log(Level.SEVERE, "Failed retrieving outer document ids from index "+solrCoreAddress);
+            logger.log(Level.SEVERE, "Failed retrieving dataset ids from index "+solrCoreAddress);
             e.printStackTrace();
             throw new ResourceInitializationException();
         }
@@ -232,11 +232,11 @@ public class TransparenzReader extends NewsleakReader {
      * @return List of SolrDocument
      * @throws IOException
      */
-    private SolrDocument getOuterDocumentFromSolrIndex(String outerId) throws IOException {
+    private SolrDocument getDatasetFromSolrIndex(String datasetId) throws IOException {
         QueryResponse response = null;
 
 
-        SolrQuery documentQuery = new SolrQuery("id:"+outerId);
+        SolrQuery documentQuery = new SolrQuery("id:"+datasetId);
         documentQuery.addField("id");
         documentQuery.addField("res_format");
         documentQuery.addField("res_url");
@@ -248,14 +248,14 @@ public class TransparenzReader extends NewsleakReader {
 
 
         try {
-            logger.log(Level.INFO, "Getting outer document '"+outerId+"' from index " + solrCoreAddress);
+            logger.log(Level.INFO, "Getting outer document '"+datasetId+"' from index " + solrCoreAddress);
             response = solrClient.query(documentQuery);
 
             if (response == null) {
                 throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
         } catch (SolrServerException | IOException e) {
-            logger.log(Level.SEVERE, "Failed retrieving outer document '"+outerId+"' from index "+solrCoreAddress);
+            logger.log(Level.SEVERE, "Failed retrieving outer document '"+datasetId+"' from index "+solrCoreAddress);
             logger.log(Level.SEVERE, "Error message: " + e.getMessage());
             logger.log(Level.SEVERE, "Localized error message: " + e.getLocalizedMessage());
 
@@ -281,10 +281,10 @@ public class TransparenzReader extends NewsleakReader {
 
         List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
         List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        String outerId = (String) solrDoc.getFieldValue("id");
+        String datasetId = (String) solrDoc.getFieldValue("id");
 
         try {
-            logger.log(Level.FINEST, "Getting absolute resource ids for: "+outerId+"."); //TODO log level korrekt?
+            logger.log(Level.FINEST, "Getting absolute resource ids for: "+datasetId+"."); //TODO log level korrekt?
 
             if (resourceFormats == null || resourceFormats.isEmpty() || resourceFormats.size() != resourceUrls.size()) {
                 throw new IllegalArgumentException();
@@ -295,7 +295,7 @@ public class TransparenzReader extends NewsleakReader {
                 String resourceFormat = resourceFormats.get(i);
 
                 if (resourceFormat.equals("PDF")) {
-                    String absoluteResourceId = i + "_" + outerId;
+                    String absoluteResourceId = i + "_" + datasetId;
                     absoluteResourceIds.add(absoluteResourceId);
                     numOfPdfTpResources++;
                 }
@@ -304,11 +304,11 @@ public class TransparenzReader extends NewsleakReader {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
             malformedSolrDocCounter++;
-            logger.log(Level.INFO, "Malformed document: "+outerId+". Discarding document."); //TODO evtl. level fine oder finest
+            logger.log(Level.INFO, "Malformed document: "+datasetId+". Discarding document."); //TODO evtl. level fine oder finest
             return new ArrayList<>();
         }
 
-        logger.log(Level.FINEST, "Found "+absoluteResourceIds.size()+" Transparenzportal resources for dataset: "+outerId+".");
+        logger.log(Level.FINEST, "Found "+absoluteResourceIds.size()+" Transparenzportal resources for dataset: "+datasetId+".");
         return absoluteResourceIds;
     }
 
@@ -359,7 +359,7 @@ public class TransparenzReader extends NewsleakReader {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
             malformedSolrDocCounter++;
-            logger.log(Level.INFO, "Malformed outer document: "+datasetId+". Discarding document."); //TODO evtl. level fine oder finest
+            logger.log(Level.INFO, "Malformed dataset: "+datasetId+". Discarding dataset."); //TODO evtl. level fine oder finest
             return null;
         }
 
@@ -401,17 +401,17 @@ public class TransparenzReader extends NewsleakReader {
      * An outer document (SolrDocument) is well formed if all the mandatory fields (i.e. the parameters of this method)
      * are Non-Null AND Non-Empty AND if all lists have the same length.
      *
-     * @param docResFormats The list of file-formats of the inner documents
-     * @param docResUrls The list of URLs to the original files of the inner documents
-     * @param docResFulltexts The list of fulltexts of the inner documents
-     * @param outerId The ID of the outer document (containing the inner documents)
+     * @param resourceFormats The list of file-formats of the inner documents
+     * @param resourceUrls The list of URLs to the original files of the inner documents
+     * @param resourceFulltexts The list of fulltexts of the inner documents
+     * @param datasetId The ID of the outer document (containing the inner documents)
      * @return boolean - True if the outer document is wellformed.
      */
-    private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResFulltexts, List<String> docResNames, String outerId) {
+    private boolean isSolrDocWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceFulltexts, List<String> resourceNames, String datasetId) {
         //TODO ps 2019-08-20 auch abfragen ob die listen empty sind
-        return !(docResFormats == null || docResUrls == null || docResFulltexts == null || docResNames==null || outerId == null ||
-                docResFormats.isEmpty() || docResUrls.isEmpty() || docResFulltexts.isEmpty() || docResNames.isEmpty() ||
-                docResFormats.size() != docResUrls.size() || docResFormats.size() != docResFulltexts.size() || docResFormats.size() != docResNames.size());
+        return !(resourceFormats == null || resourceUrls == null || resourceFulltexts == null || resourceNames==null || datasetId == null ||
+                resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceFulltexts.isEmpty() || resourceNames.isEmpty() ||
+                resourceFormats.size() != resourceUrls.size() || resourceFormats.size() != resourceFulltexts.size() || resourceFormats.size() != resourceNames.size());
     }
 
     @Override

@@ -162,16 +162,16 @@ public class HooverTransparenzReader extends NewsleakReader {
 		solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
 
-		SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr();
-		int outerDocsProcessed = 0;
+		SolrDocumentList solrDocuments = getAllDatasetsFromSolr();
+		int datasetsProcessed = 0;
 
 		logger.log(Level.INFO, "Total number of datasets: " + solrDocuments.size());
 		logger.log(Level.INFO, "Getting resources from dataset.");
 
 		for(SolrDocument solrDoc: solrDocuments) {
-			outerDocsProcessed++;
+			datasetsProcessed++;
 
-			List<TpResource> tpResources = getAllTpResourcesFromDataset(solrDoc, outerDocsProcessed, solrDocuments.size());
+			List<TpResource> tpResources = getAllTpResourcesFromDataset(solrDoc, datasetsProcessed, solrDocuments.size());
 
 			for(TpResource tpResource : tpResources){
 				tpResourcesMap.put(tpResource.getAbsoluteResourceId(), tpResource);
@@ -429,7 +429,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	}
 
 
-	public SolrDocumentList getAllOuterDocumentsFromSolr() throws ResourceInitializationException{
+	public SolrDocumentList getAllDatasetsFromSolr() throws ResourceInitializationException{
 		QueryResponse response = null;
 
 		SolrQuery documentQuery = new SolrQuery("*:*");//"id:f4c2d114-65fe-4e68-a162-ceefed275aa0");
@@ -458,25 +458,25 @@ public class HooverTransparenzReader extends NewsleakReader {
 		return response.getResults();
 	}
 
-	public List<TpResource> getAllTpResourcesFromDataset(SolrDocument outerDocument, int outerDocsProcessed, int numOfOuterDocs){
+	public List<TpResource> getAllTpResourcesFromDataset(SolrDocument dataset, int datasetsProcessed, int numOfDatasets){
 		List<TpResource> tpResources = new ArrayList<>();
-		List<String> resourceFormats = (List<String>) outerDocument.getFieldValue("res_format");
-		List<String> resourceUrls = (List<String>) outerDocument.getFieldValue("res_url");
-		List<String> resourceNames = (List<String>) outerDocument.getFieldValue("res_name");
-		String outerId = (String) outerDocument.getFieldValue("id");
+		List<String> resourceFormats = (List<String>) dataset.getFieldValue("res_format");
+		List<String> resourceUrls = (List<String>) dataset.getFieldValue("res_url");
+		List<String> resourceNames = (List<String>) dataset.getFieldValue("res_name");
+		String datasetId = (String) dataset.getFieldValue("id");
 
 
-		if(outerDocsProcessed%1000 == 0) {
-			logger.log(Level.INFO, "Getting inner documents from outer document number '" + outerDocsProcessed + "' of '" + numOfOuterDocs + "' from index " + solrCoreAddress);
+		if(datasetsProcessed%1000 == 0) {
+			logger.log(Level.INFO, "Getting Transparenzportal resources from dataset number '" + datasetsProcessed + "' of '" + numOfDatasets + "' from index " + solrCoreAddress);
 		}
 
-		if(isSolrDocWellFormed(resourceFormats, resourceUrls, resourceNames, outerId)){
+		if(isSolrDocWellFormed(resourceFormats, resourceUrls, resourceNames, datasetId)){
 			for (int i = 0; i < resourceUrls.size(); i++){
-				TpResource tpResource = getTpResourceFromDataset(outerDocument, i);
+				TpResource tpResource = getTpResourceFromDataset(dataset, i);
 				tpResources.add(tpResource);
 			}
 		}else{
-			System.out.println("Malformed outer document: "+outerId+". Discarding document.");
+			System.out.println("Malformed dataset: "+datasetId+". Discarding dataset.");
 		}
 
 		return tpResources;
@@ -487,16 +487,16 @@ public class HooverTransparenzReader extends NewsleakReader {
 	 * An outer document (SolrDocument) is well formed if all the mandatory fields (i.e. the parameters of this method)
 	 * are Non-Null AND Non-Empty AND if all lists have the same length.
 	 *
-	 * @param docResFormats The list of file-formats of the inner documents
-	 * @param docResUrls The list of URLs to the original files of the inner documents
-	 * @param outerId The ID of the outer document (containing the inner documents)
+	 * @param resourceFormats The list of file-formats of the inner documents
+	 * @param resourceUrls The list of URLs to the original files of the inner documents
+	 * @param datasetId The ID of the outer document (containing the inner documents)
 	 * @return boolean - True if the outer document is wellformed.
 	 */
-	private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResNames, String outerId) {
+	private boolean isSolrDocWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceNames, String datasetId) {
 		//TODO ps 2019-08-20 auch abfragen ob die listen empty sind
-		return !(docResFormats == null || docResUrls == null || docResNames==null || outerId == null ||
-				docResFormats.isEmpty() || docResUrls.isEmpty() || docResNames.isEmpty() ||
-				docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
+		return !(resourceFormats == null || resourceUrls == null || resourceNames==null || datasetId == null ||
+				resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceNames.isEmpty() ||
+				resourceFormats.size() != resourceUrls.size() || resourceFormats.size() != resourceNames.size());
 	}
 
 
