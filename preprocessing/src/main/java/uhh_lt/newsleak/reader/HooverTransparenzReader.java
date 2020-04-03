@@ -295,7 +295,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 		if(origDocText != null && !origDocText.trim().isEmpty()) {
 			field = tpResource.getAbsoluteResourceId();
 			if (field != null) {
-				newDocText += "Transparenz-ID: "+field + "\n";
+				newDocText += "Dataset ID: "+field + "\n";
 			}
 			field = getField(source, "from");
 			if (field != null) {

@@ -162,10 +162,10 @@ public class TransparenzReader extends NewsleakReader {
             metadata.add(metadataResource.createTextMetadata(docId, "filetype", field));
         }
 
-        // TP-ID
+        // Transparenzportal dataset ID
         field = tpResource.getDatasetId();
         if (field != null) {
-            metadata.add(metadataResource.createTextMetadata(docId, "transparenz-id", field));
+            metadata.add(metadataResource.createTextMetadata(docId, "dataset ID", field));
         }
 
         metadataResource.appendMetadata(metadata);
