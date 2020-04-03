@@ -55,13 +55,13 @@ public class TransparenzReader extends NewsleakReader {
     private int currentDocument = 0;
 
     /** Iterator holding all the outer ids from the Solr Index. */
-    Iterator<String> innerIdsIterator = null;
+    Iterator<String> absoluteResourceIdsIterator = null;
 
     /** Number of documents in the Solr Index where at least one of the necessary fields is missing or malformed. */
     int malformedSolrDocCounter = 0;
 
     /** Number of inner documents. */
-    int numOfInnerPdf = 0;
+    int numOfPdfTpResources = 0;
 
     /** The solr client */
     HttpSolrClient solrClient;
@@ -79,19 +79,19 @@ public class TransparenzReader extends NewsleakReader {
         logger = context.getLogger();
         solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
-        List<String> allInnerIds = new ArrayList<>();
+        List<String> allAbsoluteResourceIds = new ArrayList<>();
         SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex();
 
         logger.log(Level.INFO, "Total number of outer documents: " + solrDocuments.size());
         logger.log(Level.INFO, "Getting inner ids from outer documents.");
         for (SolrDocument solrDocument : solrDocuments) {
-            List<String> innerIds = getInnerIds(solrDocument);
-            allInnerIds.addAll(innerIds);
+            List<String> absoluteResourceIds = getInnerIds(solrDocument);
+            allAbsoluteResourceIds.addAll(absoluteResourceIds);
         }
 
-        totalDocuments = allInnerIds.size();
+        totalDocuments = allAbsoluteResourceIds.size();
         currentDocument = 0;
-        innerIdsIterator = allInnerIds.iterator();
+        absoluteResourceIdsIterator = allAbsoluteResourceIds.iterator();
     }
 
 
@@ -110,11 +110,11 @@ public class TransparenzReader extends NewsleakReader {
             throw new CollectionException(e);
         }
 
-        String innerId = innerIdsIterator.next();
-        Integer relativeInnerId = Integer.valueOf(innerId.split("_")[0]);
-        String outerId = innerId.split("_")[1];
+        String absoluteResourceId = absoluteResourceIdsIterator.next();
+        Integer relativeResourceId = Integer.valueOf(absoluteResourceId.split("_")[0]); //TODO hier (und warsch. im ganzen reader) war die absoluteResourceId noch genau anders herum; dadurch ist der code hier flasch und muss geändert werden (evtl. ist es auch kein problem weil es im ganzen doc so gemacht wird und es nicht mit den filenames zu tun hat). für konsistenz muss man es aber trotzdem ndern.
+        String outerId = absoluteResourceId.split("_")[1];
         SolrDocument solrDocument = getOuterDocumentFromSolrIndex(outerId);
-        TpResource document = getInnerDocFromOuterDoc(solrDocument, relativeInnerId);
+        TpResource document = getInnerDocFromOuterDoc(solrDocument, relativeResourceId);
         if(document == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
         }
@@ -190,7 +190,7 @@ public class TransparenzReader extends NewsleakReader {
     public boolean hasNext() throws IOException, CollectionException {
         if (currentDocument > maxRecords)
             return false;
-        return innerIdsIterator.hasNext();
+        return absoluteResourceIdsIterator.hasNext();
     }
 
 
@@ -277,27 +277,27 @@ public class TransparenzReader extends NewsleakReader {
      * @return List<String> The list of inner ids for the given outer document
      */
     private List<String> getInnerIds(SolrDocument solrDoc) {
-        List<String> innerIds = new ArrayList<>();
+        List<String> absoluteResourceIds = new ArrayList<>();
 
-        List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
-        List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
+        List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
+        List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
         String outerId = (String) solrDoc.getFieldValue("id");
 
         try {
             logger.log(Level.FINEST, "Getting inner document ids for: "+outerId+"."); //TODO log level korrekt?
 
-            if (docResFormats == null || docResFormats.isEmpty() || docResFormats.size() != docResUrls.size()) {
+            if (resourceFormats == null || resourceFormats.isEmpty() || resourceFormats.size() != resourceUrls.size()) {
                 throw new IllegalArgumentException();
             }
 
-            int numOfInnerDocs = docResFormats.size();
-            for (int i = 0; i < numOfInnerDocs; i++) {
-                String innerDocFormat = docResFormats.get(i);
+            int numOfTpResources = resourceFormats.size();
+            for (int i = 0; i < numOfTpResources; i++) {
+                String resourceFormat = resourceFormats.get(i);
 
-                if (innerDocFormat.equals("PDF")) {
-                    String innerId = i + "_" + outerId;
-                    innerIds.add(innerId);
-                    numOfInnerPdf++;
+                if (resourceFormat.equals("PDF")) {
+                    String absoluteResourceId = i + "_" + outerId;
+                    absoluteResourceIds.add(absoluteResourceId);
+                    numOfPdfTpResources++;
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -308,58 +308,58 @@ public class TransparenzReader extends NewsleakReader {
             return new ArrayList<>();
         }
 
-        logger.log(Level.FINEST, "Found "+innerIds.size()+" inner documents for "+outerId+".");
-        return innerIds;
+        logger.log(Level.FINEST, "Found "+absoluteResourceIds.size()+" inner documents for "+outerId+".");
+        return absoluteResourceIds;
     }
 
 
     /**
      * Gets an inner document from the given outer document (SolrDocument).
-     * The relativeInnerId is the position in the lists of the outer document, where the information for the desired inner document is located.
+     * The relativeResourceId is the position in the lists of the outer document, where the information for the desired inner document is located.
      * A SolrDocument in the TransparenzPortal is often actually a group of documents.
      * Each document in this group is called inner document.
      * The SolrDocument itself is called outer document.
      * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
      * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
-     * @param relativeInnerId An int specifying which of the inner documents shall be extracted.
+     * @param relativeResourceId An int specifying which of the inner documents shall be extracted.
      * @return TpDocument The inner document "extracted" from the given outer document.
      */
-    private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeInnerId) {
+    private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeResourceId) {
         TpResource tpResource = new TpResource();
 
-        List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
-        List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        List<String> docResFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
-        List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
-        String outerId = (String) solrDoc.getFieldValue("id");
-        String outerName = (String) solrDoc.getFieldValue("title");
-        String date = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
+        List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
+        List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
+        List<String> resourceFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
+        List<String> resourceNames = (List<String>) solrDoc.getFieldValue("res_name");
+        String datasetId = (String) solrDoc.getFieldValue("id");
+        String datasetTitle = (String) solrDoc.getFieldValue("title");
+        String datasetDate = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
 
 
 
         try {
-            logger.log(Level.FINEST, "Processing inner document "+relativeInnerId+" from outer document "+outerId+"."); //TODO log-level korrekt?
-            if (!isSolrDocWellFormed(docResFormats, docResUrls, docResFulltexts, docResNames, outerId)) {
+            logger.log(Level.FINEST, "Processing Transparenzportal resource "+relativeResourceId+" from dataset "+datasetId+"."); //TODO log-level korrekt?
+            if (!isSolrDocWellFormed(resourceFormats, resourceUrls, resourceFulltexts, resourceNames, datasetId)) {
                 throw new IllegalArgumentException();
             }
 
-            String innerDocFormat = docResFormats.get(relativeInnerId);
-            String url = docResUrls.get(relativeInnerId);
-            String fulltext = docResFulltexts.get(relativeInnerId);
-            String name = docResNames.get(relativeInnerId);
+            String innerDocFormat = resourceFormats.get(relativeResourceId);
+            String url = resourceUrls.get(relativeResourceId);
+            String fulltext = resourceFulltexts.get(relativeResourceId);
+            String name = resourceNames.get(relativeResourceId);
             tpResource.setFormat(innerDocFormat);
-            tpResource.setRelativeResourceId(String.valueOf(relativeInnerId));
+            tpResource.setRelativeResourceId(String.valueOf(relativeResourceId));
             tpResource.setUrl(url);
             tpResource.setFulltext(fulltext);
             tpResource.setName(name);
-            tpResource.setDatasetId(outerId);
-            tpResource.setDatasetTitle(outerName);
-            tpResource.setDatasetDate(date);
+            tpResource.setDatasetId(datasetId);
+            tpResource.setDatasetTitle(datasetTitle);
+            tpResource.setDatasetDate(datasetDate);
         } catch (IllegalArgumentException e) {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
             malformedSolrDocCounter++;
-            logger.log(Level.INFO, "Malformed outer document: "+outerId+". Discarding document."); //TODO evtl. level fine oder finest
+            logger.log(Level.INFO, "Malformed outer document: "+datasetId+". Discarding document."); //TODO evtl. level fine oder finest
             return null;
         }
 

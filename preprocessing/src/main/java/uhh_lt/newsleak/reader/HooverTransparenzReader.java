@@ -165,15 +165,15 @@ public class HooverTransparenzReader extends NewsleakReader {
 		SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr();
 		int outerDocsProcessed = 0;
 
-		logger.log(Level.INFO, "Total number of outer documents: " + solrDocuments.size());
-		logger.log(Level.INFO, "Getting inner documents from outer documents.");
+		logger.log(Level.INFO, "Total number of datasets: " + solrDocuments.size());
+		logger.log(Level.INFO, "Getting resources from dataset.");
 
 		for(SolrDocument solrDoc: solrDocuments) {
 			outerDocsProcessed++;
 
-			List<TpResource> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed, solrDocuments.size());
+			List<TpResource> tpResources = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed, solrDocuments.size());
 
-			for(TpResource tpResource : innerDocuments){
+			for(TpResource tpResource : tpResources){
 				tpResourcesMap.put(tpResource.getAbsoluteResourceId(), tpResource);
 			}
 		}
@@ -384,16 +384,16 @@ public class HooverTransparenzReader extends NewsleakReader {
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "Link", field));
 		}
 
-		//Transparenzportal ID
+		//Transparenzportal dataset ID
 		field = tpResource.getDatasetId();
 		if (field != null) {
-			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "transparenz-id", field));
+			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "dataset ID", field));
 		}
 
-		//inner Transparenzportal ID
+		//relative Transparenzportal resource ID
 		field = tpResource.getRelativeResourceId();
 		if (field != null) {
-			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "inner transparenz-id", field));
+			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "relative resource ID", field));
 		}
 
 		// attachments
@@ -459,10 +459,10 @@ public class HooverTransparenzReader extends NewsleakReader {
 	}
 
 	public List<TpResource> getAllInnerDocumentsFromOuterDoc(SolrDocument outerDocument, int outerDocsProcessed, int numOfOuterDocs){
-		List<TpResource> innerDocuments = new ArrayList<>();
-		List<String> docResFormats = (List<String>) outerDocument.getFieldValue("res_format");
-		List<String> docResUrls = (List<String>) outerDocument.getFieldValue("res_url");
-		List<String> docResNames = (List<String>) outerDocument.getFieldValue("res_name");
+		List<TpResource> tpResources = new ArrayList<>();
+		List<String> resourceFormats = (List<String>) outerDocument.getFieldValue("res_format");
+		List<String> resourceUrls = (List<String>) outerDocument.getFieldValue("res_url");
+		List<String> resourceNames = (List<String>) outerDocument.getFieldValue("res_name");
 		String outerId = (String) outerDocument.getFieldValue("id");
 
 
@@ -470,16 +470,16 @@ public class HooverTransparenzReader extends NewsleakReader {
 			logger.log(Level.INFO, "Getting inner documents from outer document number '" + outerDocsProcessed + "' of '" + numOfOuterDocs + "' from index " + solrCoreAddress);
 		}
 
-		if(isSolrDocWellFormed(docResFormats, docResUrls, docResNames, outerId)){
-			for (int i = 0; i < docResUrls.size(); i++){
-				TpResource innerDocument = getInnerDocFromOuterDoc(outerDocument, i);
-				innerDocuments.add(innerDocument);
+		if(isSolrDocWellFormed(resourceFormats, resourceUrls, resourceNames, outerId)){
+			for (int i = 0; i < resourceUrls.size(); i++){
+				TpResource tpResource = getInnerDocFromOuterDoc(outerDocument, i);
+				tpResources.add(tpResource);
 			}
 		}else{
 			System.out.println("Malformed outer document: "+outerId+". Discarding document.");
 		}
 
-		return innerDocuments;
+		return tpResources;
 	}
 
 	/**
@@ -503,34 +503,34 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 	/**
 	 * Gets an inner document from the given outer document (SolrDocument).
-	 * The relativeInnerId is the position in the lists of the outer document, where the information for the desired inner document is located.
+	 * The relativeResourceIdInt is the position in the lists of the outer document, where the information for the desired inner document is located.
 	 * A SolrDocument in the TransparenzPortal is often actually a group of documents.
 	 * Each document in this group is called inner document.
 	 * The SolrDocument itself is called outer document.
 	 * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
 	 * @assert solrDoc is wellformed
 	 * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
-	 * @param relativeInnerId An int specifying which of the inner documents shall be extracted.
+	 * @param relativeResourceIdInt An int specifying which of the inner documents shall be extracted.
 	 * @return TpDocument The inner document "extracted" from the given outer document.
 	 */
-	private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeInnerId) {
+	private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeResourceIdInt) {
 		TpResource tpResource = new TpResource();
 
 		List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
 		List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
 		List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
 		String outerId = (String) solrDoc.getFieldValue("id");
-		String innerId = String.valueOf(relativeInnerId);
+		String relativeResourceId = String.valueOf(relativeResourceIdInt);
 		String outerName = (String) solrDoc.getFieldValue("title");
 		String date = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
 
-		String innerDocFormat = docResFormats.get(relativeInnerId);
-		String url = docResUrls.get(relativeInnerId);
-		String name = docResNames.get(relativeInnerId);
+		String innerDocFormat = docResFormats.get(relativeResourceIdInt);
+		String url = docResUrls.get(relativeResourceIdInt);
+		String name = docResNames.get(relativeResourceIdInt);
 		tpResource.setFormat(innerDocFormat.toLowerCase());
-		tpResource.setRelativeResourceId(innerId);
+		tpResource.setRelativeResourceId(relativeResourceId);
 		tpResource.setDatasetId(outerId);
-		tpResource.setAbsoluteResourceId(outerId+"_"+innerId);
+		tpResource.setAbsoluteResourceId(outerId+"_"+relativeResourceId);
 		tpResource.setUrl(url);
 		tpResource.setName(name);
 		tpResource.setDatasetTitle(outerName);
