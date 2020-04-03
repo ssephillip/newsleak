@@ -82,10 +82,10 @@ public class TransparenzReader extends NewsleakReader {
         List<String> allAbsoluteResourceIds = new ArrayList<>();
         SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex();
 
-        logger.log(Level.INFO, "Total number of outer documents: " + solrDocuments.size());
-        logger.log(Level.INFO, "Getting inner ids from outer documents.");
+        logger.log(Level.INFO, "Total number of datasets: " + solrDocuments.size());
+        logger.log(Level.INFO, "Getting Transparenzportal resources from dataset.");
         for (SolrDocument solrDocument : solrDocuments) {
-            List<String> absoluteResourceIds = getInnerIds(solrDocument);
+            List<String> absoluteResourceIds = getAbsoluteResourceIds(solrDocument);
             allAbsoluteResourceIds.addAll(absoluteResourceIds);
         }
 
@@ -114,7 +114,7 @@ public class TransparenzReader extends NewsleakReader {
         Integer relativeResourceId = Integer.valueOf(absoluteResourceId.split("_")[0]); //TODO hier (und warsch. im ganzen reader) war die absoluteResourceId noch genau anders herum; dadurch ist der code hier flasch und muss geändert werden (evtl. ist es auch kein problem weil es im ganzen doc so gemacht wird und es nicht mit den filenames zu tun hat). für konsistenz muss man es aber trotzdem ndern.
         String outerId = absoluteResourceId.split("_")[1];
         SolrDocument solrDocument = getOuterDocumentFromSolrIndex(outerId);
-        TpResource document = getInnerDocFromOuterDoc(solrDocument, relativeResourceId);
+        TpResource document = getTpResourceFromDataset(solrDocument, relativeResourceId);
         if(document == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
         }
@@ -276,7 +276,7 @@ public class TransparenzReader extends NewsleakReader {
      * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
      * @return List<String> The list of inner ids for the given outer document
      */
-    private List<String> getInnerIds(SolrDocument solrDoc) {
+    private List<String> getAbsoluteResourceIds(SolrDocument solrDoc) {
         List<String> absoluteResourceIds = new ArrayList<>();
 
         List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
@@ -308,7 +308,7 @@ public class TransparenzReader extends NewsleakReader {
             return new ArrayList<>();
         }
 
-        logger.log(Level.FINEST, "Found "+absoluteResourceIds.size()+" inner documents for "+outerId+".");
+        logger.log(Level.FINEST, "Found "+absoluteResourceIds.size()+" Transparenzportal resources for dataset: "+outerId+".");
         return absoluteResourceIds;
     }
 
@@ -324,7 +324,7 @@ public class TransparenzReader extends NewsleakReader {
      * @param relativeResourceId An int specifying which of the inner documents shall be extracted.
      * @return TpDocument The inner document "extracted" from the given outer document.
      */
-    private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeResourceId) {
+    private TpResource getTpResourceFromDataset(SolrDocument solrDoc, int relativeResourceId) {
         TpResource tpResource = new TpResource();
 
         List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");

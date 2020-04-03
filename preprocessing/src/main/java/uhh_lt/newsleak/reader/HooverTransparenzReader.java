@@ -171,7 +171,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 		for(SolrDocument solrDoc: solrDocuments) {
 			outerDocsProcessed++;
 
-			List<TpResource> tpResources = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed, solrDocuments.size());
+			List<TpResource> tpResources = getAllTpResourcesFromDataset(solrDoc, outerDocsProcessed, solrDocuments.size());
 
 			for(TpResource tpResource : tpResources){
 				tpResourcesMap.put(tpResource.getAbsoluteResourceId(), tpResource);
@@ -458,7 +458,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 		return response.getResults();
 	}
 
-	public List<TpResource> getAllInnerDocumentsFromOuterDoc(SolrDocument outerDocument, int outerDocsProcessed, int numOfOuterDocs){
+	public List<TpResource> getAllTpResourcesFromDataset(SolrDocument outerDocument, int outerDocsProcessed, int numOfOuterDocs){
 		List<TpResource> tpResources = new ArrayList<>();
 		List<String> resourceFormats = (List<String>) outerDocument.getFieldValue("res_format");
 		List<String> resourceUrls = (List<String>) outerDocument.getFieldValue("res_url");
@@ -472,7 +472,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 		if(isSolrDocWellFormed(resourceFormats, resourceUrls, resourceNames, outerId)){
 			for (int i = 0; i < resourceUrls.size(); i++){
-				TpResource tpResource = getInnerDocFromOuterDoc(outerDocument, i);
+				TpResource tpResource = getTpResourceFromDataset(outerDocument, i);
 				tpResources.add(tpResource);
 			}
 		}else{
@@ -513,7 +513,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	 * @param relativeResourceIdInt An int specifying which of the inner documents shall be extracted.
 	 * @return TpDocument The inner document "extracted" from the given outer document.
 	 */
-	private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeResourceIdInt) {
+	private TpResource getTpResourceFromDataset(SolrDocument solrDoc, int relativeResourceIdInt) {
 		TpResource tpResource = new TpResource();
 
 		List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
