@@ -33,7 +33,6 @@ import uhh_lt.newsleak.types.TpResource;
 import uhh_lt.newsleak.util.StatsService;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
