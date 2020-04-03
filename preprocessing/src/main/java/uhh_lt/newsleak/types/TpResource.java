@@ -14,7 +14,7 @@ import java.util.Objects;
  * E.g. For the inner document X the filename is in the position 2 of the list of filenames.
  *      Therefore the file-format in position 2 in the list of file-formats is the file-format of this inner document etc.
  */
-public class TpDocument {
+public class TpResource {
 
     /** The id of the outer document (possibly referencing multiple TpDocuments (inner documents)) */
     String outerId;
@@ -48,8 +48,8 @@ public class TpDocument {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TpDocument)) return false;
-        TpDocument that = (TpDocument) o;
+        if (!(o instanceof TpResource)) return false;
+        TpResource that = (TpResource) o;
         return Objects.equals(innerId, that.innerId);
     }
 

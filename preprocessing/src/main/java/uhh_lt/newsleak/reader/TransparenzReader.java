@@ -21,7 +21,7 @@ import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
 import uhh_lt.newsleak.resources.MetadataResource;
 import uhh_lt.newsleak.types.Metadata;
-import uhh_lt.newsleak.types.TpDocument;
+import uhh_lt.newsleak.types.TpResource;
 
 import java.io.IOException;
 import java.util.*;
@@ -115,7 +115,7 @@ public class TransparenzReader extends NewsleakReader {
         Integer relativeInnerId = Integer.valueOf(innerId.split("_")[0]);
         String outerId = innerId.split("_")[1];
         SolrDocument solrDocument = getOuterDocumentFromSolrIndex(outerId);
-        TpDocument document = getInnerDocFromOuterDoc(solrDocument, relativeInnerId);
+        TpResource document = getInnerDocFromOuterDoc(solrDocument, relativeInnerId);
         if(document == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
         }
@@ -325,8 +325,8 @@ public class TransparenzReader extends NewsleakReader {
      * @param relativeInnerId An int specifying which of the inner documents shall be extracted.
      * @return TpDocument The inner document "extracted" from the given outer document.
      */
-    private TpDocument getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeInnerId) {
-        TpDocument tpDocument = new TpDocument();
+    private TpResource getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeInnerId) {
+        TpResource tpResource = new TpResource();
 
         List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
         List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
@@ -348,14 +348,14 @@ public class TransparenzReader extends NewsleakReader {
             String url = docResUrls.get(relativeInnerId);
             String fulltext = docResFulltexts.get(relativeInnerId);
             String name = docResNames.get(relativeInnerId);
-            tpDocument.setResFormat(innerDocFormat);
-            tpDocument.setInnerId(String.valueOf(relativeInnerId));
-            tpDocument.setResUrl(url);
-            tpDocument.setResFulltext(fulltext);
-            tpDocument.setResName(name);
-            tpDocument.setOuterId(outerId);
-            tpDocument.setTitle(outerName);
-            tpDocument.setDate(date);
+            tpResource.setResFormat(innerDocFormat);
+            tpResource.setInnerId(String.valueOf(relativeInnerId));
+            tpResource.setResUrl(url);
+            tpResource.setResFulltext(fulltext);
+            tpResource.setResName(name);
+            tpResource.setOuterId(outerId);
+            tpResource.setTitle(outerName);
+            tpResource.setDate(date);
         } catch (IllegalArgumentException e) {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
@@ -364,7 +364,7 @@ public class TransparenzReader extends NewsleakReader {
             return null;
         }
 
-        return tpDocument;
+        return tpResource;
     }
 
 
