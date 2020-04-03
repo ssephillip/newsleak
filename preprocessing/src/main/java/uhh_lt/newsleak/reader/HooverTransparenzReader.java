@@ -97,7 +97,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	HttpSolrClient solrClient;
 
 	/** Map containing all data objects (documents) from the Transparenzportal solr index */
-	Map<String, TpResource> tpDocumentsMap;
+	Map<String, TpResource> tpResourcesMap;
 
 	/** JEST client to run JSON API requests. */
 	private JestClient client;
@@ -158,7 +158,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	private void transparenzInitialize(UimaContext context) throws ResourceInitializationException{
 		logger.log(Level.INFO, "Getting metadata from Transparenzportal solr index: "+solrCoreAddress);
 
-		tpDocumentsMap = new HashMap<>();
+		tpResourcesMap = new HashMap<>();
 		solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
 
@@ -174,11 +174,11 @@ public class HooverTransparenzReader extends NewsleakReader {
 			List<TpResource> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed, solrDocuments.size());
 
 			for(TpResource tpResource : innerDocuments){
-				tpDocumentsMap.put(tpResource.getId(), tpResource);
+				tpResourcesMap.put(tpResource.getId(), tpResource);
 			}
 		}
 
-		logger.log(Level.INFO, "Found " + tpDocumentsMap.size() + " inner documents in the Transparenzportal solr index.");
+		logger.log(Level.INFO, "Found " + tpResourcesMap.size() + " inner documents in the Transparenzportal solr index.");
 		logger.log(Level.INFO, "Finished getting metadata from Transparenzportal solr index");
 	}
 
@@ -274,7 +274,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 			source = o.get("_source").getAsJsonObject();
 			String fileName = getField(source, "filename");
 			fileName = fileName.split("\\.")[0];
-			tpResource = tpDocumentsMap.get(fileName);
+			tpResource = tpResourcesMap.get(fileName);
 
 			if(tpResource == null){
 				logger.log(Level.INFO, "No corresponding document found in Transparenzportal solr index for file: "+fileName+". Discarding document: " + docIdHoover);
