@@ -396,7 +396,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 
 			// define pipeline
 			AnalysisEngineDescription pipeline = AnalysisEngineFactory.createEngineDescription(sentenceICU,
-					sentenceCleaner, dictionaries, nerMicroservice, keyterms, heideltime,
+					sentenceCleaner, dictionaries, nerMicroservice, keyterms, //heideltime, TODO wieder einkommentieren
 					doc2vecWriter,
 					// linewriter,
 					// xmi,

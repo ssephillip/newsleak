@@ -174,7 +174,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 			List<TpResource> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed, solrDocuments.size());
 
 			for(TpResource tpResource : innerDocuments){
-				tpResourcesMap.put(tpResource.getId(), tpResource);
+				tpResourcesMap.put(tpResource.getAbsoluteResourceId(), tpResource);
 			}
 		}
 
@@ -293,7 +293,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 		// if document is not empty put email header information and TP ID in main text
 		if(origDocText != null && !origDocText.trim().isEmpty()) {
-			field = tpResource.getId();
+			field = tpResource.getAbsoluteResourceId();
 			if (field != null) {
 				newDocText += "Transparenz-ID: "+field + "\n";
 			}
@@ -317,11 +317,11 @@ public class HooverTransparenzReader extends NewsleakReader {
 			if (field != null) {
 				newDocText += "Subject: " + field.trim() + "\n";
 			}
-			field = tpResource.getTitle();
+			field = tpResource.getDatasetTitle();
 			if (field != null) {
 				newDocText += "Subject/Title: " + field + "\n";
 			}
-			field = tpResource.getResName();
+			field = tpResource.getName();
 			if (field != null) {
 				newDocText += "Additional Description: " + field + "\n";
 			}
@@ -346,7 +346,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 		// date
 		String docDate = "1900-01-01";
-		field = tpResource.getDate();
+		field = tpResource.getDatasetDate();
 		if(field != null){
 			docDate = field;
 		}
@@ -364,12 +364,12 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 		// filename, subject, path
 		String fileName = "";
-		field = tpResource.getTitle();
+		field = tpResource.getDatasetTitle();
 		if (field != null) {
 			fileName = field;
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "filename", fileName));
 		}
-		field = tpResource.getTitle();
+		field = tpResource.getDatasetTitle();
 		if (field != null) {
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "subject", field));
 		} else {
@@ -379,19 +379,19 @@ public class HooverTransparenzReader extends NewsleakReader {
 		}
 
 		// Source URL
-		field = tpResource.getResUrl();
+		field = tpResource.getUrl();
 		if (field != null) {
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "Link", field));
 		}
 
 		//Transparenzportal ID
-		field = tpResource.getOuterId();
+		field = tpResource.getDatasetId();
 		if (field != null) {
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "transparenz-id", field));
 		}
 
 		//inner Transparenzportal ID
-		field = tpResource.getInnerId();
+		field = tpResource.getRelativeResourceId();
 		if (field != null) {
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "inner transparenz-id", field));
 		}
@@ -405,7 +405,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 		if (field != null)
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "content-type", field));
 		// file-type
-		field = tpResource.getResFormat();
+		field = tpResource.getFormat();
 		if (field != null)
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "filetype", field));
 		// from
@@ -527,14 +527,14 @@ public class HooverTransparenzReader extends NewsleakReader {
 		String innerDocFormat = docResFormats.get(relativeInnerId);
 		String url = docResUrls.get(relativeInnerId);
 		String name = docResNames.get(relativeInnerId);
-		tpResource.setResFormat(innerDocFormat.toLowerCase());
-		tpResource.setInnerId(innerId);
-		tpResource.setOuterId(outerId);
-		tpResource.setId(outerId+"_"+innerId);
-		tpResource.setResUrl(url);
-		tpResource.setResName(name);
-		tpResource.setTitle(outerName);
-		tpResource.setDate(date);
+		tpResource.setFormat(innerDocFormat.toLowerCase());
+		tpResource.setRelativeResourceId(innerId);
+		tpResource.setDatasetId(outerId);
+		tpResource.setAbsoluteResourceId(outerId+"_"+innerId);
+		tpResource.setUrl(url);
+		tpResource.setName(name);
+		tpResource.setDatasetTitle(outerName);
+		tpResource.setDatasetDate(date);
 
 		return tpResource;
 	}

@@ -122,12 +122,12 @@ public class TransparenzReader extends NewsleakReader {
         String docId = Integer.toString(currentDocument);
         logger.log(Level.INFO, "Processing document: " + docId);
 
-        jcas.setDocumentText(document.getResFulltext());
+        jcas.setDocumentText(document.getFulltext());
 
         // Set metadata
         Metadata metaCas = new Metadata(jcas);
         metaCas.setDocId(docId);
-        metaCas.setTimestamp(document.getDate());
+        metaCas.setTimestamp(document.getDatasetDate());
         metaCas.addToIndexes();
 
 
@@ -136,12 +136,12 @@ public class TransparenzReader extends NewsleakReader {
 
         // filename, subject, path
         String fileName = "";
-        String field = document.getTitle(); //Das ist nicht wirklich der Filename
+        String field = document.getDatasetTitle(); //Das ist nicht wirklich der Filename
         if (field != null) {
             fileName = field;
             metadata.add(metadataResource.createTextMetadata(docId, "filename", fileName));
         }
-        field = document.getResName();
+        field = document.getName();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "subject", field));
         } else {
@@ -150,20 +150,20 @@ public class TransparenzReader extends NewsleakReader {
             }
         }
 
-        field = document.getResUrl();
+        field = document.getUrl();
         if(field != null) {
             // Source Id
             metadata.add(metadataResource.createTextMetadata(docId, "Link", field));
         }
 
         // file-type
-        field = document.getResFormat();
+        field = document.getFormat();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "filetype", field));
         }
 
         // TP-ID
-        field = document.getOuterId();
+        field = document.getDatasetId();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "transparenz-id", field));
         }
@@ -347,14 +347,14 @@ public class TransparenzReader extends NewsleakReader {
             String url = docResUrls.get(relativeInnerId);
             String fulltext = docResFulltexts.get(relativeInnerId);
             String name = docResNames.get(relativeInnerId);
-            tpResource.setResFormat(innerDocFormat);
-            tpResource.setInnerId(String.valueOf(relativeInnerId));
-            tpResource.setResUrl(url);
-            tpResource.setResFulltext(fulltext);
-            tpResource.setResName(name);
-            tpResource.setOuterId(outerId);
-            tpResource.setTitle(outerName);
-            tpResource.setDate(date);
+            tpResource.setFormat(innerDocFormat);
+            tpResource.setRelativeResourceId(String.valueOf(relativeInnerId));
+            tpResource.setUrl(url);
+            tpResource.setFulltext(fulltext);
+            tpResource.setName(name);
+            tpResource.setDatasetId(outerId);
+            tpResource.setDatasetTitle(outerName);
+            tpResource.setDatasetDate(date);
         } catch (IllegalArgumentException e) {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */

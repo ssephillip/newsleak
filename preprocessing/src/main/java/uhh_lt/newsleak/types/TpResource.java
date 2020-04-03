@@ -17,118 +17,118 @@ import java.util.Objects;
 public class TpResource {
 
     /** The id of the outer document (possibly referencing multiple TpDocuments (inner documents)) */
-    String outerId;
+    String datasetId;
 
     /** The id of the inner document (represented by this object). */
-    String innerId; //TODO ps 2019-08-20: evtl. auf int umstellen
+    String relativeResourceId; //TODO ps 2019-08-20: evtl. auf int umstellen
 
     /** The concatenation of the outer id and the inner id */
-    String id;
+    String absoluteResourceId;
 
     /** The URL to the original resource. */
-    String resUrl;
+    String url;
 
     /** The fulltext of this (inner) document. */
-    String resFulltext;
+    String fulltext;
 
     /** The format of this (inner) document. */
-    String resFormat;
+    String format;
 
 
-    /** The outer document name. */
-    String title;
+    /** The dataset title. Corresponds to the field "title" in the TP Solr Index. */
+    String datasetTitle;
 
-    /** The inner document name */
-    String resName;
+    /** The resource name. Corresponds to the field "res_name" in the TP Solr Index. TODO warsch. in title umbenennen für konsistenz innerhalb newsleaks (noch nicht gemacht um verwirrung mit dem alten feld "title" zu verhindern */
+    String name;
 
     /** The date the document was published */
-    String date;
+    String datasetDate;
 
-
+    //TODO hier muss die absolute id verwendet werden
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TpResource)) return false;
         TpResource that = (TpResource) o;
-        return Objects.equals(innerId, that.innerId);
+        return Objects.equals(relativeResourceId, that.relativeResourceId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(innerId);
+        return Objects.hash(relativeResourceId);
     }
 
-    public String getOuterId() {
-        return outerId;
+    public String getDatasetId() {
+        return datasetId;
     }
 
-    public void setOuterId(String outerId) {
-        this.outerId = outerId;
+    public void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
     }
 
-    public String getInnerId() {
-        return innerId;
+    public String getRelativeResourceId() {
+        return relativeResourceId;
     }
 
-    public void setInnerId(String innerId) {
-        this.innerId = innerId;
+    public void setRelativeResourceId(String relativeResourceId) {
+        this.relativeResourceId = relativeResourceId;
     }
 
-    public String getId() {
-        return id;
+    public String getAbsoluteResourceId() {
+        return absoluteResourceId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAbsoluteResourceId(String absoluteResourceId) {
+        this.absoluteResourceId = absoluteResourceId;
     }
 
-    public String getResUrl() {
-        return resUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setResUrl(String resUrl) {
-        this.resUrl = resUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    public String getResFulltext() {
-        return resFulltext;
+    public String getFulltext() {
+        return fulltext;
     }
 
-    public void setResFulltext(String resFulltext) {
-        this.resFulltext = resFulltext;
+    public void setFulltext(String fulltext) {
+        this.fulltext = fulltext;
     }
 
-    public String getResFormat() {
-        return resFormat;
+    public String getFormat() {
+        return format;
     }
 
-    public void setResFormat(String resFormat) {
-        this.resFormat = resFormat;
+    public void setFormat(String format) {
+        this.format = format;
     }
 
 
-    public String getTitle() {
-        return title;
+    public String getDatasetTitle() {
+        return datasetTitle;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setDatasetTitle(String datasetTitle) {
+        this.datasetTitle = datasetTitle;
     }
 
-    public String getResName() {
-        return resName;
+    public String getName() {
+        return name;
     }
 
-    public void setResName(String resName) {
-        this.resName = resName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDate() {
-        return date;
+    public String getDatasetDate() {
+        return datasetDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDatasetDate(String datasetDate) {
+        this.datasetDate = datasetDate;
     }
 
 
