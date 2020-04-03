@@ -49,16 +49,16 @@ public class TransparenzReader extends NewsleakReader {
     private String solrCoreAddress;
 
     /** Number of total documents in the Solr Index. */
-    private int totalDocuments = 0;
+    private int totalNumOfTpResources = 0;
 
     /** Current document number. */
-    private int currentDocument = 0;
+    private int currentTpResource = 0;
 
     /** Iterator holding all the outer ids from the Solr Index. */
     Iterator<String> absoluteResourceIdsIterator = null;
 
     /** Number of documents in the Solr Index where at least one of the necessary fields is missing or malformed. */
-    int malformedSolrDocCounter = 0;
+    int malformedDatasetCounter = 0;
 
     /** Number of inner documents. */
     int numOfPdfTpResources = 0;
@@ -80,17 +80,17 @@ public class TransparenzReader extends NewsleakReader {
         solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
         List<String> allAbsoluteResourceIds = new ArrayList<>();
-        SolrDocumentList solrDocuments = getDatasetIdsFromSolrIndex();
+        SolrDocumentList datasets = getDatasetIdsFromSolrIndex();
 
-        logger.log(Level.INFO, "Total number of datasets: " + solrDocuments.size());
+        logger.log(Level.INFO, "Total number of datasets: " + datasets.size());
         logger.log(Level.INFO, "Getting Transparenzportal resources from dataset.");
-        for (SolrDocument solrDocument : solrDocuments) {
-            List<String> absoluteResourceIds = getAbsoluteResourceIds(solrDocument);
+        for (SolrDocument dataset : datasets) {
+            List<String> absoluteResourceIds = getAbsoluteResourceIds(dataset);
             allAbsoluteResourceIds.addAll(absoluteResourceIds);
         }
 
-        totalDocuments = allAbsoluteResourceIds.size();
-        currentDocument = 0;
+        totalNumOfTpResources = allAbsoluteResourceIds.size();
+        currentTpResource = 0;
         absoluteResourceIdsIterator = allAbsoluteResourceIds.iterator();
     }
 
@@ -102,7 +102,7 @@ public class TransparenzReader extends NewsleakReader {
      * org.apache.uima.collection.CollectionReader#getNext(org.apache.uima.cas.CAS)
      */
     public void getNext(CAS cas) throws IOException, CollectionException {
-        currentDocument++; //TODO ps 2019-08-20: evtl. ans ende der methode verschieben?
+        currentTpResource++; //TODO ps 2019-08-20: evtl. ans ende der methode verschieben?
         JCas jcas;
         try {
             jcas = cas.getJCas();
@@ -113,21 +113,21 @@ public class TransparenzReader extends NewsleakReader {
         String absoluteResourceId = absoluteResourceIdsIterator.next();
         Integer relativeResourceId = Integer.valueOf(absoluteResourceId.split("_")[0]); //TODO hier (und warsch. im ganzen reader) war die absoluteResourceId noch genau anders herum; dadurch ist der code hier flasch und muss geändert werden (evtl. ist es auch kein problem weil es im ganzen doc so gemacht wird und es nicht mit den filenames zu tun hat). für konsistenz muss man es aber trotzdem ndern.
         String datasetId = absoluteResourceId.split("_")[1];
-        SolrDocument solrDocument = getDatasetFromSolrIndex(datasetId);
-        TpResource document = getTpResourceFromDataset(solrDocument, relativeResourceId);
-        if(document == null){
+        SolrDocument dataset = getDatasetFromSolrIndex(datasetId);
+        TpResource tpResource = getTpResourceFromDataset(dataset, relativeResourceId);
+        if(tpResource == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
         }
 
-        String docId = Integer.toString(currentDocument);
-        logger.log(Level.INFO, "Processing document: " + docId);
+        String docId = Integer.toString(currentTpResource);
+        logger.log(Level.INFO, "Processing Transparenzportal resource: " + docId);
 
-        jcas.setDocumentText(document.getFulltext());
+        jcas.setDocumentText(tpResource.getFulltext());
 
         // Set metadata
         Metadata metaCas = new Metadata(jcas);
         metaCas.setDocId(docId);
-        metaCas.setTimestamp(document.getDatasetDate());
+        metaCas.setTimestamp(tpResource.getDatasetDate());
         metaCas.addToIndexes();
 
 
@@ -136,12 +136,12 @@ public class TransparenzReader extends NewsleakReader {
 
         // filename, subject, path
         String fileName = "";
-        String field = document.getDatasetTitle(); //Das ist nicht wirklich der Filename
+        String field = tpResource.getDatasetTitle(); //Das ist nicht wirklich der Filename
         if (field != null) {
             fileName = field;
             metadata.add(metadataResource.createTextMetadata(docId, "filename", fileName));
         }
-        field = document.getName();
+        field = tpResource.getName();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "subject", field));
         } else {
@@ -150,20 +150,20 @@ public class TransparenzReader extends NewsleakReader {
             }
         }
 
-        field = document.getUrl();
+        field = tpResource.getUrl();
         if(field != null) {
             // Source Id
             metadata.add(metadataResource.createTextMetadata(docId, "Link", field));
         }
 
         // file-type
-        field = document.getFormat();
+        field = tpResource.getFormat();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "filetype", field));
         }
 
         // TP-ID
-        field = document.getDatasetId();
+        field = tpResource.getDatasetId();
         if (field != null) {
             metadata.add(metadataResource.createTextMetadata(docId, "transparenz-id", field));
         }
@@ -177,8 +177,8 @@ public class TransparenzReader extends NewsleakReader {
      * @see org.apache.uima.collection.base_cpm.BaseCollectionReader#getProgress()
      */
     public Progress[] getProgress() {
-        return new Progress[]{new ProgressImpl(Long.valueOf(currentDocument).intValue(),
-                Long.valueOf(totalDocuments).intValue(), Progress.ENTITIES)};
+        return new Progress[]{new ProgressImpl(Long.valueOf(currentTpResource).intValue(),
+                Long.valueOf(totalNumOfTpResources).intValue(), Progress.ENTITIES)};
     }
 
 
@@ -188,7 +188,7 @@ public class TransparenzReader extends NewsleakReader {
      * @see org.apache.uima.collection.base_cpm.BaseCollectionReader#hasNext()
      */
     public boolean hasNext() throws IOException, CollectionException {
-        if (currentDocument > maxRecords)
+        if (currentTpResource > maxRecords)
             return false;
         return absoluteResourceIdsIterator.hasNext();
     }
@@ -255,7 +255,7 @@ public class TransparenzReader extends NewsleakReader {
                 throw new IOException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
         } catch (SolrServerException | IOException e) {
-            logger.log(Level.SEVERE, "Failed retrieving outer document '"+datasetId+"' from index "+solrCoreAddress);
+            logger.log(Level.SEVERE, "Failed retrieving dataset '"+datasetId+"' from index "+solrCoreAddress);
             logger.log(Level.SEVERE, "Error message: " + e.getMessage());
             logger.log(Level.SEVERE, "Localized error message: " + e.getLocalizedMessage());
 
@@ -273,15 +273,15 @@ public class TransparenzReader extends NewsleakReader {
      * A SolrDocument in the TransparenzPortal is often actually a group of documents.
      * Each document in this group is called inner document.
      * The SolrDocument itself is called outer document.
-     * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
+     * @param dataset A SolrDocument retrieved from the Transparenz Portal solr index
      * @return List<String> The list of inner ids for the given outer document
      */
-    private List<String> getAbsoluteResourceIds(SolrDocument solrDoc) {
+    private List<String> getAbsoluteResourceIds(SolrDocument dataset) {
         List<String> absoluteResourceIds = new ArrayList<>();
 
-        List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
-        List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        String datasetId = (String) solrDoc.getFieldValue("id");
+        List<String> resourceFormats = (List<String>) dataset.getFieldValue("res_format");
+        List<String> resourceUrls = (List<String>) dataset.getFieldValue("res_url");
+        String datasetId = (String) dataset.getFieldValue("id");
 
         try {
             logger.log(Level.FINEST, "Getting absolute resource ids for: "+datasetId+"."); //TODO log level korrekt?
@@ -303,7 +303,7 @@ public class TransparenzReader extends NewsleakReader {
         } catch (IllegalArgumentException e) {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
-            malformedSolrDocCounter++;
+            malformedDatasetCounter++;
             logger.log(Level.INFO, "Malformed document: "+datasetId+". Discarding document."); //TODO evtl. level fine oder finest
             return new ArrayList<>();
         }
@@ -320,26 +320,26 @@ public class TransparenzReader extends NewsleakReader {
      * Each document in this group is called inner document.
      * The SolrDocument itself is called outer document.
      * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
-     * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
+     * @param dataset A SolrDocument retrieved from the Transparenz Portal solr index
      * @param relativeResourceId An int specifying which of the inner documents shall be extracted.
      * @return TpDocument The inner document "extracted" from the given outer document.
      */
-    private TpResource getTpResourceFromDataset(SolrDocument solrDoc, int relativeResourceId) {
+    private TpResource getTpResourceFromDataset(SolrDocument dataset, int relativeResourceId) {
         TpResource tpResource = new TpResource();
 
-        List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
-        List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        List<String> resourceFulltexts = (List<String>) solrDoc.getFieldValue("res_fulltext");
-        List<String> resourceNames = (List<String>) solrDoc.getFieldValue("res_name");
-        String datasetId = (String) solrDoc.getFieldValue("id");
-        String datasetTitle = (String) solrDoc.getFieldValue("title");
-        String datasetDate = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
+        List<String> resourceFormats = (List<String>) dataset.getFieldValue("res_format");
+        List<String> resourceUrls = (List<String>) dataset.getFieldValue("res_url");
+        List<String> resourceFulltexts = (List<String>) dataset.getFieldValue("res_fulltext");
+        List<String> resourceNames = (List<String>) dataset.getFieldValue("res_name");
+        String datasetId = (String) dataset.getFieldValue("id");
+        String datasetTitle = (String) dataset.getFieldValue("title");
+        String datasetDate = getDateAsString((Date) dataset.getFieldValue("publishing_date"));
 
 
 
         try {
             logger.log(Level.FINEST, "Processing Transparenzportal resource "+relativeResourceId+" from dataset "+datasetId+"."); //TODO log-level korrekt?
-            if (!isSolrDocWellFormed(resourceFormats, resourceUrls, resourceFulltexts, resourceNames, datasetId)) {
+            if (!isDatasetWellFormed(resourceFormats, resourceUrls, resourceFulltexts, resourceNames, datasetId)) {
                 throw new IllegalArgumentException();
             }
 
@@ -358,7 +358,7 @@ public class TransparenzReader extends NewsleakReader {
         } catch (IllegalArgumentException e) {
             /** A SolrDocument is malformed if some mandatory information is missing.
              *  E.g. the number of fulltexts does not match the number of inner documents. */
-            malformedSolrDocCounter++;
+            malformedDatasetCounter++;
             logger.log(Level.INFO, "Malformed dataset: "+datasetId+". Discarding dataset."); //TODO evtl. level fine oder finest
             return null;
         }
@@ -407,7 +407,7 @@ public class TransparenzReader extends NewsleakReader {
      * @param datasetId The ID of the outer document (containing the inner documents)
      * @return boolean - True if the outer document is wellformed.
      */
-    private boolean isSolrDocWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceFulltexts, List<String> resourceNames, String datasetId) {
+    private boolean isDatasetWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceFulltexts, List<String> resourceNames, String datasetId) {
         //TODO ps 2019-08-20 auch abfragen ob die listen empty sind
         return !(resourceFormats == null || resourceUrls == null || resourceFulltexts == null || resourceNames==null || datasetId == null ||
                 resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceFulltexts.isEmpty() || resourceNames.isEmpty() ||

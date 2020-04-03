@@ -162,16 +162,16 @@ public class HooverTransparenzReader extends NewsleakReader {
 		solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
 
-		SolrDocumentList solrDocuments = getAllDatasetsFromSolr();
+		SolrDocumentList datasets = getAllDatasetsFromSolr();
 		int datasetsProcessed = 0;
 
-		logger.log(Level.INFO, "Total number of datasets: " + solrDocuments.size());
+		logger.log(Level.INFO, "Total number of datasets: " + datasets.size());
 		logger.log(Level.INFO, "Getting resources from dataset.");
 
-		for(SolrDocument solrDoc: solrDocuments) {
+		for(SolrDocument dataset: datasets) {
 			datasetsProcessed++;
 
-			List<TpResource> tpResources = getAllTpResourcesFromDataset(solrDoc, datasetsProcessed, solrDocuments.size());
+			List<TpResource> tpResources = getAllTpResourcesFromDataset(dataset, datasetsProcessed, datasets.size());
 
 			for(TpResource tpResource : tpResources){
 				tpResourcesMap.put(tpResource.getAbsoluteResourceId(), tpResource);
@@ -277,8 +277,8 @@ public class HooverTransparenzReader extends NewsleakReader {
 			tpResource = tpResourcesMap.get(fileName);
 
 			if(tpResource == null){
-				logger.log(Level.INFO, "No corresponding document found in Transparenzportal solr index for file: "+fileName+". Discarding document: " + docIdHoover);
-				if(!hasNext()){ //TODO relies on the "current" counter being incremented in the hasNext method. When this weird implementation changes the "current" counter needs to be incremented here
+				logger.log(Level.INFO, "No Transparenzportal resource found in Transparenzportal Solr Index for file: "+fileName+". Discarding document: " + docIdHoover);
+				if(!hasNext()){ //TODO relies on the "current" counter being incremented in the hasNext method. When this weird implementation of the hasNext() method changes, the "current" counter needs to be incremented here
 					tpResource = new TpResource();
 					break;
 				}
@@ -470,7 +470,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 			logger.log(Level.INFO, "Getting Transparenzportal resources from dataset number '" + datasetsProcessed + "' of '" + numOfDatasets + "' from index " + solrCoreAddress);
 		}
 
-		if(isSolrDocWellFormed(resourceFormats, resourceUrls, resourceNames, datasetId)){
+		if(isDatasetWellFormed(resourceFormats, resourceUrls, resourceNames, datasetId)){
 			for (int i = 0; i < resourceUrls.size(); i++){
 				TpResource tpResource = getTpResourceFromDataset(dataset, i);
 				tpResources.add(tpResource);
@@ -492,7 +492,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	 * @param datasetId The ID of the outer document (containing the inner documents)
 	 * @return boolean - True if the outer document is wellformed.
 	 */
-	private boolean isSolrDocWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceNames, String datasetId) {
+	private boolean isDatasetWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceNames, String datasetId) {
 		//TODO ps 2019-08-20 auch abfragen ob die listen empty sind
 		return !(resourceFormats == null || resourceUrls == null || resourceNames==null || datasetId == null ||
 				resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceNames.isEmpty() ||
@@ -508,21 +508,21 @@ public class HooverTransparenzReader extends NewsleakReader {
 	 * Each document in this group is called inner document.
 	 * The SolrDocument itself is called outer document.
 	 * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
-	 * @assert solrDoc is wellformed
-	 * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
+	 * @assert dataset is wellformed
+	 * @param dataset A SolrDocument retrieved from the Transparenz Portal solr index
 	 * @param relativeResourceIdInt An int specifying which of the inner documents shall be extracted.
 	 * @return TpDocument The inner document "extracted" from the given outer document.
 	 */
-	private TpResource getTpResourceFromDataset(SolrDocument solrDoc, int relativeResourceIdInt) {
+	private TpResource getTpResourceFromDataset(SolrDocument dataset, int relativeResourceIdInt) {
 		TpResource tpResource = new TpResource();
 
-		List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
-		List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
-		List<String> resourceNames = (List<String>) solrDoc.getFieldValue("res_name");
-		String datasetId = (String) solrDoc.getFieldValue("id");
+		List<String> resourceFormats = (List<String>) dataset.getFieldValue("res_format");
+		List<String> resourceUrls = (List<String>) dataset.getFieldValue("res_url");
+		List<String> resourceNames = (List<String>) dataset.getFieldValue("res_name");
+		String datasetId = (String) dataset.getFieldValue("id");
 		String relativeResourceId = String.valueOf(relativeResourceIdInt);
-		String datasetTitle = (String) solrDoc.getFieldValue("title");
-		String datasetDate = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
+		String datasetTitle = (String) dataset.getFieldValue("title");
+		String datasetDate = getDateAsString((Date) dataset.getFieldValue("publishing_date"));
 
 		String resourceFormat = resourceFormats.get(relativeResourceIdInt);
 		String resourceUrl = resourceUrls.get(relativeResourceIdInt);
