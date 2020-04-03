@@ -62,7 +62,6 @@ public class TransparenzResourceDownloader {
         List<TpDocument> tpDocuments = new ArrayList<>();
         Instant startTime = Instant.now();
 
-        //       SolrDocumentList solrDocuments = getOuterDocIdsFromSolrIndex(numOfDocs);
         SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr();
         numOfOuterDocs = solrDocuments.size();
         int outerDocsProcessed = 0;
