@@ -42,27 +42,19 @@ import java.util.regex.Pattern;
 /**
  * The HooverTransparenzReader connects to a running instance of the Hoover
  * text data extraction system created by the EIC.network (see
- * <a href="https://hoover.github.io">https://hoover.github.io</a>) and to a (non-public) Solr Index of the <a href="http://transparenz.hamburg.de/">Transparenzportal Hamburg</a>.
- * It utilizes the Hoover API to query for all extracted documents in a collection. It retrieves the documents from the Hoover Elasticsearch Index one by one and combines the document text with the metadata that was retrieved from the Transparenzportal Solr Index.
- * TODO vernünftigen kommentar schreiben
- * 
- * Hoover is expected to extract raw fulltext (regardless of any further NLP
- * application or human analysts requirement). Newsleak takes Hoover's output
- * and extracted file metadata (e.g. creation date).
- * 
- * Duplicated storage of fulltexts (with newly generated document IDs) is
- * necessary since we clean and preprocess raw data for further annotation
- * processes. Among others, this includes deletion of multiple blank lines
- * (often extracted from Excel sheets), dehyphenation at line endings (a result
- * from OCR-ed or badly encoded PDFs) , or splitting of long documents into
- * chunks of roughly page length.
- * 
- * This reader sets document IDs to 0. The final document IDs will be generated
- * as an automatically incremented by @see
- * uhh_lt.newsleak.writer.ElasticsearchDocumentWriter
- * 
- * Metadata is written into a temporary file on the disk to be inserted into the
- * newsleak postgres database lateron.
+ * <a href="https://hoover.github.io">https://hoover.github.io</a>). It utilizes the Hoover API to query for all extracted documents in a collection.
+ * Additionally it retrieves the metadata of all datasets stored in the (non-public) Solr Index of the <a href="http://transparenz.hamburg.de/">Transparenzportal Hamburg</a>.
+ * The resources are extracted from the datasets and stored in {@link TpResource} objects. The extracted {@link TpResource}s are stored in a {@link Map}.
+ * The {@link TpResource#absoluteResourceId}s are used as keys.
+ * The {@link TpResource#absoluteResourceId}s are also the filenames of the documents that were extracted by Hoover.
+ * Consequentially, the filenames of the documents retrieved from Hoover can be used directly as keys to retrieve the corresponding {@link TpResource} from the {@link Map}.
+ *
+ * During processing, the information (e.g. fulltext, metadata) retrieved from the Hoover Elasticsearch Index is combined with the metadata of the corresponding {@link TpResource}.
+ * Due to the way the {@link TpResource}s are stored, combining the data is very fast.
+ *
+ * For more information on Hoover see {@link HooverElasticsearchReader}.
+ *
+ * For more information on datasets and resources see {@link TpResource}.
  */
 public class HooverTransparenzReader extends NewsleakReader {
 
@@ -89,15 +81,9 @@ public class HooverTransparenzReader extends NewsleakReader {
 	/** The Constant TRANSPARENZ_CORE_ADDRESS. */
 	public static final String TRANSPARENZ_CORE_ADDRESS = "transparenzcoreaddress";
 
-	/** The URL to the core of the (solr) Transparenz index*/
+	/** The URL to the core of the Transparenzportal Solr Index*/
 	@ConfigurationParameter(name = TRANSPARENZ_CORE_ADDRESS, mandatory = true)
 	private String solrCoreAddress;
-
-	/** The solr client */
-	HttpSolrClient solrClient;
-
-	/** Map containing all data objects (documents) from the Transparenzportal solr index */
-	Map<String, TpResource> tpResourcesMap;
 
 	/** JEST client to run JSON API requests. */
 	private JestClient client;
@@ -126,6 +112,12 @@ public class HooverTransparenzReader extends NewsleakReader {
 	/** The email regex pattern. */
 	Pattern emailPattern = Pattern.compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+");
 
+	/** The solr client */
+	HttpSolrClient solrClient;
+
+	/** Map containing all {@link TpResource}s from the Transparenzportal Solr Index */
+	Map<String, TpResource> tpResourcesMap;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -149,21 +141,24 @@ public class HooverTransparenzReader extends NewsleakReader {
 	}
 
 	/**
-	 * Retrieves the metadata of all PDF documents from the Transparenzportal Solr Index and stores it in a map.
+	 * Retrieves the metadata of all PDF resources stored in the Transparenzportal Solr Index and stores it in the {@link #tpResourcesMap}.
 	 * During processing, this metadata is combined with the document texts that are being retrieved from Hoover.
 	 *
+	 * For more information on datasets and resources see {@link TpResource}.
+	 *
 	 * @param context The UIMA context
-	 * @throws ResourceInitializationException
+	 * @throws ResourceInitializationException if the datasets cannot be retrieved from the Transparenzportal Solr Index.
 	 */
 	private void transparenzInitialize(UimaContext context) throws ResourceInitializationException{
 		logger.log(Level.INFO, "Getting metadata from Transparenzportal solr index: "+solrCoreAddress);
 
 		int datasetsProcessed = 0;
+		int numOfDatasets = 0;
 		tpResourcesMap = new HashMap<>();
 		solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
 
 		SolrDocumentList datasets = getAllDatasetsFromSolr();
-		int numOfDatasets = datasets.size();
+		numOfDatasets = datasets.size();
 
 		logger.log(Level.INFO, "Total number of datasets: " + numOfDatasets);
 		logger.log(Level.INFO, "Getting Transparenzportal resources from dataset.");
@@ -189,6 +184,13 @@ public class HooverTransparenzReader extends NewsleakReader {
 		logger.log(Level.INFO, "Finished getting metadata from Transparenzportal solr index");
 	}
 
+	/**
+	 * Retrieves the IDs of all documents in the Hoover Elasticsearch index.
+	 * Copied from {@link HooverElasticsearchReader#initialize(UimaContext)}.
+	 *
+	 * @param context The UIMA context.
+	 * @throws ResourceInitializationException if an {@link IOException} occurs during this method.
+	 */
 	private void hooverInitialize(UimaContext context) throws ResourceInitializationException{
 		logger.log(Level.INFO, "Getting IDs from Hoover elasticsearch index");
 		// init hoover connection
@@ -475,6 +477,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 
 	/**
 	 * Stores the resources contained in the given dataset in {@link TpResource} objects.
+	 *
 	 * For more information on datasets and resources see {@link TpResource}.
 	 *
 	 * @param dataset The dataset that contains the resources
