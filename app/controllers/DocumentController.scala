@@ -28,7 +28,8 @@ import play.api.mvc.{ Action, AnyContent, Controller, Request }
 import util.{ DateUtils, NewsleakConfigReader }
 import util.SessionUtils.currentDataset
 import scala.collection.mutable.ListBuffer
-import scalaj.http._
+import scalaj.http.Http
+import scalaj.http.HttpResponse
 
 /**
  * Provides document related actions.
@@ -57,15 +58,18 @@ class DocumentController @Inject() (
   }
 
   /**
-   * Returns the IDs of similar documents for a given ID
-   * @param id the ID of the document for which similar documents are retrieved
+   * Returns the IDs of similar documents for a given ID.
+   * The IDs are retrieved from the vector index.
+   * @param id the ID of the document for which similar documents shall be retrieved
    * @param numOfDocs the number of IDs that shall be retrieved
-   * @return the IDs of similar documents and the corresponding similarity scores (cosine distances)
+   * @return the IDs of similar documents and the corresponding similarity scores (cosine distances) that were retrieved from the vector index
    */
   def getSimDocsDoc2VecC(id: String, numOfDocs: Int) = Action { implicit request =>
-
     val address = NewsleakConfigReader.config.getString("vectorindex.address")
+
     val urlString: String = address + "/vector/" + id + "?num=" + numOfDocs
+
+    // executes an Http get request
     val response: HttpResponse[String] = Http(urlString).asString
     val bodyAsJson: JsValue = Json.parse(response.body)
 

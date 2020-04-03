@@ -737,7 +737,7 @@ define([
                         }
                     }
 
-                    //gets similar documents from elasticsearch
+                    //gets the ids and similarity scores (Lucene score) of similar documents from elasticsearch
                     $scope.getSimilarDocsElasticsearch = function (docid) {
                         console.log("Getting similar documents with method 'Elastic");
 
@@ -752,7 +752,7 @@ define([
                     }
 
 
-
+                    //gets the ids and similarity scores (cosine distance) of similar documents from the vector index
                     $scope.getSimilarDocsDoc2VecC = function (docid) {
                         console.log("Getting similar documents with method 'Doc2VecC");
 
@@ -791,7 +791,7 @@ define([
                     }
 
 
-                    //transforms the documents into a different data structure
+                    //transforms the documents into the data structure that is required by the document list view. All content remains unchanged
                     $scope.transformDocuments = function (docs, docIdsAndScores) {
                         var transformedDocs = [];
 
@@ -804,7 +804,7 @@ define([
                                 metadata: {}
                             };
 
-                            //transforms metadata into different structure; content stays the same
+                            //transforms metadata into the data structure required by the document list viewe
                             angular.forEach(doc.metadata, function (metadata) {
                                 if (!currentDoc.metadata.hasOwnProperty(metadata.key)) {
                                     currentDoc.metadata[metadata.key] = [];
@@ -822,7 +822,7 @@ define([
                     }
 
 
-                    //opens a document for reading
+                    //opens a document
                     $scope.loadFullDocument = function (doc) {
                         EntityService.setToggleEntityGraph(true);
                         EntityService.setToggleKeywordGraph(false);
