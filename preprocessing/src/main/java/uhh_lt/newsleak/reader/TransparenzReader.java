@@ -284,7 +284,7 @@ public class TransparenzReader extends NewsleakReader {
         String outerId = (String) solrDoc.getFieldValue("id");
 
         try {
-            logger.log(Level.FINEST, "Getting inner document ids for: "+outerId+"."); //TODO log level korrekt?
+            logger.log(Level.FINEST, "Getting absolute resource ids for: "+outerId+"."); //TODO log level korrekt?
 
             if (resourceFormats == null || resourceFormats.isEmpty() || resourceFormats.size() != resourceUrls.size()) {
                 throw new IllegalArgumentException();
@@ -343,15 +343,15 @@ public class TransparenzReader extends NewsleakReader {
                 throw new IllegalArgumentException();
             }
 
-            String innerDocFormat = resourceFormats.get(relativeResourceId);
-            String url = resourceUrls.get(relativeResourceId);
-            String fulltext = resourceFulltexts.get(relativeResourceId);
-            String name = resourceNames.get(relativeResourceId);
-            tpResource.setFormat(innerDocFormat);
+            String resourceFormat = resourceFormats.get(relativeResourceId);
+            String resourceUrl = resourceUrls.get(relativeResourceId);
+            String resourceFulltext = resourceFulltexts.get(relativeResourceId);
+            String resourceName = resourceNames.get(relativeResourceId);
+            tpResource.setFormat(resourceFormat);
             tpResource.setRelativeResourceId(String.valueOf(relativeResourceId));
-            tpResource.setUrl(url);
-            tpResource.setFulltext(fulltext);
-            tpResource.setName(name);
+            tpResource.setUrl(resourceUrl);
+            tpResource.setFulltext(resourceFulltext);
+            tpResource.setName(resourceName);
             tpResource.setDatasetId(datasetId);
             tpResource.setDatasetTitle(datasetTitle);
             tpResource.setDatasetDate(datasetDate);

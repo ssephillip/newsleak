@@ -178,7 +178,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 			}
 		}
 
-		logger.log(Level.INFO, "Found " + tpResourcesMap.size() + " inner documents in the Transparenzportal solr index.");
+		logger.log(Level.INFO, "Found " + tpResourcesMap.size() + " Transparenzportal resources in the Transparenzportal solr index.");
 		logger.log(Level.INFO, "Finished getting metadata from Transparenzportal solr index");
 	}
 
@@ -516,25 +516,25 @@ public class HooverTransparenzReader extends NewsleakReader {
 	private TpResource getTpResourceFromDataset(SolrDocument solrDoc, int relativeResourceIdInt) {
 		TpResource tpResource = new TpResource();
 
-		List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
-		List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
-		List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
-		String outerId = (String) solrDoc.getFieldValue("id");
+		List<String> resourceFormats = (List<String>) solrDoc.getFieldValue("res_format");
+		List<String> resourceUrls = (List<String>) solrDoc.getFieldValue("res_url");
+		List<String> resourceNames = (List<String>) solrDoc.getFieldValue("res_name");
+		String datasetId = (String) solrDoc.getFieldValue("id");
 		String relativeResourceId = String.valueOf(relativeResourceIdInt);
-		String outerName = (String) solrDoc.getFieldValue("title");
-		String date = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
+		String datasetTitle = (String) solrDoc.getFieldValue("title");
+		String datasetDate = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
 
-		String innerDocFormat = docResFormats.get(relativeResourceIdInt);
-		String url = docResUrls.get(relativeResourceIdInt);
-		String name = docResNames.get(relativeResourceIdInt);
-		tpResource.setFormat(innerDocFormat.toLowerCase());
+		String resourceFormat = resourceFormats.get(relativeResourceIdInt);
+		String resourceUrl = resourceUrls.get(relativeResourceIdInt);
+		String resourceName = resourceNames.get(relativeResourceIdInt);
+		tpResource.setFormat(resourceFormat.toLowerCase());
 		tpResource.setRelativeResourceId(relativeResourceId);
-		tpResource.setDatasetId(outerId);
-		tpResource.setAbsoluteResourceId(outerId+"_"+relativeResourceId);
-		tpResource.setUrl(url);
-		tpResource.setName(name);
-		tpResource.setDatasetTitle(outerName);
-		tpResource.setDatasetDate(date);
+		tpResource.setDatasetId(datasetId);
+		tpResource.setAbsoluteResourceId(datasetId+"_"+relativeResourceId);
+		tpResource.setUrl(resourceUrl);
+		tpResource.setName(resourceName);
+		tpResource.setDatasetTitle(datasetTitle);
+		tpResource.setDatasetDate(datasetDate);
 
 		return tpResource;
 	}
