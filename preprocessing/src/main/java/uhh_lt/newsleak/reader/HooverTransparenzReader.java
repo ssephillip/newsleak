@@ -501,30 +501,6 @@ public class HooverTransparenzReader extends NewsleakReader {
 	}
 
 
-	/**
-	 * Tests if a dataset is well-formed.
-	 * A dataset is well-formed if all the parameters of this method are Non-Null AND all the lists are Non-Empty AND all the lists have the same length.
-	 * Explanation:
-	 * If one of the parameters would be Null or empty (if it is a list), all resources contained in the dataset would miss a mandatory value.
-	 * If the lists would not have the same length, it is not possible to determine which information belongs to which resource.
-	 *
-	 * For more information on datasets and resources see {@link TpResource}.
-	 * TODO verschieben nach unter getTpResourceFromDataset
-	 *
-	 * @param resourceFormats The list of file-formats of the resources contained in the dataset
-	 * @param resourceUrls The list of URLs to the actual files corresponding to the resources
-	 * @param resourceNames The list of names of the resources contained in the dataset
-	 * @param datasetId The ID of the dataset
-	 * @return True if the dataset is well-formed.
-	 */
-	private boolean isDatasetWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceNames, String datasetId) {
-
-		return !(resourceFormats == null || resourceUrls == null || resourceNames==null || datasetId == null ||
-				resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceNames.isEmpty() ||
-				resourceFormats.size() != resourceUrls.size() || resourceFormats.size() != resourceNames.size());
-	}
-
-
 
 	/**
 	 * Extracts a resource from the given dataset and stores it in a {@link TpResource} object.
@@ -564,6 +540,30 @@ public class HooverTransparenzReader extends NewsleakReader {
 		tpResource.setDatasetDate(datasetDate);
 
 		return tpResource;
+	}
+
+
+
+	/**
+	 * Tests if a dataset is well-formed.
+	 * A dataset is well-formed if all the parameters of this method are Non-Null AND all the lists are Non-Empty AND all the lists have the same length.
+	 * Explanation:
+	 * If one of the parameters would be Null or empty (if it is a list), all resources contained in the dataset would miss a mandatory value.
+	 * If the lists would not have the same length, it is not possible to determine which information belongs to which resource.
+	 *
+	 * For more information on datasets and resources see {@link TpResource}.
+	 *
+	 * @param resourceFormats The list of file-formats of the resources contained in the dataset
+	 * @param resourceUrls The list of URLs to the actual files corresponding to the resources
+	 * @param resourceNames The list of names of the resources contained in the dataset
+	 * @param datasetId The ID of the dataset
+	 * @return True if the dataset is well-formed.
+	 */
+	private boolean isDatasetWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceNames, String datasetId) {
+
+		return !(resourceFormats == null || resourceUrls == null || resourceNames==null || datasetId == null ||
+				resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceNames.isEmpty() ||
+				resourceFormats.size() != resourceUrls.size() || resourceFormats.size() != resourceNames.size());
 	}
 
 
