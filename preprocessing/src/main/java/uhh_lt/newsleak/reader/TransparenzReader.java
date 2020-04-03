@@ -112,8 +112,8 @@ public class TransparenzReader extends NewsleakReader {
 
         String absoluteResourceId = absoluteResourceIdsIterator.next();
         Integer relativeResourceId = Integer.valueOf(absoluteResourceId.split("_")[0]); //TODO hier (und warsch. im ganzen reader) war die absoluteResourceId noch genau anders herum; dadurch ist der code hier flasch und muss geändert werden (evtl. ist es auch kein problem weil es im ganzen doc so gemacht wird und es nicht mit den filenames zu tun hat). für konsistenz muss man es aber trotzdem ndern.
-        String outerId = absoluteResourceId.split("_")[1];
-        SolrDocument solrDocument = getDatasetFromSolrIndex(outerId);
+        String datasetId = absoluteResourceId.split("_")[1];
+        SolrDocument solrDocument = getDatasetFromSolrIndex(datasetId);
         TpResource document = getTpResourceFromDataset(solrDocument, relativeResourceId);
         if(document == null){
             throw new CollectionException(); //TODO ps 2019-08-21: was für eine sinnvolle exception kann man hier schmeißen
@@ -248,7 +248,7 @@ public class TransparenzReader extends NewsleakReader {
 
 
         try {
-            logger.log(Level.INFO, "Getting outer document '"+datasetId+"' from index " + solrCoreAddress);
+            logger.log(Level.INFO, "Getting dataset '"+datasetId+"' from index " + solrCoreAddress);
             response = solrClient.query(documentQuery);
 
             if (response == null) {

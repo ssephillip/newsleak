@@ -449,7 +449,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 				throw new ResourceInitializationException(); //TODO 2020-01-07 ps: ist diese Exception hier korrekt?
 			}
 		} catch (Exception e) {
-			System.out.println("Failed retrieving outer documents from index "+solrCoreAddress);
+			System.out.println("Failed retrieving datasets from index "+solrCoreAddress);
 
 			e.printStackTrace();
 			throw new ResourceInitializationException();
