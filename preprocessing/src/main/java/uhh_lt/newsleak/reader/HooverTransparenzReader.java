@@ -573,7 +573,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	 * @param date The date that is supposed to be transformed.
 	 * @return The {@link String} that was created based on the given {@link Date}.
 	 */
-	public String getDateAsString(Date date){
+	private String getDateAsString(Date date){
 		String dateString;
 
 		if(date != null) {
