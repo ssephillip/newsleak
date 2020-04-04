@@ -60,7 +60,7 @@ public class TransparenzResourceDownloader {
 
                 @Override
                 public void run() {
-                    downloadFiles(tpResourceProvider, path, numOfDocsToDownload, totalNumOfResources);
+                    startDownloadingThreads(tpResourceProvider, path, numOfDocsToDownload, totalNumOfResources);
                 }
             });
             thread.start();
@@ -68,7 +68,7 @@ public class TransparenzResourceDownloader {
     }
 
 
-    private void downloadFiles(TpResourceProvider tpResourceProvider, String path, int numOfDocsToDownload, int totalNumOfResources) {
+    private void startDownloadingThreads(TpResourceProvider tpResourceProvider, String path, int numOfDocsToDownload, int totalNumOfResources) {
         int threadNumber = tpResourceProvider.getCurrentThreadCount();
         System.out.println("Thread '"+threadNumber+"' is starting to download files.");
 
