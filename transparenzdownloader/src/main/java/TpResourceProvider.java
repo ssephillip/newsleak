@@ -6,18 +6,18 @@ public class TpResourceProvider {
     Iterator<TpResource> tpResourceIterator;
     int current;
     int threadCounter;
-    int numOfInnerDocsDownloaded;
-    int numOfInnerDocsFailed;
-    int numOfDocsTotal;
-    int numOfDocsToDownload;
+    int numOfFilesDownloaded;
+    int numOfFilesFailedToDownload;
+    int totalNumOfResources;
+    int numOfFilesToDownload;
 
 
     static TpResourceProvider tpResourceProvider;
 
-    private TpResourceProvider(List<TpResource> tpResources, int numofDocsToDownload){
+    private TpResourceProvider(List<TpResource> tpResources, int numOfFilesToDownload){
         tpResourceIterator = tpResources.iterator();
-        numOfDocsTotal = tpResources.size();
-        this.numOfDocsToDownload = numofDocsToDownload;
+        totalNumOfResources = tpResources.size();
+        this.numOfFilesToDownload = numOfFilesToDownload;
         current = -1;
     }
 
@@ -36,7 +36,7 @@ public class TpResourceProvider {
         return tpResourceProvider;
     }
 
-    public synchronized TpResource getNextTpDocument(){
+    public synchronized TpResource getNextTpResource(){
         TpResource tpResource = null;
         if(tpResourceIterator.hasNext()){
             current++;
@@ -56,22 +56,22 @@ public class TpResourceProvider {
     }
 
     public synchronized boolean isFinished(){
-        return (numOfInnerDocsDownloaded + numOfInnerDocsFailed == numOfDocsTotal) || (numOfInnerDocsDownloaded + numOfInnerDocsFailed == numOfDocsToDownload);
+        return (numOfFilesDownloaded + numOfFilesFailedToDownload == totalNumOfResources) || (numOfFilesDownloaded + numOfFilesFailedToDownload == numOfFilesToDownload);
     }
 
     public synchronized void incrementNumOfFilesDownloaded(){
-        numOfInnerDocsDownloaded++;
+        numOfFilesDownloaded++;
     }
 
     public synchronized void incrementNumOfFilesFailedToDownload(){
-        numOfInnerDocsFailed++;
+        numOfFilesFailedToDownload++;
     }
 
-    public int getNumOfInnerDocsDownloaded(){
-        return numOfInnerDocsDownloaded;
+    public int getNumOfFilesDownloaded(){
+        return numOfFilesDownloaded;
     }
 
-    public int getNumOfInnerDocsFailed(){
-        return numOfInnerDocsFailed;
+    public int getNumOfFilesFailedToDownload(){
+        return numOfFilesFailedToDownload;
     }
 }

@@ -86,7 +86,7 @@ public class TransparenzResourceDownloader {
         System.out.println("Thread '"+threadNumber+"' is starting to download files.");
 
         while(true) {
-            TpResource tpResource = tpResourceProvider.getNextTpDocument();
+            TpResource tpResource = tpResourceProvider.getNextTpResource();
             int current = tpResourceProvider.getCurrent();
 
             if(tpResource != null && current < numOfDocsToDownload) {
@@ -151,13 +151,13 @@ public class TransparenzResourceDownloader {
             if(tpResourceProvider != null && tpResourceProvider.isFinished()){
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
-                writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfInnerDocsDownloaded(), tpResourceProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToStats, numOfThreads);
+                writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfFilesDownloaded(), tpResourceProvider.getNumOfFilesFailedToDownload(), formatsToDownload, pathToStats, numOfThreads);
                 break;
             }else if(tpResourceProvider != null &&  tpResourceProvider.getCurrent()%500==0){ //TODO determine time for temp-stat print better (e.g. with a callback)
                 //TODO zwischen stats ausbauen wenn fertig, da zwischen stats funktion zu unstabil.
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
-                writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfInnerDocsDownloaded(), tpResourceProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToTempStats, numOfThreads);
+                writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfFilesDownloaded(), tpResourceProvider.getNumOfFilesFailedToDownload(), formatsToDownload, pathToTempStats, numOfThreads);
 
             }
 
