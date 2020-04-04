@@ -1,6 +1,4 @@
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
@@ -62,7 +60,7 @@ public class TransparenzResourceDownloader {
         List<TpDocument> tpDocuments = new ArrayList<>();
         Instant startTime = Instant.now();
 
-        SolrDocumentList solrDocuments = TransparenzUtils.getAllOuterDocumentsFromSolr(solrClient, solrCoreAddress);
+        SolrDocumentList solrDocuments = TransparenzService.getAllOuterDocumentsFromSolr(solrClient, solrCoreAddress);
         numOfOuterDocs = solrDocuments.size();
         int outerDocsProcessed = 0;
 

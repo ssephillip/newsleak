@@ -5,7 +5,7 @@ import org.apache.solr.common.SolrDocumentList;
 
 import java.util.List;
 
-public class TransparenzUtils {
+public class TransparenzService {
 
 
 
