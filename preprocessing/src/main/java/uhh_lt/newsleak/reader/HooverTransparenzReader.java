@@ -383,12 +383,15 @@ public class HooverTransparenzReader extends NewsleakReader {
 		if (field != null) {
 			fileName = field;
 			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "Filename", fileName));
+
+			//This is done to keep consistency with the other readers
+			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "Subject", fileName));
 		}
 
 		// Source URL
 		field = tpResource.getUrl();
 		if (field != null) {
-			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "Resource URL", field));
+			metadata.add(metadataResource.createTextMetadata(docIdNewsleak, "Link", field));
 		}
 
 		//Transparenzportal dataset ID
