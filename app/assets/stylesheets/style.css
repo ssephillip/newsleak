@@ -436,6 +436,14 @@ footer > div #histogram {
     padding-left: 0px;
 }
 
+#metadata .metadata-button {
+    margin-right: 0px;
+    padding-right: 0px;
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+
 .docs-loading {
     position: absolute;
     height: 100%;
