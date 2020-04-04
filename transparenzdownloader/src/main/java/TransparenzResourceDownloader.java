@@ -1,6 +1,4 @@
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
 import java.io.*;
 import java.net.URL;
@@ -19,7 +17,7 @@ public class TransparenzResourceDownloader {
 
     Iterator<TpDocument> tpDocumentsIterator;
 
-    TransparenzService transparenzService;
+    TransparenzSolrService transparenzSolrService;
 
 
 
@@ -30,12 +28,7 @@ public class TransparenzResourceDownloader {
         this.solrCoreAddress = solrCoreAddress;
 
         solrClient = new HttpSolrClient.Builder(solrCoreAddress).build();
-
     }
-
-
-
-
 
 
 
@@ -43,15 +36,15 @@ public class TransparenzResourceDownloader {
         Instant startTime = Instant.now();
 
         List<TpDocument> tpDocuments = new ArrayList<>();
-        transparenzService = new TransparenzService(solrClient, solrCoreAddress);
+        transparenzSolrService = new TransparenzSolrService(solrClient, solrCoreAddress);
 
         //gets all resources stored in the Transparenzportal
-        tpDocuments = transparenzService.getAllInnerDocumentsFromSolr();
+        tpDocuments = transparenzSolrService.getAllInnerDocumentsFromSolr();
 
         //removes all resources that have a file format that is not supposed to be downloaded
         tpDocuments.removeIf(tp -> !formatsToDownload.contains(tp.getResFormat()));
 
-        transparenzService.setFilteredNumOfInnerDocs(tpDocuments.size());
+        transparenzSolrService.setFilteredNumOfInnerDocs(tpDocuments.size());
         tpDocumentsIterator = tpDocuments.iterator();
         System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
@@ -78,7 +71,7 @@ public class TransparenzResourceDownloader {
         final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpDocuments, numOfDocsToDownload);
         final int start = startFrom;
         final int end = downloadUntil;
-        final int totalNumOfInnerDocs = transparenzService.getFilteredNumOfInnerDocs();
+        final int totalNumOfInnerDocs = transparenzSolrService.getFilteredNumOfInnerDocs();
 
         for(int i= 0; i < numOfThreads; i++){
             Thread thread = new Thread(new Runnable() {
@@ -91,6 +84,7 @@ public class TransparenzResourceDownloader {
             thread.start();
         }
     }
+
 
     private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int startFrom, int downloadUntil, int numOfDocsToDownload, int totalNumOfInnerDocs) {
         System.out.println("Starting to download files.");
@@ -155,7 +149,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void writeStatsWhenFinished(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {
+    private void writeStatsWhenFinished(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {  //TODO wenn temp stats hier bleiben dann umbenennen
         String pathToTempStats = pathToStats+"--temp.txt";
 
         while(true){
@@ -181,11 +175,12 @@ public class TransparenzResourceDownloader {
         }
     }
 
+
     private void writeDownloadStatsToFile(long secondsElapsed, int numOfDocsDownloaded, int numOfDocsFailedToDownload, List<String> downloadedFormats, String filePath, int numOfThreads){
-        int numOfOuterDocs = transparenzService.getNumOfOuterDocs();
-        int totalNumOfInnerDocs = transparenzService.getTotalNumOfInnerDocs();
-        int filteredNumOfInnerDocs = transparenzService.getFilteredNumOfInnerDocs(); //TODO umbenennen zu numOfRelevantInnerDocs
-        int malformedSolrDocCounter = transparenzService.getMalformedSolrDocCounter();
+        int numOfOuterDocs = transparenzSolrService.getNumOfOuterDocs();
+        int totalNumOfInnerDocs = transparenzSolrService.getTotalNumOfInnerDocs();
+        int filteredNumOfInnerDocs = transparenzSolrService.getFilteredNumOfInnerDocs(); //TODO umbenennen zu numOfRelevantInnerDocs
+        int malformedSolrDocCounter = transparenzSolrService.getMalformedSolrDocCounter();
 
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);

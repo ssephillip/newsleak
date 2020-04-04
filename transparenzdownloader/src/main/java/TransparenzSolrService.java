@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class TransparenzService {
+public class TransparenzSolrService {
 
     /** The solr client */
     HttpSolrClient solrClient;
@@ -26,7 +26,7 @@ public class TransparenzService {
     int malformedSolrDocCounter;
 
 
-    public TransparenzService(HttpSolrClient solrClient, String solrCoreAddress){
+    public TransparenzSolrService(HttpSolrClient solrClient, String solrCoreAddress){
         super();
         this.solrClient = solrClient;
         this.solrCoreAddress = solrCoreAddress;
