@@ -16,14 +16,14 @@ public class TransparenzSolrService {
 
     String solrCoreAddress;
 
-    /** Number of outer documents in the Solr Index. */
-    int numOfOuterDocs;
+    /** Number of datasets in the Solr Index. */
+    int totalNumOfDatasets;
 
-    int totalNumOfInnerDocs;
+    int totalNumOfResources;
 
-    int filteredNumOfInnerDocs; //TODO umbenennen zu numOfRelevantInnerDocs
+    int numOfRelevantResources;
 
-    int malformedSolrDocCounter;
+    int illformedDatasetsCounter;
 
 
     public TransparenzSolrService(HttpSolrClient solrClient, String solrCoreAddress){
@@ -31,36 +31,33 @@ public class TransparenzSolrService {
         this.solrClient = solrClient;
         this.solrCoreAddress = solrCoreAddress;
 
-        numOfOuterDocs = 0;
-        totalNumOfInnerDocs = 0;
-        filteredNumOfInnerDocs = 0;
-        malformedSolrDocCounter = 0;
+        totalNumOfDatasets = 0;
+        totalNumOfResources = 0;
+        numOfRelevantResources = 0;
+        illformedDatasetsCounter = 0;
     }
 
 
-    public List<TpResource> getAllInnerDocumentsFromSolr() throws InstantiationException{
+    public List<TpResource> getAllResourcesFromSolr() throws InstantiationException{
         List<TpResource> tpResources = new ArrayList<>();
 
-        SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr();
-        numOfOuterDocs = solrDocuments.size();
-        int outerDocsProcessed = 0;
+        SolrDocumentList datasets = getAllDatasetsFromSolr();
+        totalNumOfDatasets = datasets.size();
 
-        for(SolrDocument solrDoc: solrDocuments) {
-            outerDocsProcessed++;
+        for(SolrDocument dataset: datasets) {
 
-            List<TpResource> tempTpResources = getAllTpResourcesFromDataset(solrDoc);
-
+            List<TpResource> tempTpResources = getAllTpResourcesFromDataset(dataset);
             tpResources.addAll(tempTpResources);
         }
 
-        totalNumOfInnerDocs = tpResources.size();
+        totalNumOfResources = tpResources.size();
 
         return tpResources;
     }
 
 
 
-    public SolrDocumentList getAllOuterDocumentsFromSolr() throws InstantiationException{
+    public SolrDocumentList getAllDatasetsFromSolr() throws InstantiationException{
         QueryResponse response = null;
 
         SolrQuery documentQuery = new SolrQuery("*:*");
@@ -112,7 +109,7 @@ public class TransparenzSolrService {
                 tpResources.add(tpResource);
             }
         }else{
-            malformedSolrDocCounter++;
+            illformedDatasetsCounter++;
             System.out.println("Ill-formed dataset: "+datasetId+". Discarding dataset.");
         }
 
@@ -224,37 +221,37 @@ public class TransparenzSolrService {
 
 
 
-    public int getNumOfOuterDocs() {
-        return numOfOuterDocs;
+    public int getTotalNumOfDatasets() {
+        return totalNumOfDatasets;
     }
 
-    public void setNumOfOuterDocs(int numOfOuterDocs) {
-        this.numOfOuterDocs = numOfOuterDocs;
+    public void setTotalNumOfDatasets(int totalNumOfDatasets) {
+        this.totalNumOfDatasets = totalNumOfDatasets;
     }
 
-    public int getTotalNumOfInnerDocs() {
-        return totalNumOfInnerDocs;
+    public int getTotalNumOfResources() {
+        return totalNumOfResources;
     }
 
-    public void setTotalNumOfInnerDocs(int totalNumOfInnerDocs) {
-        this.totalNumOfInnerDocs = totalNumOfInnerDocs;
+    public void setTotalNumOfResources(int totalNumOfResources) {
+        this.totalNumOfResources = totalNumOfResources;
     }
 
-    public int getFilteredNumOfInnerDocs() {
-        return filteredNumOfInnerDocs;
+    public int getNumOfRelevantResources() {
+        return numOfRelevantResources;
     }
 
-    public void setFilteredNumOfInnerDocs(int filteredNumOfInnerDocs) {
-        this.filteredNumOfInnerDocs = filteredNumOfInnerDocs;
+    public void setNumOfRelevantResources(int numOfRelevantResources) {
+        this.numOfRelevantResources = numOfRelevantResources;
     }
 
 
-    public int getMalformedSolrDocCounter() {
-        return malformedSolrDocCounter;
+    public int getIllformedDatasetsCounter() {
+        return illformedDatasetsCounter;
     }
 
-    public void setMalformedSolrDocCounter(int malformedSolrDocCounter) {
-        this.malformedSolrDocCounter = malformedSolrDocCounter;
+    public void setIllformedDatasetsCounter(int illformedDatasetsCounter) {
+        this.illformedDatasetsCounter = illformedDatasetsCounter;
     }
 
 

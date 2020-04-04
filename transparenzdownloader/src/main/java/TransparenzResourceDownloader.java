@@ -37,12 +37,12 @@ public class TransparenzResourceDownloader {
         transparenzSolrService = new TransparenzSolrService(solrClient, solrCoreAddress);
 
         //gets all resources stored in the Transparenzportal
-        tpResources = transparenzSolrService.getAllInnerDocumentsFromSolr();
+        tpResources = transparenzSolrService.getAllResourcesFromSolr();
 
         //removes all resources that have a file format that is not supposed to be downloaded
         tpResources.removeIf(tp -> !formatsToDownload.contains(tp.getFormat()));
 
-        transparenzSolrService.setFilteredNumOfInnerDocs(tpResources.size());
+        transparenzSolrService.setNumOfRelevantResources(tpResources.size());
         System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
         //downloads the actual files corresponding to the resources retrieved from the Transparenzportal Solr Index
@@ -66,7 +66,7 @@ public class TransparenzResourceDownloader {
 
     private void downloadAllDocuments(List<TpResource> tpResources, String path, int numOfDocsToDownload, int numOfThreads){
         final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpResources, numOfDocsToDownload);
-        final int totalNumOfInnerDocs = transparenzSolrService.getFilteredNumOfInnerDocs();
+        final int totalNumOfInnerDocs = transparenzSolrService.getNumOfRelevantResources();
 
         for(int i= 0; i < numOfThreads; i++){
             Thread thread = new Thread(new Runnable() {
@@ -112,7 +112,7 @@ public class TransparenzResourceDownloader {
             try {
                 URL url = new URL(urlString);
                 URLConnection urlConnection = url.openConnection();
-                urlConnection.setReadTimeout(1000000);
+                urlConnection.setReadTimeout(300000);//1000000);
                 urlConnection.connect();
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(pathToFile));
@@ -171,10 +171,10 @@ public class TransparenzResourceDownloader {
 
 
     private void writeDownloadStatsToFile(long secondsElapsed, int numOfDocsDownloaded, int numOfDocsFailedToDownload, List<String> downloadedFormats, String filePath, int numOfThreads){
-        int numOfOuterDocs = transparenzSolrService.getNumOfOuterDocs();
-        int totalNumOfInnerDocs = transparenzSolrService.getTotalNumOfInnerDocs();
-        int filteredNumOfInnerDocs = transparenzSolrService.getFilteredNumOfInnerDocs(); //TODO umbenennen zu numOfRelevantInnerDocs
-        int malformedSolrDocCounter = transparenzSolrService.getMalformedSolrDocCounter();
+        int numOfOuterDocs = transparenzSolrService.getTotalNumOfDatasets();
+        int totalNumOfInnerDocs = transparenzSolrService.getTotalNumOfResources();
+        int filteredNumOfInnerDocs = transparenzSolrService.getNumOfRelevantResources(); //TODO umbenennen zu numOfRelevantInnerDocs
+        int malformedSolrDocCounter = transparenzSolrService.getIllformedDatasetsCounter();
 
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
