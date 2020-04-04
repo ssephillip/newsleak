@@ -48,7 +48,7 @@ public class TransparenzSolrService {
         for(SolrDocument solrDoc: solrDocuments) {
             outerDocsProcessed++;
 
-            List<TpResource> tempTpResources = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed);
+            List<TpResource> tempTpResources = getAllTpResourcesFromDataset(solrDoc);
 
             tpResources.addAll(tempTpResources);
         }
@@ -80,7 +80,7 @@ public class TransparenzSolrService {
                 throw new InstantiationException(); //TODO 2019-07-11 ps: ist diese Exception hier korrekt?
             }
         } catch (Exception e) {
-            System.out.println("Failed retrieving outer documents from index "+solrCoreAddress);
+            System.out.println("Failed retrieving datasets from Transparenzportal Solr Index "+solrCoreAddress);
 
             e.printStackTrace();
             throw new InstantiationException(); //TODO 2019-08-20 ps: sinnvolle exception schmeißen
@@ -90,92 +90,110 @@ public class TransparenzSolrService {
     }
 
 
-    public List<TpDocument> getAllInnerDocumentsFromOuterDoc(SolrDocument outerDocument, int outerDocsProcessed){
-        List<TpDocument> innerDocuments = new ArrayList<>();
-        List<String> docResFormats = (List<String>) outerDocument.getFieldValue("res_format");
-        List<String> docResUrls = (List<String>) outerDocument.getFieldValue("res_url");
-        List<String> docResNames = (List<String>) outerDocument.getFieldValue("res_name");
-        String outerId = (String) outerDocument.getFieldValue("id");
+    /**
+     * Stores the resources contained in the given dataset in {@link TpResource} objects.
+     *
+     * For more information on datasets and resources see {@link TpResource}.
+     *
+     * @param dataset The dataset that contains the resources
+     * @return All {@link TpResource}s contained in the dataset or an empty list if the dataset is not well-formed (see {@link #isDatasetWellFormed(List, List, List, String)}).
+     */
+    public List<TpResource> getAllTpResourcesFromDataset(SolrDocument dataset){
+        List<TpResource> tpResources = new ArrayList<>();
+        List<String> resourceFormats = (List<String>) dataset.getFieldValue("res_format");
+        List<String> resourceUrls = (List<String>) dataset.getFieldValue("res_url");
+        List<String> resourceNames = (List<String>) dataset.getFieldValue("res_name");
+        String datasetId = (String) dataset.getFieldValue("id");
 
 
-        if(outerDocsProcessed%100 == 0) {
-            System.out.println("Getting inner documents from outer document number '" + outerDocsProcessed + "' of '" + numOfOuterDocs + "' from index " + solrCoreAddress);
-        }
-
-        if(isSolrDocWellFormed(docResFormats, docResUrls, docResNames, outerId)){
-            for (int i = 0; i < docResUrls.size(); i++){
-                TpDocument innerDocument = getInnerDocFromOuterDoc(outerDocument, i);
-                innerDocuments.add(innerDocument);
+        if(isDatasetWellFormed(resourceFormats, resourceUrls, resourceNames, datasetId)){
+            for (int i = 0; i < resourceUrls.size(); i++){
+                TpResource tpResource = getTpResourceFromDataset(dataset, i);
+                tpResources.add(tpResource);
             }
         }else{
             malformedSolrDocCounter++;
-            System.out.println("Malformed outer document: "+outerId+". Discarding document.");
+            System.out.println("Ill-formed dataset: "+datasetId+". Discarding dataset.");
         }
 
-        return innerDocuments;
+        return tpResources;
     }
 
 
 
     /**
-     * Gets an inner document from the given outer document (SolrDocument).
-     * The relativeInnerId is the position in the lists of the outer document, where the information for the desired inner document is located.
-     * A SolrDocument in the TransparenzPortal is often actually a group of documents.
-     * Each document in this group is called inner document.
-     * The SolrDocument itself is called outer document.
-     * Whenever a field has the prefix "res" it referrs to a inner document (e.g. res_fulltext refers to the fulltext a an inner document).
-     * @assert solrDoc is wellformed
-     * @param solrDoc A SolrDocument retrieved from the Transparenz Portal solr index
-     * @param relativeInnerId An int specifying which of the inner documents shall be extracted.
-     * @return TpDocument The inner document "extracted" from the given outer document.
-     */
-    private TpDocument getInnerDocFromOuterDoc(SolrDocument solrDoc, int relativeInnerId) {
-        TpDocument tpDocument = new TpDocument();
-
-        List<String> docResFormats = (List<String>) solrDoc.getFieldValue("res_format");
-        List<String> docResUrls = (List<String>) solrDoc.getFieldValue("res_url");
-        List<String> docResNames = (List<String>) solrDoc.getFieldValue("res_name");
-        String outerId = (String) solrDoc.getFieldValue("id");
-        String outerName = (String) solrDoc.getFieldValue("title");
-        String date = getDateAsString((Date) solrDoc.getFieldValue("publishing_date"));
-
-        String innerDocFormat = docResFormats.get(relativeInnerId);
-        String url = docResUrls.get(relativeInnerId);
-        String name = docResNames.get(relativeInnerId);
-        tpDocument.setResFormat(innerDocFormat.toLowerCase());
-        tpDocument.setInnerId(String.valueOf(relativeInnerId));
-        tpDocument.setResUrl(url);
-        tpDocument.setResName(name);
-        tpDocument.setOuterId(outerId);
-        tpDocument.setTitle(outerName);
-        tpDocument.setDate(date);
-
-        return tpDocument;
-    }
-
-
-
-
-    /**
-     * Tests if an outer document is well formed.
-     * An outer document (SolrDocument) is well formed if all the mandatory fields (i.e. the parameters of this method)
-     * are Non-Null AND Non-Empty AND if all lists have the same length.
+     * Extracts a resource from the given dataset and stores it in a {@link TpResource} object.
      *
-     * @param docResFormats The list of file-formats of the inner documents
-     * @param docResUrls The list of URLs to the original files of the inner documents
-     * @param outerId The ID of the outer document (containing the inner documents)
-     * @return boolean - True if the outer document is wellformed.
+     * For more information on datasets and resources see {@link TpResource}.
+     *
+     * @assert dataset is well-formed (see {@link #isDatasetWellFormed(List, List, List, String)})
+     * @param dataset The dataset containing the resource
+     * @param relativeResourceIdInt The relative ID of the resource that is supposed to be extracted
+     * @return The {@link TpResource} extracted from the dataset
      */
-    private boolean isSolrDocWellFormed(List<String> docResFormats, List<String> docResUrls, List<String> docResNames, String outerId) {
-        //TODO ps 2019-08-20 auch abfragen ob die listen empty sind
-        return !(docResFormats == null || docResUrls == null || docResNames==null || outerId == null ||
-                docResFormats.isEmpty() || docResUrls.isEmpty() || docResNames.isEmpty() ||
-                docResFormats.size() != docResUrls.size() || docResFormats.size() != docResNames.size());
+    private TpResource getTpResourceFromDataset(SolrDocument dataset, int relativeResourceIdInt) {
+        TpResource tpResource = new TpResource();
+
+        //Gets the information of all resources contained in the dataset and of the dataset from the dataset
+        List<String> resourceFormats = (List<String>) dataset.getFieldValue("res_format");
+        List<String> resourceUrls = (List<String>) dataset.getFieldValue("res_url");
+        List<String> resourceNames = (List<String>) dataset.getFieldValue("res_name");
+        String datasetId = (String) dataset.getFieldValue("id");
+        String relativeResourceId = String.valueOf(relativeResourceIdInt);
+        String datasetTitle = (String) dataset.getFieldValue("title");
+        String datasetDate = getDateAsString((Date) dataset.getFieldValue("publishing_date"));
+
+        //Gets the information of the resource that is supposed to be extracted
+        String resourceFormat = resourceFormats.get(relativeResourceIdInt);
+        String resourceUrl = resourceUrls.get(relativeResourceIdInt);
+        String resourceName = resourceNames.get(relativeResourceIdInt);
+
+        //Stores the extracted information in the {@link TpResource} object.
+        tpResource.setFormat(resourceFormat.toLowerCase());
+        tpResource.setRelativeResourceId(relativeResourceId);
+        tpResource.setDatasetId(datasetId);
+        tpResource.setAbsoluteResourceId(datasetId+"_"+relativeResourceId);
+        tpResource.setUrl(resourceUrl);
+        tpResource.setName(resourceName);
+        tpResource.setDatasetTitle(datasetTitle);
+        tpResource.setDatasetDate(datasetDate);
+
+        return tpResource;
     }
 
 
 
-    //TODO java-doc comments
+
+    /**
+     * Tests if a dataset is well-formed.
+     * A dataset is well-formed if all the parameters of this method are Non-Null AND all the lists are Non-Empty AND all the lists have the same length.
+     * Explanation:
+     * If one of the parameters would be Null or empty (if it is a list), all resources contained in the dataset would miss a mandatory value.
+     * If the lists would not have the same length, it is not possible to determine which information belongs to which resource.
+     *
+     * For more information on datasets, resources and well-formed datasets see {@link TpResource}.
+     *
+     * @param resourceFormats The list of file-formats of the resources contained in the dataset
+     * @param resourceUrls The list of URLs to the actual files corresponding to the resources
+     * @param resourceNames The list of names of the resources contained in the dataset
+     * @param datasetId The ID of the dataset
+     * @return True if the dataset is well-formed.
+     */
+    private boolean isDatasetWellFormed(List<String> resourceFormats, List<String> resourceUrls, List<String> resourceNames, String datasetId) {
+
+        return !(resourceFormats == null || resourceUrls == null || resourceNames==null || datasetId == null ||
+                resourceFormats.isEmpty() || resourceUrls.isEmpty() || resourceNames.isEmpty() ||
+                resourceFormats.size() != resourceUrls.size() || resourceFormats.size() != resourceNames.size());
+    }
+
+
+
+    /**
+     * Transforms a {@link Date} into a {@link String}.
+     *
+     * @param date The date that is supposed to be transformed.
+     * @return The {@link String} that was created based on the given {@link Date}.
+     */
     public String getDateAsString(Date date){
         String dateString;
 
