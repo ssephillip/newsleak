@@ -15,8 +15,6 @@ public class TransparenzResourceDownloader {
 
     String solrCoreAddress;
 
-    Iterator<TpDocument> tpDocumentsIterator;
-
     TransparenzSolrService transparenzSolrService;
 
 
@@ -45,7 +43,6 @@ public class TransparenzResourceDownloader {
         tpDocuments.removeIf(tp -> !formatsToDownload.contains(tp.getResFormat()));
 
         transparenzSolrService.setFilteredNumOfInnerDocs(tpDocuments.size());
-        tpDocumentsIterator = tpDocuments.iterator();
         System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
         //downloads the actual files corresponding to the resources retrieved from the Transparenzportal Solr Index
