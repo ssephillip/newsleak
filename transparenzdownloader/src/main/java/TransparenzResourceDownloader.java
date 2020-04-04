@@ -184,8 +184,8 @@ public class TransparenzResourceDownloader {
 
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
-            fileWriter.write("--------------------------------------------------");
-            fileWriter.write("--------------------------------------------------");
+            fileWriter.write("\n--------------------------------------------------");
+            fileWriter.write("--------------------------------------------------\n");
             fileWriter.write("Run: "+Instant.now().toString()+"\n");
             fileWriter.write("Number of threads: "+numOfThreads+"\n");
             fileWriter.write("Total number of outer documents: "+numOfOuterDocs+"\n");
@@ -197,7 +197,7 @@ public class TransparenzResourceDownloader {
             fileWriter.write("Time elapsed: "+secondsElapsed+"\n");
             fileWriter.write("Documents per second: "+((double) numOfDocsDownloaded)/secondsElapsed+"\n");
             fileWriter.write("Formats downloaded: "+downloadedFormats.toString()+"\n");
-            fileWriter.write("--------------------------------------------------");
+            fileWriter.write("--------------------------------------------------\n");
             fileWriter.write("--------------------------------------------------");
 
 
