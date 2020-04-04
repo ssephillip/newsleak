@@ -45,7 +45,7 @@ public class TpDocument {
         if (this == o) return true;
         if (!(o instanceof TpDocument)) return false;
         TpDocument that = (TpDocument) o;
-        return Objects.equals(innerId, that.innerId);
+        return Objects.equals(innerId, that.innerId); //TODO absoluteResourceId verwenden
     }
 
     @Override
