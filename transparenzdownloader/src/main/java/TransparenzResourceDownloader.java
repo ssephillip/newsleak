@@ -19,8 +19,6 @@ public class TransparenzResourceDownloader {
 
 
 
-
-
     public TransparenzResourceDownloader(String solrCoreAddress){
         super();
         this.solrCoreAddress = solrCoreAddress;
@@ -29,8 +27,7 @@ public class TransparenzResourceDownloader {
     }
 
 
-
-    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocsToDownload, int numOfThreads) throws InstantiationException{
+    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfFilesToDownload, int numOfThreads) throws InstantiationException{
         Instant startTime = Instant.now();
 
         List<TpResource> tpResources = new ArrayList<>();
@@ -46,21 +43,11 @@ public class TransparenzResourceDownloader {
         System.out.println("Time for getting TpResources from Transparenzportal Solr Index: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
         //downloads the actual files corresponding to the resources retrieved from the Transparenzportal Solr Index
-        downloadAllFiles(tpResources, path, numOfDocsToDownload, numOfThreads);
+        downloadAllFiles(tpResources, path, numOfFilesToDownload, numOfThreads);
 
         //writes the statistics to the file specified in the command line arguments
         writeStatsWhenFinished(startTime, pathToStats, formatsToDownload, numOfThreads);
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -101,12 +88,10 @@ public class TransparenzResourceDownloader {
     }
 
 
-
     private void downloadFile(TpResource tpResource, TpResourceProvider tpResourceProvider, String path){
             String urlString = tpResource.getUrl();
             String docFormat = tpResource.getFormat().toLowerCase();
             String docId = tpResource.getAbsoluteResourceId();
-            String docName = tpResource.getName();
             String pathToFile = path+docId+"."+docFormat;
 
             try {
@@ -128,19 +113,7 @@ public class TransparenzResourceDownloader {
                 e.printStackTrace();
                 tpResourceProvider.incrementNumOfFilesFailedToDownload();
             }
-
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     private void writeStatsWhenFinished(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {  //TODO wenn temp stats hier bleiben dann umbenennen
@@ -201,6 +174,5 @@ public class TransparenzResourceDownloader {
             e.printStackTrace();
         }
     }
-
 
 }
