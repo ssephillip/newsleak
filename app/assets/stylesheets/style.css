@@ -430,8 +430,8 @@ footer > div #histogram {
 }
 
 #documents-view .metadata-button {
-    margin-right: 8px;
-    padding-right: 16px;
+    margin-right: 0px;
+    padding-right: 0px;
     margin-left: 0px;
     padding-left: 0px;
 }
