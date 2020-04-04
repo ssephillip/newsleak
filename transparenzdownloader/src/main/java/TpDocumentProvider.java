@@ -2,7 +2,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TpDocumentProvider{
-    Iterator<TpDocument> tpDocumentIterator;
+    Iterator<TpResource> tpResourceIterator;
     int current;
     int threadCounter;
     int numOfInnerDocsDownloaded;
@@ -13,9 +13,9 @@ public class TpDocumentProvider{
 
     static TpDocumentProvider tpDocumentProvider;
 
-    private TpDocumentProvider(List<TpDocument> tpDocuments, int numofDocsToDownload){
-        tpDocumentIterator = tpDocuments.iterator();
-        numOfDocsTotal = tpDocuments.size();
+    private TpDocumentProvider(List<TpResource> tpResources, int numofDocsToDownload){
+        tpResourceIterator = tpResources.iterator();
+        numOfDocsTotal = tpResources.size();
         this.numOfDocsToDownload = numofDocsToDownload;
         current = -1;
     }
@@ -28,21 +28,21 @@ public class TpDocumentProvider{
         return tpDocumentProvider;
     }
 
-    public static TpDocumentProvider getInstance(List<TpDocument> tpDocuments, int numofDocsToDownload){
+    public static TpDocumentProvider getInstance(List<TpResource> tpResources, int numofDocsToDownload){
         if(tpDocumentProvider == null){
-            tpDocumentProvider = new TpDocumentProvider(tpDocuments, numofDocsToDownload);
+            tpDocumentProvider = new TpDocumentProvider(tpResources, numofDocsToDownload);
         }
         return tpDocumentProvider;
     }
 
-    public synchronized TpDocument getNextTpDocument(){
-        TpDocument tpDocument = null;
-        if(tpDocumentIterator.hasNext()){
+    public synchronized TpResource getNextTpDocument(){
+        TpResource tpResource = null;
+        if(tpResourceIterator.hasNext()){
             current++;
-            tpDocument = tpDocumentIterator.next();
+            tpResource = tpResourceIterator.next();
         }
 
-        return tpDocument;
+        return tpResource;
     }
 
     public synchronized int getCurrentThreadCount(){

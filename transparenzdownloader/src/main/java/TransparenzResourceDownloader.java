@@ -33,20 +33,20 @@ public class TransparenzResourceDownloader {
     public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocs, int numOfThreads) throws InstantiationException{
         Instant startTime = Instant.now();
 
-        List<TpDocument> tpDocuments = new ArrayList<>();
+        List<TpResource> tpResources = new ArrayList<>();
         transparenzSolrService = new TransparenzSolrService(solrClient, solrCoreAddress);
 
         //gets all resources stored in the Transparenzportal
-        tpDocuments = transparenzSolrService.getAllInnerDocumentsFromSolr();
+        tpResources = transparenzSolrService.getAllInnerDocumentsFromSolr();
 
         //removes all resources that have a file format that is not supposed to be downloaded
-        tpDocuments.removeIf(tp -> !formatsToDownload.contains(tp.getResFormat()));
+        tpResources.removeIf(tp -> !formatsToDownload.contains(tp.getFormat()));
 
-        transparenzSolrService.setFilteredNumOfInnerDocs(tpDocuments.size());
+        transparenzSolrService.setFilteredNumOfInnerDocs(tpResources.size());
         System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
         //downloads the actual files corresponding to the resources retrieved from the Transparenzportal Solr Index
-        downloadAllDocuments(tpDocuments, path, numOfDocs, numOfThreads);
+        downloadAllDocuments(tpResources, path, numOfDocs, numOfThreads);
 
         //writes the statistics to the file specified in the command line arguments
         writeStatsWhenFinished(startTime, pathToStats, formatsToDownload, numOfThreads);
@@ -64,8 +64,8 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int numOfDocsToDownload, int numOfThreads){
-        final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpDocuments, numOfDocsToDownload);
+    private void downloadAllDocuments(List<TpResource> tpResources, String path, int numOfDocsToDownload, int numOfThreads){
+        final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpResources, numOfDocsToDownload);
         final int totalNumOfInnerDocs = transparenzSolrService.getFilteredNumOfInnerDocs();
 
         for(int i= 0; i < numOfThreads; i++){
@@ -86,12 +86,12 @@ public class TransparenzResourceDownloader {
         int threadNumber = tpDocumentProvider.getCurrentThreadCount();
 
         while(true) {
-            TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
+            TpResource tpResource = tpDocumentProvider.getNextTpDocument();
             int current = tpDocumentProvider.getCurrent();
 
-            if(tpDocument != null && current < numOfDocsToDownload) {
-                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+(current+1)+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpDocument.getOuterId()+"_"+tpDocument.innerId);
-                    downloadDocument(tpDocument, tpDocumentProvider, path);
+            if(tpResource != null && current < numOfDocsToDownload) {
+                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+(current+1)+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpResource.getAbsoluteResourceId());
+                    downloadDocument(tpResource, tpDocumentProvider, path);
             }else{
                 System.out.println("Thread '"+threadNumber+"' finished");
                 break;
@@ -102,11 +102,11 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadDocument(TpDocument tpDocument,  TpDocumentProvider tpDocumentProvider, String path){
-            String urlString = tpDocument.getResUrl();
-            String docFormat = tpDocument.getResFormat().toLowerCase();
-            String docId = tpDocument.getOuterId()+"_"+tpDocument.getInnerId();
-            String docName = tpDocument.getResName();
+    private void downloadDocument(TpResource tpResource,  TpDocumentProvider tpDocumentProvider, String path){
+            String urlString = tpResource.getUrl();
+            String docFormat = tpResource.getFormat().toLowerCase();
+            String docId = tpResource.getAbsoluteResourceId();
+            String docName = tpResource.getName();
             String pathToFile = path+docId+"."+docFormat;
 
             try {

@@ -38,8 +38,8 @@ public class TransparenzSolrService {
     }
 
 
-    public List<TpDocument> getAllInnerDocumentsFromSolr() throws InstantiationException{
-        List<TpDocument> tpDocuments = new ArrayList<>();
+    public List<TpResource> getAllInnerDocumentsFromSolr() throws InstantiationException{
+        List<TpResource> tpResources = new ArrayList<>();
 
         SolrDocumentList solrDocuments = getAllOuterDocumentsFromSolr();
         numOfOuterDocs = solrDocuments.size();
@@ -48,22 +48,20 @@ public class TransparenzSolrService {
         for(SolrDocument solrDoc: solrDocuments) {
             outerDocsProcessed++;
 
-            List<TpDocument> innerDocuments = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed);
+            List<TpResource> tempTpResources = getAllInnerDocumentsFromOuterDoc(solrDoc, outerDocsProcessed);
 
-            tpDocuments.addAll(innerDocuments);
+            tpResources.addAll(tempTpResources);
         }
 
-        totalNumOfInnerDocs = tpDocuments.size();
+        totalNumOfInnerDocs = tpResources.size();
 
-        return tpDocuments;
+        return tpResources;
     }
 
 
 
     public SolrDocumentList getAllOuterDocumentsFromSolr() throws InstantiationException{
         QueryResponse response = null;
-
-
 
         SolrQuery documentQuery = new SolrQuery("*:*");
         documentQuery.addField("id");
