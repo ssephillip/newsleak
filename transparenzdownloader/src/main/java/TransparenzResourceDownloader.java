@@ -30,7 +30,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocs, int numOfThreads) throws InstantiationException{
+    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocsToDownload, int numOfThreads) throws InstantiationException{
         Instant startTime = Instant.now();
 
         List<TpResource> tpResources = new ArrayList<>();
@@ -43,10 +43,10 @@ public class TransparenzResourceDownloader {
         tpResources.removeIf(tp -> !formatsToDownload.contains(tp.getFormat()));
 
         transparenzSolrService.setNumOfRelevantResources(tpResources.size());
-        System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
+        System.out.println("Time for getting TpResources from Transparenzportal Solr Index: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
         //downloads the actual files corresponding to the resources retrieved from the Transparenzportal Solr Index
-        downloadAllDocuments(tpResources, path, numOfDocs, numOfThreads);
+        downloadAllFiles(tpResources, path, numOfDocsToDownload, numOfThreads);
 
         //writes the statistics to the file specified in the command line arguments
         writeStatsWhenFinished(startTime, pathToStats, formatsToDownload, numOfThreads);
@@ -64,16 +64,16 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadAllDocuments(List<TpResource> tpResources, String path, int numOfDocsToDownload, int numOfThreads){
+    private void downloadAllFiles(List<TpResource> tpResources, String path, int numOfDocsToDownload, int numOfThreads){ //TODO umbenennen zu startDownloadThreads
         final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpResources, numOfDocsToDownload);
-        final int totalNumOfInnerDocs = transparenzSolrService.getNumOfRelevantResources();
+        final int totalNumOfResources = transparenzSolrService.getNumOfRelevantResources();
 
         for(int i= 0; i < numOfThreads; i++){
             Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    downloadDocuments(tpDocumentProvider, path, numOfDocsToDownload, totalNumOfInnerDocs);
+                    downloadFiles(tpDocumentProvider, path, numOfDocsToDownload, totalNumOfResources);
                 }
             });
             thread.start();
@@ -81,17 +81,17 @@ public class TransparenzResourceDownloader {
     }
 
 
-    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int numOfDocsToDownload, int totalNumOfInnerDocs) {
-        System.out.println("Starting to download files.");
+    private void downloadFiles(TpDocumentProvider tpDocumentProvider, String path, int numOfDocsToDownload, int totalNumOfResources) {
         int threadNumber = tpDocumentProvider.getCurrentThreadCount();
+        System.out.println("Thread '"+threadNumber+"' is starting to download files.");
 
         while(true) {
             TpResource tpResource = tpDocumentProvider.getNextTpDocument();
             int current = tpDocumentProvider.getCurrent();
 
             if(tpResource != null && current < numOfDocsToDownload) {
-                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+(current+1)+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpResource.getAbsoluteResourceId());
-                    downloadDocument(tpResource, tpDocumentProvider, path);
+                    System.out.println("Thread '"+threadNumber+"'Downloading file '"+(current+1)+"' of '"+totalNumOfResources+"' with the absolute resource ID: '"+tpResource.getAbsoluteResourceId());
+                    downloadFile(tpResource, tpDocumentProvider, path);
             }else{
                 System.out.println("Thread '"+threadNumber+"' finished");
                 break;
@@ -102,7 +102,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadDocument(TpResource tpResource,  TpDocumentProvider tpDocumentProvider, String path){
+    private void downloadFile(TpResource tpResource, TpDocumentProvider tpDocumentProvider, String path){
             String urlString = tpResource.getUrl();
             String docFormat = tpResource.getFormat().toLowerCase();
             String docId = tpResource.getAbsoluteResourceId();
@@ -122,11 +122,11 @@ public class TransparenzResourceDownloader {
                 }
                 in.close();
                 out.close();
-                tpDocumentProvider.incrementNumOfDocsDownloaded();
+                tpDocumentProvider.incrementNumOfFilesDownloaded();
             }catch(Exception e){
-                System.out.println("Couldn't download dcoument.");
+                System.out.println("Couldn't download file.");
                 e.printStackTrace();
-                tpDocumentProvider.incrementNumOfDocsFailed();
+                tpDocumentProvider.incrementNumOfFilesFailedToDownload();
             }
 
     }
@@ -170,11 +170,11 @@ public class TransparenzResourceDownloader {
     }
 
 
-    private void writeDownloadStatsToFile(long secondsElapsed, int numOfDocsDownloaded, int numOfDocsFailedToDownload, List<String> downloadedFormats, String filePath, int numOfThreads){
-        int numOfOuterDocs = transparenzSolrService.getTotalNumOfDatasets();
-        int totalNumOfInnerDocs = transparenzSolrService.getTotalNumOfResources();
-        int filteredNumOfInnerDocs = transparenzSolrService.getNumOfRelevantResources(); //TODO umbenennen zu numOfRelevantInnerDocs
-        int malformedSolrDocCounter = transparenzSolrService.getIllformedDatasetsCounter();
+    private void writeDownloadStatsToFile(long secondsElapsed, int numOfFilesDownloaded, int numOfFilesFailedToDownload, List<String> downloadedFormats, String filePath, int numOfThreads){
+        int numOfDatasets = transparenzSolrService.getTotalNumOfDatasets();
+        int totalNumOfResources = transparenzSolrService.getTotalNumOfResources();
+        int filteredNumOfResources = transparenzSolrService.getNumOfRelevantResources(); //TODO umbenennen zu numOfRelevantInnerDocs
+        int illformedDatasetsCounter = transparenzSolrService.getIllformedDatasetsCounter();
 
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
@@ -182,14 +182,14 @@ public class TransparenzResourceDownloader {
             fileWriter.write("--------------------------------------------------\n");
             fileWriter.write("Run: "+Instant.now().toString()+"\n");
             fileWriter.write("Number of threads: "+numOfThreads+"\n");
-            fileWriter.write("Total number of outer documents: "+numOfOuterDocs+"\n");
-            fileWriter.write("Number of malformed outer documents: "+malformedSolrDocCounter+"\n");
-            fileWriter.write("Total number of inner documents: "+totalNumOfInnerDocs+"\n");
-            fileWriter.write("Number of inner documents of desired formats: "+filteredNumOfInnerDocs+"\n");
-            fileWriter.write("Number of inner documents downloaded: "+numOfDocsDownloaded+"\n");
-            fileWriter.write("Number of inner documents failed to download: "+numOfDocsFailedToDownload+"\n");
+            fileWriter.write("Total number of datasets: "+numOfDatasets+"\n");
+            fileWriter.write("Number of illformed datasets: "+illformedDatasetsCounter+"\n");
+            fileWriter.write("Total number of resources: "+totalNumOfResources+"\n");
+            fileWriter.write("Number of resources of desired formats: "+filteredNumOfResources+"\n");
+            fileWriter.write("Number of resources downloaded: "+numOfFilesDownloaded+"\n");
+            fileWriter.write("Number of resources failed to download: "+numOfFilesFailedToDownload+"\n");
             fileWriter.write("Time elapsed: "+secondsElapsed+"\n");
-            fileWriter.write("Documents per second: "+((double) numOfDocsDownloaded)/secondsElapsed+"\n");
+            fileWriter.write("Resources per second (average): "+((double) numOfFilesDownloaded)/secondsElapsed+"\n");
             fileWriter.write("Formats downloaded: "+downloadedFormats.toString()+"\n");
             fileWriter.write("--------------------------------------------------\n");
             fileWriter.write("--------------------------------------------------");

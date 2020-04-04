@@ -58,11 +58,11 @@ public class TpDocumentProvider{
         return (numOfInnerDocsDownloaded + numOfInnerDocsFailed == numOfDocsTotal) || (numOfInnerDocsDownloaded + numOfInnerDocsFailed == numOfDocsToDownload);
     }
 
-    public synchronized void incrementNumOfDocsDownloaded(){
+    public synchronized void incrementNumOfFilesDownloaded(){
         numOfInnerDocsDownloaded++;
     }
 
-    public synchronized void incrementNumOfDocsFailed(){
+    public synchronized void incrementNumOfFilesFailedToDownload(){
         numOfInnerDocsFailed++;
     }
 
