@@ -65,7 +65,7 @@ public class TransparenzResourceDownloader {
 
 
     private void downloadAllFiles(List<TpResource> tpResources, String path, int numOfDocsToDownload, int numOfThreads){ //TODO umbenennen zu startDownloadThreads
-        final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpResources, numOfDocsToDownload);
+        final TpResourceProvider tpResourceProvider = TpResourceProvider.getInstance(tpResources, numOfDocsToDownload);
         final int totalNumOfResources = transparenzSolrService.getNumOfRelevantResources();
 
         for(int i= 0; i < numOfThreads; i++){
@@ -73,7 +73,7 @@ public class TransparenzResourceDownloader {
 
                 @Override
                 public void run() {
-                    downloadFiles(tpDocumentProvider, path, numOfDocsToDownload, totalNumOfResources);
+                    downloadFiles(tpResourceProvider, path, numOfDocsToDownload, totalNumOfResources);
                 }
             });
             thread.start();
@@ -81,17 +81,17 @@ public class TransparenzResourceDownloader {
     }
 
 
-    private void downloadFiles(TpDocumentProvider tpDocumentProvider, String path, int numOfDocsToDownload, int totalNumOfResources) {
-        int threadNumber = tpDocumentProvider.getCurrentThreadCount();
+    private void downloadFiles(TpResourceProvider tpResourceProvider, String path, int numOfDocsToDownload, int totalNumOfResources) {
+        int threadNumber = tpResourceProvider.getCurrentThreadCount();
         System.out.println("Thread '"+threadNumber+"' is starting to download files.");
 
         while(true) {
-            TpResource tpResource = tpDocumentProvider.getNextTpDocument();
-            int current = tpDocumentProvider.getCurrent();
+            TpResource tpResource = tpResourceProvider.getNextTpDocument();
+            int current = tpResourceProvider.getCurrent();
 
             if(tpResource != null && current < numOfDocsToDownload) {
                     System.out.println("Thread '"+threadNumber+"'Downloading file '"+(current+1)+"' of '"+totalNumOfResources+"' with the absolute resource ID: '"+tpResource.getAbsoluteResourceId());
-                    downloadFile(tpResource, tpDocumentProvider, path);
+                    downloadFile(tpResource, tpResourceProvider, path);
             }else{
                 System.out.println("Thread '"+threadNumber+"' finished");
                 break;
@@ -102,7 +102,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadFile(TpResource tpResource, TpDocumentProvider tpDocumentProvider, String path){
+    private void downloadFile(TpResource tpResource, TpResourceProvider tpResourceProvider, String path){
             String urlString = tpResource.getUrl();
             String docFormat = tpResource.getFormat().toLowerCase();
             String docId = tpResource.getAbsoluteResourceId();
@@ -122,11 +122,11 @@ public class TransparenzResourceDownloader {
                 }
                 in.close();
                 out.close();
-                tpDocumentProvider.incrementNumOfFilesDownloaded();
+                tpResourceProvider.incrementNumOfFilesDownloaded();
             }catch(Exception e){
                 System.out.println("Couldn't download file.");
                 e.printStackTrace();
-                tpDocumentProvider.incrementNumOfFilesFailedToDownload();
+                tpResourceProvider.incrementNumOfFilesFailedToDownload();
             }
 
     }
@@ -147,17 +147,17 @@ public class TransparenzResourceDownloader {
         String pathToTempStats = pathToStats+"--temp.txt";
 
         while(true){
-            TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance();
-            if(tpDocumentProvider != null && tpDocumentProvider.isFinished()){
+            TpResourceProvider tpResourceProvider = TpResourceProvider.getInstance();
+            if(tpResourceProvider != null && tpResourceProvider.isFinished()){
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
-                writeDownloadStatsToFile(secondsElapsed, tpDocumentProvider.getNumOfInnerDocsDownloaded(), tpDocumentProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToStats, numOfThreads);
+                writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfInnerDocsDownloaded(), tpResourceProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToStats, numOfThreads);
                 break;
-            }else if(tpDocumentProvider != null &&  tpDocumentProvider.getCurrent()%500==0){ //TODO determine time for temp-stat print better (e.g. with a callback)
+            }else if(tpResourceProvider != null &&  tpResourceProvider.getCurrent()%500==0){ //TODO determine time for temp-stat print better (e.g. with a callback)
                 //TODO zwischen stats ausbauen wenn fertig, da zwischen stats funktion zu unstabil.
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
-                writeDownloadStatsToFile(secondsElapsed, tpDocumentProvider.getNumOfInnerDocsDownloaded(), tpDocumentProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToTempStats, numOfThreads);
+                writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfInnerDocsDownloaded(), tpResourceProvider.getNumOfInnerDocsFailed(), formatsToDownload, pathToTempStats, numOfThreads);
 
             }
 

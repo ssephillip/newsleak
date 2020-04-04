@@ -1,7 +1,8 @@
 import java.util.Iterator;
 import java.util.List;
 
-public class TpDocumentProvider{
+//TODO javadoc comment
+public class TpResourceProvider {
     Iterator<TpResource> tpResourceIterator;
     int current;
     int threadCounter;
@@ -11,28 +12,28 @@ public class TpDocumentProvider{
     int numOfDocsToDownload;
 
 
-    static TpDocumentProvider tpDocumentProvider;
+    static TpResourceProvider tpResourceProvider;
 
-    private TpDocumentProvider(List<TpResource> tpResources, int numofDocsToDownload){
+    private TpResourceProvider(List<TpResource> tpResources, int numofDocsToDownload){
         tpResourceIterator = tpResources.iterator();
         numOfDocsTotal = tpResources.size();
         this.numOfDocsToDownload = numofDocsToDownload;
         current = -1;
     }
 
-    public static TpDocumentProvider getInstance(){
-        if(tpDocumentProvider == null){
+    public static TpResourceProvider getInstance(){
+        if(tpResourceProvider == null){
             return null;
         }
 
-        return tpDocumentProvider;
+        return tpResourceProvider;
     }
 
-    public static TpDocumentProvider getInstance(List<TpResource> tpResources, int numofDocsToDownload){
-        if(tpDocumentProvider == null){
-            tpDocumentProvider = new TpDocumentProvider(tpResources, numofDocsToDownload);
+    public static TpResourceProvider getInstance(List<TpResource> tpResources, int numofDocsToDownload){
+        if(tpResourceProvider == null){
+            tpResourceProvider = new TpResourceProvider(tpResources, numofDocsToDownload);
         }
-        return tpDocumentProvider;
+        return tpResourceProvider;
     }
 
     public synchronized TpResource getNextTpDocument(){
