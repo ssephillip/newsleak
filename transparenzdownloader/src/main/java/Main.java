@@ -24,15 +24,13 @@ public class Main {
         String pathToStats = args[2];
         List<String> formatsToDownload = Arrays.asList(args[3].split(","));
         int numOfDocs = Integer.valueOf(args[4]);
-        int startFrom = Integer.valueOf(args[5]);
-        int downloadUntil = Integer.valueOf(args[6]);
-        int numOfThreads =Integer.valueOf(args[7]);
+        int numOfThreads =Integer.valueOf(args[5]);
 
 
         TransparenzResourceDownloader transparenzResourceDownloader = new TransparenzResourceDownloader(solrAddress);
         Instant start = Instant.now();
         try {
-            transparenzResourceDownloader.download(path, pathToStats, formatsToDownload, numOfDocs, startFrom, downloadUntil, numOfThreads);
+            transparenzResourceDownloader.download(path, pathToStats, formatsToDownload, numOfDocs, numOfThreads);
         }catch(InstantiationException e){
             System.out.println("Couldn't retrieve IDs!");
             e.printStackTrace();

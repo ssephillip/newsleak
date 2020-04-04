@@ -30,7 +30,7 @@ public class TransparenzResourceDownloader {
 
 
 
-    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocs, int startFrom, int downloadUntil, int numOfThreads) throws InstantiationException{
+    public void download(String path, String pathToStats, List<String> formatsToDownload, int numOfDocs, int numOfThreads) throws InstantiationException{
         Instant startTime = Instant.now();
 
         List<TpDocument> tpDocuments = new ArrayList<>();
@@ -46,7 +46,7 @@ public class TransparenzResourceDownloader {
         System.out.println("Time for getting and extracting documents: "+Duration.between(startTime, Instant.now()).getSeconds() + " sec"); //TODO evtl. weg da sehr schnell
 
         //downloads the actual files corresponding to the resources retrieved from the Transparenzportal Solr Index
-        downloadAllDocuments(tpDocuments, path, numOfDocs, startFrom, downloadUntil, numOfThreads);
+        downloadAllDocuments(tpDocuments, path, numOfDocs, numOfThreads);
 
         //writes the statistics to the file specified in the command line arguments
         writeStatsWhenFinished(startTime, pathToStats, formatsToDownload, numOfThreads);
@@ -64,10 +64,8 @@ public class TransparenzResourceDownloader {
 
 
 
-    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int numOfDocsToDownload, int startFrom, int downloadUntil, int numOfThreads){
+    private void downloadAllDocuments(List<TpDocument> tpDocuments, String path, int numOfDocsToDownload, int numOfThreads){
         final TpDocumentProvider tpDocumentProvider = TpDocumentProvider.getInstance(tpDocuments, numOfDocsToDownload);
-        final int start = startFrom;
-        final int end = downloadUntil;
         final int totalNumOfInnerDocs = transparenzSolrService.getFilteredNumOfInnerDocs();
 
         for(int i= 0; i < numOfThreads; i++){
@@ -75,7 +73,7 @@ public class TransparenzResourceDownloader {
 
                 @Override
                 public void run() {
-                    downloadDocuments(tpDocumentProvider, path, start, end, numOfDocsToDownload, totalNumOfInnerDocs);
+                    downloadDocuments(tpDocumentProvider, path, numOfDocsToDownload, totalNumOfInnerDocs);
                 }
             });
             thread.start();
@@ -83,7 +81,7 @@ public class TransparenzResourceDownloader {
     }
 
 
-    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int startFrom, int downloadUntil, int numOfDocsToDownload, int totalNumOfInnerDocs) {
+    private void downloadDocuments(TpDocumentProvider tpDocumentProvider, String path, int numOfDocsToDownload, int totalNumOfInnerDocs) {
         System.out.println("Starting to download files.");
         int threadNumber = tpDocumentProvider.getCurrentThreadCount();
 
@@ -91,7 +89,7 @@ public class TransparenzResourceDownloader {
             TpDocument tpDocument = tpDocumentProvider.getNextTpDocument();
             if(tpDocument != null) {
                 int current = tpDocumentProvider.getCurrent();
-                if(current >= startFrom && current<downloadUntil && current < numOfDocsToDownload) {
+                if(current < numOfDocsToDownload) {
                     System.out.println("Thread '"+threadNumber+"'Downloading document '"+current+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpDocument.getOuterId()+"_"+tpDocument.innerId);
                     downloadDocument(tpDocument, tpDocumentProvider, path);
                 }
