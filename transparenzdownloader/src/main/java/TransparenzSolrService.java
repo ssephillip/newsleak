@@ -72,7 +72,7 @@ public class TransparenzSolrService {
         documentQuery.addField("res_name");
         documentQuery.addField("title");
         documentQuery.addField("publishing_date");
-        documentQuery.setRows(Integer.MAX_VALUE); //TODO evtl. weg, da immer nur ein ergebnis kommen sollte
+        documentQuery.setRows(Integer.MAX_VALUE);
 
 
         try {

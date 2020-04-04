@@ -90,7 +90,7 @@ public class TransparenzResourceDownloader {
             int current = tpDocumentProvider.getCurrent();
 
             if(tpDocument != null && current < numOfDocsToDownload) {
-                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+current+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpDocument.getOuterId()+"_"+tpDocument.innerId);
+                    System.out.println("Thread '"+threadNumber+"'Downloading document '"+(current+1)+"' of '"+totalNumOfInnerDocs+"' with the ID: '"+tpDocument.getOuterId()+"_"+tpDocument.innerId);
                     downloadDocument(tpDocument, tpDocumentProvider, path);
             }else{
                 System.out.println("Thread '"+threadNumber+"' finished");
