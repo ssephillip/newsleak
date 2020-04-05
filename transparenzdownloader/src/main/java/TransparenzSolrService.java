@@ -9,6 +9,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Provides functionality to retrieve datasets from the Transparenzportal Solr Index and extract resources from datasets.
+ *
+ * For more information on datasets and resources see {@link TpResource}.
+ *
+ * Additionally, while retrieving and extracting resources this service keeps track of different statistical information related to this topic (e.g. number of ill-formed datasets).
+ * This information is used for the statistics that are printed at the end of every download run.
+ */
 public class TransparenzSolrService {
 
     /** The solr client */
@@ -16,13 +24,16 @@ public class TransparenzSolrService {
 
     String solrCoreAddress;
 
-    /** Number of datasets in the Solr Index. */
+    /** Number of all datasets in the TP Solr Index. */
     int totalNumOfDatasets;
 
+    /** Number of all resources in the TP Solr Index */
     int totalNumOfResources;
 
+    /** Number of resources in the TP Solr Index that have a file format that is supposed to be downloaded */
     int numOfRelevantResources;
 
+    /** NUmber of datasets that are not well-formed (i.e. that are ill-formed). */
     int illformedDatasetsCounter;
 
 
@@ -37,7 +48,12 @@ public class TransparenzSolrService {
         illformedDatasetsCounter = 0;
     }
 
-
+    /**
+     * Gets all resources form the Transparenzportal Solr Index and stores them in {@link TpResource} objects.
+     *
+     * @return a list containing all the retrieved resources
+     * @throws InstantiationException if no data could be retrieved from the Transparenzportal Solr Index
+     */
     public List<TpResource> getAllResourcesFromSolr() throws InstantiationException{
         List<TpResource> tpResources = new ArrayList<>();
 
@@ -56,7 +72,13 @@ public class TransparenzSolrService {
     }
 
 
-
+    /**
+     * Gets all datasets from the Transparenzportal Solr Index.
+     * For more information on datasets and resources see {@link TpResource}
+     *
+     * @return A list of datasets. Each dataset is represented by a {@link SolrDocument})
+     * @throws InstantiationException if no datasets could be retrieved (for any reason)
+     */
     public SolrDocumentList getAllDatasetsFromSolr() throws InstantiationException{
         QueryResponse response = null;
 
