@@ -28,6 +28,7 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        //TODO remove the outprints of the file names
         DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
         docEmbeddingManager.getConfiguration(args);
 

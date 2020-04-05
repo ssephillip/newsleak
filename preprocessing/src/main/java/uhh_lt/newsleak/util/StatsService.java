@@ -135,7 +135,7 @@ public class StatsService {
      * @param filePath the path to the file to which the stats will be written
      * @param numOfThreads the number of threads used during processing
      */
-    public void startNewRun(String filePath, int numOfThreads) {
+    public void startNewRun(String filePath, int numOfThreads) { //TODO zu setRunInformation oder so umbenennen
         statsFilePath = filePath+"/processing-stats.txt";
         this.numOfThreads = numOfThreads;
 

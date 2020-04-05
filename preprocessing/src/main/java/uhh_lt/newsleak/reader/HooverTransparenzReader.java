@@ -162,7 +162,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 		logger.log(Level.INFO, "Total number of datasets: " + numOfDatasets);
 		logger.log(Level.INFO, "Getting Transparenzportal resources from dataset.");
 
-		//gets the TP resources from all datasets
+		//gets the TP resources from all datasets TODO in eine methode getAllResourcesFromSolr auslagern (wie beim downloader)
 		for(SolrDocument dataset: datasets) {
 			datasetsProcessed++;
 
