@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+//TODO javadocs im ganzen doc
 public class StatsService {
     private static StatsService statsService;
     public static final String TOTAL = "Total";
@@ -56,6 +57,16 @@ public class StatsService {
         return statsService;
     }
 
+
+    public void addStatsEvent(String eventType, String serviceName, Instant instant){
+        if(eventType.equals(EVENT_TYPE_START)){
+            startTimes.putIfAbsent(serviceName, instant);
+        }else if (eventType.equals(EVENT_TYPE_STOP)){
+            endTimes.put(serviceName, instant);
+        }
+
+    }
+
     public void startNewRun(String filePath, int numOfThreads) {
         statsFilePath = filePath+"/processing-stats.txt";
         this.numOfThreads = numOfThreads;
@@ -82,7 +93,7 @@ public class StatsService {
 
     public void writeStatsForStartedRun(){
         if(isRunStarted) {
-            Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes);
+            Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes); //TODO warsch. diese kpie wegmachen da nicht mehr nötig
             Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimesCopy.entrySet();
             for (Map.Entry startEntry : startTimesEntrySet) {
                 String componentName = (String) startEntry.getKey();
@@ -117,16 +128,6 @@ public class StatsService {
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-    }
-
-
-    public void addStatsEvent(String eventType, String serviceName, Instant instant){
-        if(eventType.equals(EVENT_TYPE_START)){
-            startTimes.putIfAbsent(serviceName, instant);
-        }else if (eventType.equals(EVENT_TYPE_STOP)){
-            endTimes.put(serviceName, instant);
         }
 
     }
