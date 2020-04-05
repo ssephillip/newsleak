@@ -13,6 +13,13 @@ import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.util.StatsService;
 import java.time.Instant;
 
+/**
+ * A writer to write the document fulltexts toa textfile.
+ * This textfile is later used as training data to create the Doc2VecC document embedding vectors.
+ *
+ * The fulltexts are written to the textfile in the form: *
+ * [newsleak-document-ID]<TAB>[document-fulltext]
+ */
 @OperationalProperties(multipleDeploymentAllowed = true, modifiesCas = false)
 public class Doc2VecWriter extends JCasAnnotator_ImplBase {
 

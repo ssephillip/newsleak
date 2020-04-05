@@ -11,7 +11,7 @@ public class Doc2VecUtil {
 
     /**
      * Deletes the training data of the previous run (if there is any).
-     * If the old training data is not delted, the new training data is appended to the old training data.
+     * If the old training data is not deleted, the new training data is appended to the old training data.
      *
      * @param trainingFileString Path to the training file
      * @param logger UIMA logger

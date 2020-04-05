@@ -12,6 +12,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+
+/**
+ * Provides shared functionality and data for the {@link uhh_lt.newsleak.writer.Doc2VecWriter}.
+ * It allows for synchronzied writing of text to the given output file.
+ */
 public class Doc2VecWriterResource extends Resource_ImplBase {
 
     /** The logger. */
@@ -43,7 +48,9 @@ public class Doc2VecWriterResource extends Resource_ImplBase {
     }
 
     /**
-     * Append text to the training file.
+     * Append training data lines to the training file.
+     * A training data line consists of the newsleak-document-id and the fulltext of the corresponding document.
+     * For more information see {@link uhh_lt.newsleak.writer.Doc2VecWriter}.
      *
      * @param text the text
      */

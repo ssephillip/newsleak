@@ -18,11 +18,16 @@ import java.io.InputStreamReader;
 import java.time.Instant;
 
 /**
- * Provides functionality to create document embedding vectors and store these vectors to a remote vector index (via an Http Request)
+ * Provides functionality to create document embedding vectors and store these vectors in a remote vector index (via Http Request)
  */
 public class DocEmbeddingManager extends NewsleakPreprocessor {
 
     //Creates Doc2VecC document embedding vectors and stores them in a remote vector index
+
+    /**
+     * Starts the Doc2VecC document embedding process and stores them in a remote vector index
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
         docEmbeddingManager.getConfiguration(args);
@@ -40,8 +45,11 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
 
 
     /**
-     * Triggers a Shell script which prepares the training data and starts a C-Program. This C-Program which starts the embedding process.
-     * The resulting vectors are written to a textfile in the result directory.
+     * Triggers a Shell script which prepares the training data and starts the C-Program that exectutes the embedding process.
+     * The C-Program is the implementation of Doc2VecC provided by the author of the paper that introduces Doc2VecC.
+     * For more information on the C-Program an Doc2VecC go to the <a href="https://github.com/mchen24/iclr2017">Github repository</a>.
+     *
+     * The resulting vectors are written to a textfile.
      */
     public void createEmbeddings() {
 
@@ -78,7 +86,7 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
 
     /**
      * Reads vectors from a textfile and stores them in a remote vector index.
-     * The data is sent via http request.
+     * The data is sent to the vector index via Http request.
      */
     public void indexVectors(){
         logger.log(Level.INFO, "Preparing document vector indexing.");
