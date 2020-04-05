@@ -1,5 +1,6 @@
 package uhh_lt.newsleak.util;
 
+import org.apache.uima.cas.AbstractCas;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
@@ -12,9 +13,47 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-//TODO javadocs im ganzen doc
+/**
+ * Provides functionality to measure the time spent on different parts of the application (measurment targets).
+ * Additionally it provides functionality to write these measurements (and other useful information) to a text file.
+ *
+ * The StatsService works as follows:
+ * To begin a time measurement a start-event needs to be registered at the StatsService.
+ * To stop a time measurement an end-event needs to be registered.
+ *
+ * To register an event the method {@link #addStatsEvent(String, String, Instant)} is called.
+ * As parameters, the event type constant ({@link #EVENT_TYPE_START} or {@link #EVENT_TYPE_STOP}), the constant of that corresponds to the measurement target and the current {@link Instant} is passed.
+ *
+ * To add a new measurement target (i.e. measure a part of the software that is currently not measured), a new measurement target CONSTANT should be defined in this class.
+ *
+ *
+ *
+ * Additional information on how this Service works:
+ * Before the time measurements can be written to a file, a new run needs to be started.
+ * Measurement events can be registered <b>BEFORE</b> a run was started.
+ * Starting a new run simply sets the values that are needed to write the stats to a file.
+ * This information is not passed as parameter of the method that writes the stats to the file, because the required information might not be available when that method is called.
+ *
+ *
+ * When a start-event is registered multiple times for the same measurement target, all but the first start-event are ignored.
+ * When an end-event is registered multiple times only the last end-event that was registered is used to determine the time spent on the measurement target.
+ * This is done to enable measurement of Analysis Components (e.g. {@link uhh_lt.newsleak.annotator.KeytermExtractor}, {@link uhh_lt.newsleak.writer.PostgresDbWriter}).
+ *
+ * The reason behind this is the following:
+ * There is no method that provides (reliable) information if an Analysis Component processed all documents.
+ * There are some methods that seem as they could be used for this purpose, but it has been shown that they do not work reliably.
+ * However, when processing a document, an Analysis Component always calls the method "process" ({@link org.apache.uima.analysis_component.AnalysisComponent#process(AbstractCas)}).
+ * Consequentially, when an Analysis Component processes the first document and the last document it calls the method "process".
+ * Thus, we can register the start-event at the beginning of the method "process" and the end-event at the end of the method "process".
+ * The problem with this is that the method "process" is called many times in between the first and the last time it is called.
+ * This is why the start-event and end-event are handled as described above.
+ * This works very efficiently, because the events are stored in hash maps.
+ *
+ */
 public class StatsService {
     private static StatsService statsService;
+
+    /** Measurement target CONSTANTS */
     public static final String TOTAL = "Total";
     public static final String UIMA_PIPELINE = "UIMA Pipeline";
     public static final String LANGUAGE_DETECTOR = "Language Detector";
@@ -32,13 +71,27 @@ public class StatsService {
     public static final String EMBEDDING_INDEXING = "Doc embedding indexing";
     public static final String INITIALIZE_TRANSPARENZ = "Transparenz(reader) initialization";
     public static final String INITIALIZE_HOOVER = "Hoover(reader) initialization";
+
+    /** Event type CONSTANTS */
     public static final String EVENT_TYPE_START = "start";
     public static final String EVENT_TYPE_STOP = "stop";
+
+    /** Path to the file to which the stats will be written */
     String statsFilePath;
+
+    /** Number of documents that were processed */
     int numOfDocsProcessed;
+
+    /** NUmber of threads used */
     int numOfThreads;
-    Map<String, Instant> startTimes;
-    Map<String, Instant> endTimes;
+
+    /** The Map containing the start times (i.e. start events). A linked map is used to preserve to order at which the start times were added. A hash map is used so to ensure efficiency.*/
+    LinkedHashMap<String, Instant> startTimes;
+
+    /** The Map containing the end times (i.e. end events). A hash map is used so to ensure efficiency. */
+    HashMap<String, Instant> endTimes;
+
+    /** True if a run has been started */
     private boolean isRunStarted;
 
 
@@ -57,20 +110,37 @@ public class StatsService {
         return statsService;
     }
 
-
-    public void addStatsEvent(String eventType, String serviceName, Instant instant){
+    /**
+     * Adds a stats event.
+     *
+     * For more information on stats events see the class description.
+     *
+     * @param eventType The event type CONSTANT
+     * @param measurementTarget The measurement target CONSTANT
+     * @param instant The instant at which the event is registered
+     */
+    public void addStatsEvent(String eventType, String measurementTarget, Instant instant){ //TODO evtl. instant als parameter entfernen. man könnte das ja auch einfach hier messen (wenn ich das mache dann auch oben im kommentar weg)
         if(eventType.equals(EVENT_TYPE_START)){
-            startTimes.putIfAbsent(serviceName, instant);
+            startTimes.putIfAbsent(measurementTarget, instant);
         }else if (eventType.equals(EVENT_TYPE_STOP)){
-            endTimes.put(serviceName, instant);
+            endTimes.put(measurementTarget, instant);
         }
 
     }
 
+    /**
+     * Starts a new run.
+     * This method needs to be called before the stats can be written to a file.
+     * Calling this method sets the path to the file to which the stats will be written and the number of threads used during processing.
+     *
+     * @param filePath the path to the file to which the stats will be written
+     * @param numOfThreads the number of threads used during processing
+     */
     public void startNewRun(String filePath, int numOfThreads) {
         statsFilePath = filePath+"/processing-stats.txt";
         this.numOfThreads = numOfThreads;
 
+        //TODO das hier warsch. in die writeStats methode verschieben
         try {
             FileWriter fileWriter = new FileWriter(statsFilePath, true);
             fileWriter.write("-------------------------------------------------- \n");
@@ -90,14 +160,20 @@ public class StatsService {
 
     }
 
-
+    /**
+     * Writes the stats to the file that was specified when the run was started.
+     *
+     */
     public void writeStatsForStartedRun(){
         if(isRunStarted) {
             Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes); //TODO warsch. diese kpie wegmachen da nicht mehr nötig
             Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimesCopy.entrySet();
+
+            //writes the stats for each measurement target
             for (Map.Entry startEntry : startTimesEntrySet) {
                 String componentName = (String) startEntry.getKey();
                 Instant endTime = endTimes.get(componentName);
+
                 if (endTime != null) {
                     Duration duration = Duration.between((Instant) startEntry.getValue(), endTime);
                     writeStatsForComponent(componentName, duration);
@@ -109,14 +185,18 @@ public class StatsService {
         }
     }
 
-
-    private void writeStatsForComponent(String componentName, Duration timeSpent) {
+    /**
+     * Writes the stats of one measurement target to the file specified when the run was started.
+     * @param measurementTargetName the name of the measurement target
+     * @param timeSpent the time spent on the measurement target
+     */
+    private void writeStatsForComponent(String measurementTargetName, Duration timeSpent) {
 
         try {
             FileWriter fileWriter = new FileWriter(statsFilePath, true);
             fileWriter.write("----------------- \n");
-            fileWriter.write("Target: "+componentName +"\n");
-            fileWriter.write("Number of docs processed: "+ numOfDocsProcessed +"\n");
+            fileWriter.write("Target: "+measurementTargetName +"\n");
+            fileWriter.write("Number of docs processed: "+ numOfDocsProcessed +"\n"); //TODO warsch. in der writeStats methode machen
             fileWriter.write("Time spent (sec): "+timeSpent.getSeconds() +"\n");
 
             if(numOfDocsProcessed != 0) {
