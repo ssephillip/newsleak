@@ -147,9 +147,11 @@ public class StatsService {
      *
      */
     public void writeStatsForStartedRun(){
-        if(isRunStarted) {
-            Map<String, Instant> startTimesCopy = new LinkedHashMap<>(startTimes); //TODO warsch. diese kpie wegmachen da nicht mehr nötig
-            Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimesCopy.entrySet();
+        if(isRunStarted) {//TODO warsch. diese kpie wegmachen da nicht mehr nötig
+            Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimes.entrySet();
+
+            //Writes general information to the stats file
+            writeGeneralInformation();
 
             //writes the stats for each measurement target
             for (Map.Entry startEntry : startTimesEntrySet) {
