@@ -44,7 +44,7 @@ public class CreateCollection {
 
 
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.TOTAL);
-		StatsService.getInstance().writeStatsForStartedRun();
+		StatsService.getInstance().writeStatsToFile();
 	}
 
 

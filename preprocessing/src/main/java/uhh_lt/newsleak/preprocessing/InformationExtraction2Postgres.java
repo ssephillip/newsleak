@@ -82,7 +82,7 @@ public class InformationExtraction2Postgres extends NewsleakPreprocessor {
 		np.getConfiguration(args);
 
 		//starts a new run TODO: evtl. so umschreiben, dass der Statsservice sich selber diese daten holt und das hier gar nciht mehr gebraucht wird
-		StatsService.getInstance().startNewRun(np.dataDirectory, np.threads); //TODO richtige variable einführen
+		StatsService.getInstance().setRunInformation(np.dataDirectory, np.threads); //TODO richtige variable einführen
 
 		String pathToTrainingFile = np.doc2vecTrainingDir+File.separator+np.trainingFileName+".txt";
 		Doc2VecUtil.deleteOldTrainingData(pathToTrainingFile, np.logger);

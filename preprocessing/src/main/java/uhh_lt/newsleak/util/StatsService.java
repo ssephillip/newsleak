@@ -27,10 +27,9 @@ import java.util.Set;
  *
  *
  * Additional information on how this Service works:
- * Before the time measurements can be written to a file, a new run needs to be started.
- * Measurement events can be registered <b>BEFORE</b> a run was started.
- * Starting a new run simply sets the values that are needed to write the stats to a file.
- * This information is not passed as parameter of the method that writes the stats to the file, because the required information might not be available when that method is called.
+ * Before the time measurements can be written to a file, the run information needs to be set (by calling {@link #setRunInformation(String, int)}).
+ * Measurement events can be registered <b>BEFORE</b> the run information was set.
+ * The run information is not passed as parameter of the method that writes the stats to the file, because the required information might not be available when that method is called.
  *
  *
  * When a start-event is registered multiple times for the same measurement target, all but the first start-event are ignored.
@@ -90,15 +89,15 @@ public class StatsService {
     /** The Map containing the end times (i.e. end events). A hash map is used so to ensure efficiency. */
     HashMap<String, Instant> endTimes;
 
-    /** True if a run has been started */
-    private boolean isRunStarted;
+    /** True if the run information has been set */
+    private boolean isRunInformationSet;
 
 
     private StatsService(){
         super();
         startTimes = new LinkedHashMap<>();
         endTimes = new HashMap<>();
-        isRunStarted = false;
+        isRunInformationSet = false;
     }
 
     public static StatsService getInstance(){
@@ -128,26 +127,26 @@ public class StatsService {
     }
 
     /**
-     * Starts a new run.
+     * Sets the information needed to write the stats.
      * This method needs to be called before the stats can be written to a file.
-     * Calling this method sets the path to the file to which the stats will be written and the number of threads used during processing.
+     * Sets the path to the file to which the stats will be written and the number of threads used during processing.
      *
      * @param filePath the path to the file to which the stats will be written
      * @param numOfThreads the number of threads used during processing
      */
-    public void startNewRun(String filePath, int numOfThreads) { //TODO zu setRunInformation oder so umbenennen
+    public void setRunInformation(String filePath, int numOfThreads) { //TODO zu setRunInformation oder so umbenennen
         statsFilePath = filePath+"/processing-stats.txt";
         this.numOfThreads = numOfThreads;
 
-        isRunStarted = true;
+        isRunInformationSet = true;
     }
 
     /**
      * Writes the stats to the file that was specified when the run was started.
      *
      */
-    public void writeStatsForStartedRun(){
-        if(isRunStarted) {//TODO warsch. diese kpie wegmachen da nicht mehr nötig
+    public void writeStatsToFile(){
+        if(isRunInformationSet) {
             Set<Map.Entry<String, Instant>> startTimesEntrySet = startTimes.entrySet();
 
             //Writes general information to the stats file
@@ -155,17 +154,18 @@ public class StatsService {
 
             //writes the stats for each measurement target
             for (Map.Entry startEntry : startTimesEntrySet) {
-                String componentName = (String) startEntry.getKey();
-                Instant endTime = endTimes.get(componentName);
+                String measurementTargetName = (String) startEntry.getKey();
+                Instant endTime = endTimes.get(measurementTargetName);
 
                 if (endTime != null) {
                     Duration duration = Duration.between((Instant) startEntry.getValue(), endTime);
-                    writeStatsForComponent(componentName, duration);
+                    writeStatsForMeasurementTarget(measurementTargetName, duration);
                 }
             }
 
         }else{
-            System.out.println("Stats could not be written because no run was started!"); //TODO maybe better to throw exception or log the error. Problem: logger is not available in the calling method.
+            //TODO It would be better to log the error (maybe even trhow an exception). Problem: logger is not available in this method or the calling method.
+            System.out.println("Stats could not be written because no run was started!");
         }
     }
 
@@ -193,7 +193,7 @@ public class StatsService {
      * @param measurementTargetName the name of the measurement target
      * @param timeSpent the time spent on the measurement target
      */
-    private void writeStatsForComponent(String measurementTargetName, Duration timeSpent) {
+    private void writeStatsForMeasurementTarget(String measurementTargetName, Duration timeSpent) {
 
         try {
             FileWriter fileWriter = new FileWriter(statsFilePath, true);
