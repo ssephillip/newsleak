@@ -139,24 +139,7 @@ public class StatsService {
         statsFilePath = filePath+"/processing-stats.txt";
         this.numOfThreads = numOfThreads;
 
-        //TODO das hier warsch. in die writeStats methode verschieben
-        try {
-            FileWriter fileWriter = new FileWriter(statsFilePath, true);
-            fileWriter.write("-------------------------------------------------- \n");
-            fileWriter.write("-------------------------------------------------- \n");
-            fileWriter.write("-------------------------------------------------- \n");
-            fileWriter.write("-------------------------------------------------- \n");
-            fileWriter.write("Run: "+ Instant.now() +"\n");
-            fileWriter.write("Threads: "+numOfThreads +"\n");
-
-            fileWriter.flush();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         isRunStarted = true;
-
     }
 
     /**
@@ -184,6 +167,25 @@ public class StatsService {
         }
     }
 
+
+    private void writeGeneralInformation(){
+        try {
+            FileWriter fileWriter = new FileWriter(statsFilePath, true);
+            fileWriter.write("-------------------------------------------------- \n");
+            fileWriter.write("-------------------------------------------------- \n");
+            fileWriter.write("-------------------------------------------------- \n");
+            fileWriter.write("-------------------------------------------------- \n");
+            fileWriter.write("Run: "+ Instant.now() +"\n");
+            fileWriter.write("Threads: "+numOfThreads +"\n");
+            fileWriter.write("Number of docs processed: "+ numOfDocsProcessed +"\n");
+
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Writes the stats of one measurement target to the file specified when the run was started.
      * @param measurementTargetName the name of the measurement target
@@ -195,7 +197,6 @@ public class StatsService {
             FileWriter fileWriter = new FileWriter(statsFilePath, true);
             fileWriter.write("----------------- \n");
             fileWriter.write("Target: "+measurementTargetName +"\n");
-            fileWriter.write("Number of docs processed: "+ numOfDocsProcessed +"\n"); //TODO warsch. in der writeStats methode machen
             fileWriter.write("Time spent (sec): "+timeSpent.getSeconds() +"\n");
 
             if(numOfDocsProcessed != 0) {
