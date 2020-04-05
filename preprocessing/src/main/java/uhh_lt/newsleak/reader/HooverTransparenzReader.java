@@ -34,7 +34,6 @@ import uhh_lt.newsleak.util.StatsService;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,13 +129,13 @@ public class HooverTransparenzReader extends NewsleakReader {
 		super.initialize(context);
 		logger = context.getLogger();
 
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.INITIALIZE_TRANSPARENZ, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.INITIALIZE_TRANSPARENZ);
 		transparenzInitialize(context);
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.INITIALIZE_TRANSPARENZ, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.INITIALIZE_TRANSPARENZ);
 
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.INITIALIZE_HOOVER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.INITIALIZE_HOOVER);
 		hooverInitialize(context);
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.INITIALIZE_HOOVER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.INITIALIZE_HOOVER);
 
 	}
 

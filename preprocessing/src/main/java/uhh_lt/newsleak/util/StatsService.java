@@ -1,8 +1,6 @@
 package uhh_lt.newsleak.util;
 
 import org.apache.uima.cas.AbstractCas;
-import org.apache.uima.util.Level;
-import org.apache.uima.util.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,7 +19,7 @@ import java.util.Set;
  * To begin a time measurement a start-event needs to be registered at the StatsService.
  * To stop a time measurement an end-event needs to be registered.
  *
- * To register an event the method {@link #addStatsEvent(String, String, Instant)} is called.
+ * To register an event the method {@link #addStatsEvent(String, String)} is called.
  * As parameters, the event type constant ({@link #EVENT_TYPE_START} or {@link #EVENT_TYPE_STOP}), the constant of that corresponds to the measurement target and the current {@link Instant} is passed.
  *
  * To add a new measurement target (i.e. measure a part of the software that is currently not measured), a new measurement target CONSTANT should be defined in this class.
@@ -115,12 +113,12 @@ public class StatsService {
      * Adds a stats event.
      *
      * For more information on stats events see the class description.
-     *
-     * @param eventType The event type CONSTANT
+     *  @param eventType The event type CONSTANT
      * @param measurementTarget The measurement target CONSTANT
-     * @param instant The instant at which the event is registered
      */
-    public void addStatsEvent(String eventType, String measurementTarget, Instant instant){ //TODO evtl. instant als parameter entfernen. man könnte das ja auch einfach hier messen (wenn ich das mache dann auch oben im kommentar weg)
+    public void addStatsEvent(String eventType, String measurementTarget){
+        Instant instant = Instant.now();
+
         if(eventType.equals(EVENT_TYPE_START)){
             startTimes.putIfAbsent(measurementTarget, instant);
         }else if (eventType.equals(EVENT_TYPE_STOP)){

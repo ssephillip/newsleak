@@ -1,6 +1,5 @@
 package uhh_lt.newsleak.annotator;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,7 +80,7 @@ public class SentenceCleaner extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.SENTENCE_CLEANER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.SENTENCE_CLEANER);
 		// step 1
 		cleanTokens(jcas);
 
@@ -90,7 +89,7 @@ public class SentenceCleaner extends JCasAnnotator_ImplBase {
 
 		// step 3
 		restructureSentences(jcas);
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.SENTENCE_CLEANER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.SENTENCE_CLEANER);
 	}
 
 	/**

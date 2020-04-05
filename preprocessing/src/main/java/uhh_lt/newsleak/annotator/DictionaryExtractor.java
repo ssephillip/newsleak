@@ -1,6 +1,5 @@
 package uhh_lt.newsleak.annotator;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -112,7 +111,7 @@ public class DictionaryExtractor extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.DICTIONARY, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.DICTIONARY);
 		ArrayList<DictTerm> termsToTokenList = new ArrayList<DictTerm>();
 
 		// EMAIL
@@ -142,7 +141,7 @@ public class DictionaryExtractor extends JCasAnnotator_ImplBase {
 		for (Token t : tokens) {
 			annotateDictTypes(jcas, t);
 		}
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.DICTIONARY, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.DICTIONARY);
 
 	}
 

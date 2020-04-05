@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -117,7 +116,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.ELASTICSEARCH_WRITER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.ELASTICSEARCH_WRITER);
 		String docText = jcas.getDocumentText();
 
 		// skip indexing empty documents
@@ -154,7 +153,7 @@ public class ElasticsearchDocumentWriter extends JCasAnnotator_ImplBase {
 
 		}
 
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.ELASTICSEARCH_WRITER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.ELASTICSEARCH_WRITER);
 	}
 
 	/**

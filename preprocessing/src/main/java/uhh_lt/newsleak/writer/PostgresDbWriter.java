@@ -1,7 +1,6 @@
 package uhh_lt.newsleak.writer;
 
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -85,7 +84,7 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 	 */
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.POSTGRES_DB_WRITER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.POSTGRES_DB_WRITER);
 		Metadata metadata = (Metadata) jcas.getAnnotationIndex(Metadata.type).iterator().next();
 		Integer docId = Integer.parseInt(metadata.getDocId());
 
@@ -168,7 +167,7 @@ public class PostgresDbWriter extends JCasAnnotator_ImplBase {
 		}
 
 		StatsService.getInstance().setNumOfDocsProcessed(postgresResource.getDocumentCounter());
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.POSTGRES_DB_WRITER, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.POSTGRES_DB_WRITER);
 	}
 
 	/**

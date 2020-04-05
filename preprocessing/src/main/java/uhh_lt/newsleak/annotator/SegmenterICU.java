@@ -1,7 +1,6 @@
 package uhh_lt.newsleak.annotator;
 
 import java.text.BreakIterator;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -85,7 +84,7 @@ public class SegmenterICU extends JCasAnnotator_ImplBase {
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.SEGMENTER_ICU, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.SEGMENTER_ICU);
 		// annotate paragraphs in document text
 		annotateParagraphs(jcas);
 
@@ -142,7 +141,7 @@ public class SegmenterICU extends JCasAnnotator_ImplBase {
 
 		// flag unlikely fulltext paragraphs (e.g. log files)
 		flagDubiousParagraphs(jcas);
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.SEGMENTER_ICU, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.SEGMENTER_ICU);
 	}
 
 	

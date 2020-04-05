@@ -15,7 +15,6 @@ package uhh_lt.newsleak.annotator;
  * For details, see http://dbs.ifi.uni-heidelberg.de/heideltime
  */
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +34,6 @@ import org.apache.uima.fit.descriptor.OperationalProperties;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.util.Level;
 
 import de.unihd.dbs.uima.annotator.heideltime.ProcessorManager;
 import de.unihd.dbs.uima.annotator.heideltime.ProcessorManager.Priority;
@@ -227,7 +225,7 @@ public class HeidelTimeOpenNLP extends JCasAnnotator_ImplBase {
 	 * @see JCasAnnotator_ImplBase#process(JCas)
 	 */
 	public void process(JCas jcas) {
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.HEIDELTIME, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.HEIDELTIME);
 		// check whether a given DCT (if any) is of the correct format and if
 		// not, skip this call
 		if (!isValidDCT(jcas)) {
@@ -385,7 +383,7 @@ public class HeidelTimeOpenNLP extends JCasAnnotator_ImplBase {
 		timex_counter_global = timex_counter_global + timex_counter;
 		Logger.printDetail(component,
 				"Number of Timexes added to CAS: " + timex_counter + "(global: " + timex_counter_global + ")");
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.HEIDELTIME, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.HEIDELTIME);
 	}
 
 	/**

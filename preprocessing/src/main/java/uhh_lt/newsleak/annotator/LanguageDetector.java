@@ -3,7 +3,6 @@ package uhh_lt.newsleak.annotator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -117,7 +116,7 @@ public class LanguageDetector extends JCasAnnotator_ImplBase {
 	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
 
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.LANGUAGE_DETECTOR, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.LANGUAGE_DETECTOR);
 		String docText = jcas.getDocumentText();
 		Integer maxLength = Math.min(docText.length(), 3000);
 		String docBeginning = docText.substring(0, maxLength);
@@ -138,7 +137,7 @@ public class LanguageDetector extends JCasAnnotator_ImplBase {
 			metadataResource.appendMetadata(langmetadata);
 		}
 
-		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.LANGUAGE_DETECTOR, Instant.now());
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.LANGUAGE_DETECTOR);
 	}
 
 	/**
