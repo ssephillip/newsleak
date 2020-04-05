@@ -67,6 +67,7 @@ public class StatsService {
     public static final String DOC2VEC_WRITER = "Doc2Vec writer";
     public static final String POSTGRES_DB_WRITER = "PostgresDB writer";
     public static final String POSTGRES_TO_ELASTIC = "Postgres to Elastic indexing";
+    public static final String EMBEDDING_MANAGER = "Doc embedding manager";
     public static final String EMBEDDING = "Doc embedding";
     public static final String EMBEDDING_INDEXING = "Doc embedding indexing";
     public static final String INITIALIZE_TRANSPARENZ = "Transparenz(reader) initialization";

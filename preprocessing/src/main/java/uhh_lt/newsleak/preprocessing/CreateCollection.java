@@ -33,8 +33,9 @@ public class CreateCollection {
 		InformationExtraction2Postgres.main(args);
 		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.UIMA_PIPELINE, Instant.now());
 
-		//TODO 2020-04-01 ps: zeit für docembeddingmanager messen (hier in dieser methode die events registrieren)
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_START, StatsService.EMBEDDING_MANAGER, Instant.now());
 		DocEmbeddingManager.main(args);
+		StatsService.getInstance().addStatsEvent(StatsService.EVENT_TYPE_STOP, StatsService.EMBEDDING_MANAGER, Instant.now());
 
 
 
