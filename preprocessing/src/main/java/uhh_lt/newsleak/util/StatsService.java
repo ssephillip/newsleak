@@ -134,7 +134,7 @@ public class StatsService {
      * @param filePath the path to the file to which the stats will be written
      * @param numOfThreads the number of threads used during processing
      */
-    public void setRunInformation(String filePath, int numOfThreads) { //TODO zu setRunInformation oder so umbenennen
+    public void setRunInformation(String filePath, int numOfThreads) {
         statsFilePath = filePath+"/processing-stats.txt";
         this.numOfThreads = numOfThreads;
 
@@ -169,7 +169,9 @@ public class StatsService {
         }
     }
 
-
+    /**
+     * Writes general information to the stats file before the stats for the measurement targets are written to the file.
+     */
     private void writeGeneralInformation(){
         try {
             FileWriter fileWriter = new FileWriter(statsFilePath, true);
