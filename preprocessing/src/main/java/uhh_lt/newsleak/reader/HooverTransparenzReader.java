@@ -44,8 +44,8 @@ import java.util.regex.Pattern;
  * <a href="https://hoover.github.io">https://hoover.github.io</a>). It utilizes the Hoover API to query for all extracted documents in a collection.
  * Additionally it retrieves the metadata of all datasets stored in the (non-public) Solr Index of the <a href="http://transparenz.hamburg.de/">Transparenzportal Hamburg</a>.
  * The resources are extracted from the datasets and stored in {@link TpResource} objects. The extracted {@link TpResource}s are stored in a {@link Map}.
- * The {@link TpResource#absoluteResourceId}s are used as keys.
- * The {@link TpResource#absoluteResourceId}s are also the filenames of the documents that were extracted by Hoover.
+ * The absolute resource IDs are used as keys.
+ * The absolute resource IDs are also the filenames of the documents provided by Hoover.
  * Consequentially, the filenames of the documents retrieved from Hoover can be used directly as keys to retrieve the corresponding {@link TpResource} from the {@link Map}.
  *
  * During processing, the information (e.g. fulltext, metadata) retrieved from the Hoover Elasticsearch Index is combined with the metadata of the corresponding {@link TpResource}.
@@ -556,7 +556,7 @@ public class HooverTransparenzReader extends NewsleakReader {
 	 * If one of the parameters would be Null or empty (if it is a list), all resources contained in the dataset would miss a mandatory value.
 	 * If the lists would not have the same length, it is not possible to determine which information belongs to which resource.
 	 *
-	 * For more information on datasets and resources see {@link TpResource}.
+	 * For more information on datasets, resources and well-formed datasets see {@link TpResource}.
 	 *
 	 * @param resourceFormats The list of file-formats of the resources contained in the dataset
 	 * @param resourceUrls The list of URLs to the actual files corresponding to the resources
