@@ -71,7 +71,7 @@ public class TpResource {
     String datasetId;
 
     /** The relative resource ID. See class description for more information on resources and datasets. */
-    String relativeResourceId; //TODO ps 2019-08-20: evtl. auf int umstellen
+    String relativeResourceId;
 
     /** The absolute resource ID. It is the concatenation of the dataset ID and the relative resource ID. */
     String absoluteResourceId;
@@ -89,19 +89,18 @@ public class TpResource {
     /** The dataset title. */
     String datasetTitle;
 
-    /** The resource name. TODO warsch. in title umbenennen für konsistenz innerhalb newsleaks (noch nicht gemacht um verwirrung mit dem alten feld "title" zu verhindern */
+    /** The resource name. */
     String name;
 
     /** The date on which the dataset was published */
     String datasetDate;
 
-    //TODO hier muss die absolute id verwendet werden
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TpResource)) return false;
         TpResource that = (TpResource) o;
-        return Objects.equals(relativeResourceId, that.relativeResourceId);
+        return Objects.equals(absoluteResourceId, that.absoluteResourceId);
     }
 
     @Override
