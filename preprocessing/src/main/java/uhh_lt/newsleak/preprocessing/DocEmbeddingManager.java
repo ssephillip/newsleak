@@ -28,7 +28,6 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //TODO remove the outprints of the file names
         DocEmbeddingManager docEmbeddingManager = new DocEmbeddingManager();
         docEmbeddingManager.getConfiguration(args);
 
@@ -52,20 +51,22 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
      * The resulting vectors are written to a textfile.
      */
     public void createEmbeddings() {
-
         //Intializes the process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.inheritIO();
         processBuilder.directory(new File(this.doc2vecTrainingDir));
 
         //specifies the file to execute and the parameters
-        //TODO 2020-04-01 ps: define parameters is separate strings
-        //TODO 2020-04-01 ps: evtl. prepare training data within java
-        processBuilder.command(this.doc2vecTrainingDir+File.separator+"produce_vectors.sh", this.trainingFileName+".txt", this.trainingFileNameDocOnly+".txt", this.trainingFileNameIdOnly+".txt", this.doc2vecResultFileName+".txt");
+        String pathToShellScript = this.doc2vecTrainingDir+File.separator+"produce_vectors.sh";
+        String trainingFileName = this.trainingFileName + ".txt";
+        String trainingFileDocsOnlyName = this.trainingFileNameDocOnly + ".txt";
+        String trainingFileIdsOnlyName = this.trainingFileNameIdOnly + ".txt";
+        String resultsFileName = this.doc2vecResultFileName + ".txt";
 
+        processBuilder.command(pathToShellScript, trainingFileName, trainingFileDocsOnlyName, trainingFileIdsOnlyName, resultsFileName);
 
         try {
-            logger.log(Level.INFO, "Starting document embedding process with "+this.trainingFileName+" as training data.");
+            logger.log(Level.INFO, "Starting document embedding process with "+trainingFileName+" as training data.");
             Process process = processBuilder.start();
 
             StringBuilder output = readOutput(process); //For some reason the script does not finish/return if the output isn't read. For this reason we read the output here. The output is of no relevance. It is just a bug fix since I was not able to identify the problem.
@@ -78,10 +79,9 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
             logger.log(Level.INFO, "Finished document embedding process successfully.");
 
         }catch(Exception e){
-            logger.log(Level.SEVERE, "Failed producing document embeddings with "+this.trainingFileName+" as training data.");
+            logger.log(Level.SEVERE, "Failed producing document embeddings with "+trainingFileName+" as training data.");
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -93,11 +93,13 @@ public class DocEmbeddingManager extends NewsleakPreprocessor {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(this.doc2vecIndexUrl+":"+this.doc2vecIndexPort+"/index_vectors");
 
+        String pathToDoc2VeccVectors = this.doc2vecResultDir + File.separator + this.doc2vecResultFileName + ".txt";
+        String pathToDocumentIdsFile = this.doc2vecTrainingDir + File.separator + this.trainingFileNameIdOnly + ".txt";
+
         //Constructs the Multipart and adds it to the http request
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        //TODO 2020-04-01 ps: introduce separate string variables for parameters
-        builder.addBinaryBody("vectors", new File(this.doc2vecResultDir+File.separator+this.doc2vecResultFileName +".txt"), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultFileName +".ext"); //TODO 2019-09-18 ps: introduce own attribute in config file for result dir
-        builder.addBinaryBody("ids", new File(this.doc2vecTrainingDir+File.separator+this.trainingFileNameIdOnly+".txt"), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");//TODO 2019-09-18 ps: maybe copy id file also to result dir for consistency
+        builder.addBinaryBody("vectors", new File(pathToDoc2VeccVectors), ContentType.APPLICATION_OCTET_STREAM, doc2vecResultFileName +".ext");
+        builder.addBinaryBody("ids", new File(pathToDocumentIdsFile), ContentType.APPLICATION_OCTET_STREAM, trainingFileNameIdOnly+".ext");
         HttpEntity multipart = builder.build();
         httpPost.setEntity(multipart);
 
