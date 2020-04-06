@@ -15,7 +15,8 @@ public class Main {
      * The TransparenzDownloader can be run as a standalone jar or from within an IDE.
      * To create the jar, go into the project directory ([the path to newsleak]/newsleak/transparenzdownloader/) and execute the following command from the command line:
      * <code>mvn clean package assembly:single"</code>
-     *
+     * The jar is found at:
+     * [the path to newsleak]/newsleak/transparenzdownloader/target/transparenzdownloader-jar-with-dependencies.jar
      *
      *
      * <h3>The following parameters must be provided:</h3>
@@ -32,10 +33,7 @@ public class Main {
      * Conceptual example:
      * "solrAddress" "pathToFileStorage" "pathToStatsFile/stats-file.txt" "format-1,format-2,format-3" numberOfFilesToDownload numberOfThreads
      *
-     * Example call for the standalone JAR:
-     * //TODO testen wie sie hier nochmal aussehen
-     *
-     * Example parameters (when using an IDE):
+     * Concrete example command line parameters:
      * "http://localhost:8983/solr/simfin" "/home/user/data/file-folder/" "/home/user/data/stats-file.txt" "pdf,csv,html" 150000  3
      *
      *
