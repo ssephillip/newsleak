@@ -1,0 +1,95 @@
+-------------------------------------------------- 
+-------------------------------------------------- 
+-------------------------------------------------- 
+-------------------------------------------------- 
+Run: 2020-04-06T00:52:03.221269Z
+Threads: 4
+Number of docs processed: 26
+----------------- 
+Target: Total
+Time spent (sec): 74
+Time spent per doc (sec): 2.8461538461538463
+----------------- 
+Target: UIMA Pipeline
+Time spent (sec): 70
+Time spent per doc (sec): 2.6923076923076925
+----------------- 
+Target: Transparenz(reader) initialization
+Time spent (sec): 27
+Time spent per doc (sec): 1.0384615384615385
+----------------- 
+Target: Hoover(reader) initialization
+Time spent (sec): 0
+Time spent per doc (sec): 0.0
+----------------- 
+Target: Language Detector
+Time spent (sec): 3
+Time spent per doc (sec): 0.11538461538461539
+----------------- 
+Target: Elasticsearch writer
+Time spent (sec): 3
+Time spent per doc (sec): 0.11538461538461539
+----------------- 
+Target: Segmenter ICU
+Time spent (sec): 13
+Time spent per doc (sec): 0.5
+----------------- 
+Target: Sentence Cleaner
+Time spent (sec): 13
+Time spent per doc (sec): 0.5
+----------------- 
+Target: Dictionary extractor
+Time spent (sec): 14
+Time spent per doc (sec): 0.5384615384615384
+----------------- 
+Target: NER
+Time spent (sec): 17
+Time spent per doc (sec): 0.6538461538461539
+----------------- 
+Target: Keyterms
+Time spent (sec): 18
+Time spent per doc (sec): 0.6923076923076923
+----------------- 
+Target: Doc2Vec writer
+Time spent (sec): 17
+Time spent per doc (sec): 0.6538461538461539
+----------------- 
+Target: PostgresDB writer
+Time spent (sec): 17
+Time spent per doc (sec): 0.6538461538461539
+----------------- 
+Target: Segmenter ICU
+Time spent (sec): 11
+Time spent per doc (sec): 0.4230769230769231
+----------------- 
+Target: Segmenter ICU
+Time spent (sec): 11
+Time spent per doc (sec): 0.4230769230769231
+----------------- 
+Target: Doc2Vec writer
+Time spent (sec): 17
+Time spent per doc (sec): 0.6538461538461539
+----------------- 
+Target: PostgresDB writer
+Time spent (sec): 17
+Time spent per doc (sec): 0.6538461538461539
+----------------- 
+Target: NER
+Time spent (sec): 15
+Time spent per doc (sec): 0.5769230769230769
+----------------- 
+Target: Doc embedding manager
+Time spent (sec): 3
+Time spent per doc (sec): 0.11538461538461539
+----------------- 
+Target: Doc embedding
+Time spent (sec): 3
+Time spent per doc (sec): 0.11538461538461539
+----------------- 
+Target: Doc embedding indexing
+Time spent (sec): 0
+Time spent per doc (sec): 0.0
+----------------- 
+Target: Postgres to Elastic indexing
+Time spent (sec): 0
+Time spent per doc (sec): 0.0

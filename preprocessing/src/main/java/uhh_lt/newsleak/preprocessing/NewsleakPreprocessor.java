@@ -88,6 +88,9 @@ public abstract class NewsleakPreprocessor {
 	//transparenz reader configuration
 	protected String transparenzCoreAddress;
 
+	//transparenz reader configuration
+	protected String statsDirectory;
+
 	// newsleak postgres configuration
 	protected String dbUrl;
 	protected String dbName;
@@ -164,6 +167,8 @@ public abstract class NewsleakPreprocessor {
 			doc2vecIndexPort = prop.getProperty("doc2vecindexport");
 
 			transparenzCoreAddress = prop.getProperty("transparenzcoreaddress");
+
+			statsDirectory = prop.getProperty("statsdir");
 
 			esHost = prop.getProperty("esurl");
 			esClustername = prop.getProperty("esclustername");
