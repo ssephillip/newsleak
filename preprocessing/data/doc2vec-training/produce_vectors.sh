@@ -3,10 +3,6 @@ training_file_doc_only=$2
 training_file_id_only=$3
 result_vectors=$4
 
-echo $training_file
-echo $training_file_doc_only
-echo $training_file_id_only
-echo $result_vectors
 
 echo "preparing training data"
 cut -f2 <$training_file >$training_file_doc_only
