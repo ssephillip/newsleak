@@ -56,7 +56,7 @@ public class TransparenzResourceDownloader {
         startDownloadingThreads(tpResources, path, numOfFilesToDownload, numOfThreads);
 
         //writes the statistics to the file specified in the command line arguments
-        writeStatsWhenFinished(startTime, pathToStats, formatsToDownload, numOfThreads);
+        writeStatsToFile(startTime, pathToStats, formatsToDownload, numOfThreads);
     }
 
 
@@ -156,26 +156,30 @@ public class TransparenzResourceDownloader {
     }
 
     /**
-     * Coordinates if/when the stats should be written to the stats file.
-     *
-     * TODO wenn ich entschieden habe ob temp stats raus kommen oder nicht unter noch ein bisschen kommentieren (und evtl. hier auch noch was schreiben).
+     * Coordinates if/when the stats should be written to the stats file or the temp-stats file respectively.
+     * The temp-stats file is a file to which the stats are written during the download process.
+     * This enables the user to keep track of the progress and times spent per document during the download process.
+     * This is especially useful when downloading large amounts of documents.
+     * Temp-stats are written approximately every 1000 files downloaded.
      *
      * @param startTime the time at which the downloading process started
      * @param pathToStats the path to the file to which the stats will be written
      * @param formatsToDownload files of the specified formats will be downloaded
      * @param numOfThreads the number of threads used to download the files
      */
-    private void writeStatsWhenFinished(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {  //TODO wenn temp stats hier bleiben dann umbenennen
+    private void writeStatsToFile(Instant startTime, String pathToStats, List<String> formatsToDownload, int numOfThreads) {  //TODO wenn temp stats hier bleiben dann umbenennen
         String pathToTempStats = pathToStats+"--temp.txt";
 
         while(true){
             TpResourceProvider tpResourceProvider = TpResourceProvider.getInstance();
+
             if(tpResourceProvider != null && tpResourceProvider.isFinished()){
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
                 writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfFilesDownloaded(), tpResourceProvider.getNumOfFilesFailedToDownload(), formatsToDownload, pathToStats, numOfThreads);
                 break;
-            }else if(tpResourceProvider != null &&  tpResourceProvider.getNumOfDownloadsSinceLastTempStats() >= 1000){
+            }
+            else if(tpResourceProvider != null &&  tpResourceProvider.getNumOfDownloadsSinceLastTempStats() >= 1000){
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
                 writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfFilesDownloaded(), tpResourceProvider.getNumOfFilesFailedToDownload(), formatsToDownload, pathToTempStats, numOfThreads);
