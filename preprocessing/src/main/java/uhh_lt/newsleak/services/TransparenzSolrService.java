@@ -1,4 +1,4 @@
-package uhh_lt.newsleak.util;
+package uhh_lt.newsleak.services;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
