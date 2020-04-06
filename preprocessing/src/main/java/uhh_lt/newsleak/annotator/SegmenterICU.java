@@ -23,7 +23,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import opennlp.uima.Sentence;
 import opennlp.uima.Token;
 import uhh_lt.newsleak.types.Paragraph;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * Tokenization, sentence and paragraph annotation with the ICU4J library. ICU4J

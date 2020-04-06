@@ -25,7 +25,7 @@ import opennlp.uima.Token;
 import uhh_lt.keyterms.Extractor;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.Paragraph;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * UIMA annotator for key term extraction. Uses the uhh-lt/lt-keyterms maven

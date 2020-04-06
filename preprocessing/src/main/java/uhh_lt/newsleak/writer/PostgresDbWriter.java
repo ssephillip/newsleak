@@ -25,7 +25,7 @@ import opennlp.uima.Person;
 import uhh_lt.newsleak.resources.PostgresResource;
 import uhh_lt.newsleak.types.DictTerm;
 import uhh_lt.newsleak.types.Metadata;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * A writer to populate the newsleak postgres database with final fulltexts and

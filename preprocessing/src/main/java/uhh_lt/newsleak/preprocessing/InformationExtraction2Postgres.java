@@ -40,7 +40,7 @@ import uhh_lt.newsleak.annotator.SegmenterICU;
 import uhh_lt.newsleak.reader.*;
 import uhh_lt.newsleak.resources.*;
 import uhh_lt.newsleak.util.Doc2VecUtil;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 import uhh_lt.newsleak.writer.Doc2VecWriter;
 import uhh_lt.newsleak.writer.ElasticsearchDocumentWriter;
 import uhh_lt.newsleak.writer.PostgresDbWriter;

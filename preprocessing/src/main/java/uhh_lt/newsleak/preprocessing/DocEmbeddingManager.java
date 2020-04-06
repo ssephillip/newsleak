@@ -9,7 +9,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.uima.util.Level;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 import java.io.BufferedReader;
 import java.io.File;

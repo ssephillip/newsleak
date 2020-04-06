@@ -25,7 +25,7 @@ import opennlp.tools.langdetect.LanguageDetectorME;
 import uhh_lt.newsleak.resources.LanguageDetectorResource;
 import uhh_lt.newsleak.resources.MetadataResource;
 import uhh_lt.newsleak.types.Metadata;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * Detects the language of a document based on the first 3000 characters of its

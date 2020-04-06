@@ -1,6 +1,6 @@
 package uhh_lt.newsleak.preprocessing;
 
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * Main class to create a new newsleak collection. It runs the information

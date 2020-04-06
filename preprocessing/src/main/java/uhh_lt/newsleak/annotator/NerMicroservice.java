@@ -38,7 +38,7 @@ import opennlp.uima.Person;
 import opennlp.uima.Sentence;
 import opennlp.uima.Token;
 import uhh_lt.newsleak.types.Paragraph;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * Annotator for Named Entity Recognition. The annotator queries a micro-service

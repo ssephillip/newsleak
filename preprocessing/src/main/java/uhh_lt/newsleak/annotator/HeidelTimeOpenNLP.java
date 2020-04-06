@@ -53,7 +53,7 @@ import opennlp.uima.Sentence;
 import de.unihd.dbs.uima.types.heideltime.Timex3;
 import opennlp.uima.Token;
 import uhh_lt.newsleak.types.Paragraph;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * HeidelTime finds temporal expressions and normalizes them according to the

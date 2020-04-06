@@ -26,7 +26,7 @@ import uhh_lt.newsleak.resources.HooverResource;
 import uhh_lt.newsleak.resources.MetadataResource;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.TpResource;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 import uhh_lt.newsleak.services.TransparenzSolrService;
 
 import java.io.IOException;

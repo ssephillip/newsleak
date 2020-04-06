@@ -10,7 +10,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import uhh_lt.newsleak.resources.Doc2VecWriterResource;
 import uhh_lt.newsleak.types.Metadata;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * A writer to write the document fulltexts toa textfile.

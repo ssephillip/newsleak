@@ -21,7 +21,7 @@ import com.ibm.icu.text.DateFormatSymbols;
 
 import opennlp.uima.Sentence;
 import opennlp.uima.Token;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * Annotator to remove implausible Sentences. The ICU4J sentence segmentation

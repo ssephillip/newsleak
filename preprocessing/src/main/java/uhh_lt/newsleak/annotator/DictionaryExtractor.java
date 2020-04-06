@@ -22,7 +22,7 @@ import opennlp.uima.Token;
 import uhh_lt.newsleak.resources.DictionaryResource;
 import uhh_lt.newsleak.resources.DictionaryResource.Dictionary;
 import uhh_lt.newsleak.types.DictTerm;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * A UIMA annotator to annotate regular expression patterns and dictionary

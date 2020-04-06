@@ -31,7 +31,7 @@ import org.apache.uima.fit.util.JCasUtil;
 import uhh_lt.newsleak.resources.ElasticsearchResource;
 import uhh_lt.newsleak.types.Metadata;
 import uhh_lt.newsleak.types.Paragraph;
-import uhh_lt.newsleak.util.StatsService;
+import uhh_lt.newsleak.services.StatsService;
 
 /**
  * A writer to populate a temporary elasticsearch index with fulltexts from a
