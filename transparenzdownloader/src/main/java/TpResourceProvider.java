@@ -32,6 +32,9 @@ public class TpResourceProvider {
     /** The number of files that shall be downloaded */
     int numOfFilesToDownload;
 
+    /** The number of files that have been downloaded since the last temp stats was printed */
+    int numOfDownloadsSinceLastTempStats;
+
     static TpResourceProvider tpResourceProvider;
 
 
@@ -80,6 +83,7 @@ public class TpResourceProvider {
         TpResource tpResource = null;
         if(tpResourceIterator.hasNext()){
             current++;
+            numOfDownloadsSinceLastTempStats++;
             tpResource = tpResourceIterator.next();
         }
 
@@ -118,5 +122,15 @@ public class TpResourceProvider {
 
     public int getNumOfFilesFailedToDownload(){
         return numOfFilesFailedToDownload;
+    }
+
+
+
+    public int getNumOfDownloadsSinceLastTempStats() {
+        return numOfDownloadsSinceLastTempStats;
+    }
+
+    public void setNumOfDownloadsSinceLastTempStats(int numOfDownloadsSinceLastTempStats) {
+        this.numOfDownloadsSinceLastTempStats = numOfDownloadsSinceLastTempStats;
     }
 }

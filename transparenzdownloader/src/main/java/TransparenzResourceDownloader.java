@@ -175,16 +175,15 @@ public class TransparenzResourceDownloader {
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
                 writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfFilesDownloaded(), tpResourceProvider.getNumOfFilesFailedToDownload(), formatsToDownload, pathToStats, numOfThreads);
                 break;
-            }else if(tpResourceProvider != null &&  tpResourceProvider.getCurrent()%500==0){ //TODO in resourceProvider ein feld einführen numOfDownloadsSinceLastStatsPrint, das dann hier abfragen und wenn größer als XXX rein gehen und zurücksetzen mit resetNumOf...
-                //TODO zwischen stats ausbauen wenn fertig, da zwischen stats funktion zu unstabil.
+            }else if(tpResourceProvider != null &&  tpResourceProvider.getNumOfDownloadsSinceLastTempStats() >= 1000){
                 Instant endTime = Instant.now();
                 long secondsElapsed = Duration.between(startTime, endTime).toMillis()/1000;
                 writeDownloadStatsToFile(secondsElapsed, tpResourceProvider.getNumOfFilesDownloaded(), tpResourceProvider.getNumOfFilesFailedToDownload(), formatsToDownload, pathToTempStats, numOfThreads);
-
+                tpResourceProvider.setNumOfDownloadsSinceLastTempStats(0);
             }
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
